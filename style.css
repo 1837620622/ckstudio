@@ -1396,10 +1396,48 @@ footer {
     
     .about-card {
         width: 100%;
+        text-align: center;
+    }
+    
+    .card-avatar {
+        margin: 0 auto 20px;
+    }
+    
+    .card-name {
+        justify-content: center;
     }
     
     .card-stats {
         gap: 15px;
+        justify-content: center;
+    }
+    
+    .card-links {
+        justify-content: center;
+    }
+    
+    .about-text {
+        text-align: center;
+    }
+    
+    .about-text h3 {
+        text-align: center;
+    }
+    
+    .about-text p {
+        text-align: center;
+    }
+    
+    .skills-box {
+        text-align: center;
+    }
+    
+    .skills-box h4 {
+        text-align: center;
+    }
+    
+    .skill-tags {
+        justify-content: center;
     }
     
     .contact-grid {
@@ -1409,10 +1447,20 @@ footer {
     
     .contact-card {
         padding: 25px;
+        text-align: center;
+    }
+    
+    .contact-icon {
+        margin: 0 auto 15px;
     }
     
     .contact-heading {
         font-size: 1.8rem;
+        text-align: center;
+    }
+    
+    .contact-intro {
+        text-align: center;
     }
     
     .cta-btn {
