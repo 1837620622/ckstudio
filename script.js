@@ -81,6 +81,14 @@ const projects = [
         code: "11",
         tags: ["游戏", "在线"],
         featured: true
+    },
+    { 
+        name: "黄金价格检测系统", 
+        desc: "AI量化分析黄金价格，实时行情监控，DeepSeek驱动", 
+        url: "https://gold.chuankangkk.top/", 
+        code: "12",
+        tags: ["金融", "AI", "量化"],
+        featured: true
     }
 ];
 
