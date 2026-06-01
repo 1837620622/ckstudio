@@ -10,7 +10,7 @@
     --font-main: 'Space Grotesk', -apple-system, sans-serif;
     --font-mono: 'JetBrains Mono', 'Courier New', monospace;
     
-    /* 🎨 黑白渐变配色 */
+    /* 黑白渐变配色 */
     --gradient-primary: linear-gradient(135deg, #ffffff 0%, #888888 100%);
     --gradient-secondary: linear-gradient(135deg, #ffffff 0%, #cccccc 50%, #888888 100%);
     --gradient-accent: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%);
@@ -57,20 +57,41 @@ body {
 /* ===== 鼠标跟随 ===== */
 .cursor-follower {
     position: fixed;
-    width: 20px;
-    height: 20px;
-    border: 1px solid rgba(255,255,255,0.5);
-    border-radius: 50%;
+    width: 24px;
+    height: 32px;
+    border: 0;
+    border-radius: 0;
     pointer-events: none;
     z-index: 9999;
-    transition: transform 0.15s ease, width 0.2s, height 0.2s;
-    transform: translate(-50%, -50%);
+    transform: translate(3px, 3px);
+    transition: transform 0.16s ease, filter 0.16s ease, opacity 0.16s ease;
+    filter: drop-shadow(0 10px 18px rgba(0,0,0,0.45));
+    will-change: left, top, transform;
+}
+
+.cursor-follower::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(145deg, #ffffff 0%, #d6dae1 52%, #8f949d 100%);
+    clip-path: polygon(0 0, 0 78%, 7px 70%, 12px 100%, 18px 98%, 13px 68%, 24px 68%);
+}
+
+.cursor-follower::after {
+    content: "";
+    position: absolute;
+    left: 1px;
+    top: 1px;
+    width: 22px;
+    height: 30px;
+    background: rgba(1,2,5,0.92);
+    clip-path: polygon(0 0, 0 78%, 7px 70%, 12px 100%, 18px 98%, 13px 68%, 24px 68%, 22px 64%, 11px 64%, 16px 94%, 13px 95%, 8px 64%, 2px 70%, 2px 6%);
+    opacity: 0.72;
 }
 
 .cursor-follower.hover {
-    width: 40px;
-    height: 40px;
-    background: rgba(255,255,255,0.1);
+    transform: translate(3px, 3px) scale(1.18);
+    filter: drop-shadow(0 14px 26px rgba(255,255,255,0.16));
 }
 
 a {
@@ -3974,5 +3995,124 @@ nav {
 @media (prefers-reduced-motion: reduce) {
     .category-header:hover .category-icon::after {
         animation: none;
+    }
+}
+
+/* ===== 纯画面启动页与真实指针覆盖 ===== */
+.loader-frame-line,
+.loader-shard {
+    fill: none;
+    stroke: rgba(255,255,255,0.36);
+    stroke-width: 1.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+}
+
+.loader-frame-line {
+    stroke: rgba(255,255,255,0.28);
+}
+
+.loader-shard {
+    stroke: rgba(255,255,255,0.46);
+    filter: drop-shadow(0 0 10px rgba(255,255,255,0.22));
+}
+
+.loader-hud {
+    width: min(360px, 86vw);
+    margin-top: 14px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    color: rgba(247,248,251,0.62);
+}
+
+.loader-brand,
+.loader-status {
+    display: none;
+}
+
+.loader-scene {
+    width: min(470px, 80vw);
+}
+
+.hero-desc {
+    color: rgba(247,248,251,0.82);
+}
+
+.hero-desc strong {
+    color: #ffffff;
+}
+
+.loader-core-frame {
+    fill: rgba(0, 0, 0, 0.78);
+}
+
+.loader-ck-text {
+    filter: drop-shadow(0 0 18px rgba(255,255,255,0.20));
+}
+
+.cursor-follower {
+    width: 24px;
+    height: 32px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    transform: translate(3px, 3px);
+    transition: transform 0.16s ease, filter 0.16s ease, opacity 0.16s ease;
+    filter: drop-shadow(0 10px 18px rgba(0,0,0,0.45));
+}
+
+.cursor-follower::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(145deg, #ffffff 0%, #d6dae1 52%, #8f949d 100%);
+    clip-path: polygon(0 0, 0 78%, 7px 70%, 12px 100%, 18px 98%, 13px 68%, 24px 68%);
+}
+
+.cursor-follower::after {
+    content: "";
+    position: absolute;
+    left: 1px;
+    top: 1px;
+    width: 22px;
+    height: 30px;
+    background: rgba(1,2,5,0.92);
+    clip-path: polygon(0 0, 0 78%, 7px 70%, 12px 100%, 18px 98%, 13px 68%, 24px 68%, 22px 64%, 11px 64%, 16px 94%, 13px 95%, 8px 64%, 2px 70%, 2px 6%);
+    opacity: 0.72;
+}
+
+.cursor-follower.hover {
+    width: 24px;
+    height: 32px;
+    background: transparent;
+    transform: translate(3px, 3px) scale(1.18);
+    filter: drop-shadow(0 14px 26px rgba(255,255,255,0.16));
+}
+
+@media (hover: none), (pointer: coarse) {
+    body {
+        cursor: auto;
+    }
+
+    .cursor-follower {
+        display: none;
+    }
+}
+
+@media (max-width: 860px) {
+    .loader-scene {
+        width: min(390px, 86vw);
+    }
+
+    .loader-hud {
+        font-size: 10px;
+        letter-spacing: 0.12em;
     }
 }
