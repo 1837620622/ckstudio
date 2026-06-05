@@ -270,6 +270,31 @@ const openSourceProjects = [
 const iconExternal = '<svg class="inline-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17L17 7M10 7h7v7"/></svg>';
 const iconArrowRight = '<svg class="inline-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
 
+function escapeHtml(value) {
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function safeExternalUrl(value) {
+    try {
+        const url = new URL(String(value), window.location.href);
+        if (url.protocol === 'http:' || url.protocol === 'https:' || url.protocol === 'mailto:') {
+            return url.href;
+        }
+    } catch (error) {
+        return '#';
+    }
+    return '#';
+}
+
+function renderTags(tags) {
+    return tags.map(tag => `<span>${escapeHtml(tag)}</span>`).join('');
+}
+
 // ===== 渲染项目卡片（支持分类） =====
 function renderProjects() {
     const gridContainer = document.getElementById('projectGrid');
@@ -300,25 +325,27 @@ function renderProjects() {
         categoryHeader.className = 'category-header';
         categoryHeader.innerHTML = `
             <span class="category-icon">${catInfo.icon}</span>
-            <span class="category-name">${catInfo.name}</span>
-            <span class="category-count">(${catProjects.length})</span>
+            <span class="category-name">${escapeHtml(catInfo.name)}</span>
+            <span class="category-count">(${escapeHtml(catProjects.length)})</span>
         `;
         gridContainer.appendChild(categoryHeader);
 
         // 渲染该分类下的项目
         catProjects.forEach(proj => {
             const card = document.createElement('a');
-            card.href = proj.url;
+            card.href = safeExternalUrl(proj.url);
             card.className = 'card' + (proj.featured ? ' card-featured' : '');
             card.target = '_blank';
+            card.rel = 'noopener noreferrer';
+            card.setAttribute('aria-label', `打开项目：${proj.name}`);
 
-            const tagsHtml = proj.tags.map(tag => `<span>${tag}</span>`).join('');
+            const tagsHtml = renderTags(proj.tags);
 
             card.innerHTML = `
                 <div class="card-top">
-                    <div class="card-number">// ${proj.code}</div>
-                    <div class="card-title">${proj.name}</div>
-                    <div class="card-desc">${proj.desc}</div>
+                    <div class="card-number">// ${escapeHtml(proj.code)}</div>
+                    <div class="card-title">${escapeHtml(proj.name)}</div>
+                    <div class="card-desc">${escapeHtml(proj.desc)}</div>
                     <div class="card-tags">${tagsHtml}</div>
                 </div>
                 <div class="card-bottom">
@@ -343,22 +370,22 @@ function renderOpenSourceProjects() {
         card.className = 'repo-card' + (project.featured ? ' repo-card-featured' : '');
         card.style.setProperty('--repo-delay', `${index * 0.05}s`);
 
-        const tagsHtml = project.tags.map(tag => `<span>${tag}</span>`).join('');
-        const demoLink = project.demo ? `<a href="${project.demo}" target="_blank" class="repo-action repo-demo">在线预览 ${iconExternal}</a>` : '';
+        const tagsHtml = renderTags(project.tags);
+        const demoLink = project.demo ? `<a href="${safeExternalUrl(project.demo)}" target="_blank" rel="noopener noreferrer" class="repo-action repo-demo">在线预览 ${iconExternal}</a>` : '';
 
         card.innerHTML = `
             <div class="repo-card-top">
                 <div class="repo-meta">
-                    <span class="repo-language">${project.language}</span>
-                    <span>${project.stars} stars</span>
-                    <span>${project.forks} forks</span>
+                    <span class="repo-language">${escapeHtml(project.language)}</span>
+                    <span>${escapeHtml(project.stars)} stars</span>
+                    <span>${escapeHtml(project.forks)} forks</span>
                 </div>
-                <h3>${project.name}</h3>
-                <p>${project.desc}</p>
+                <h3>${escapeHtml(project.name)}</h3>
+                <p>${escapeHtml(project.desc)}</p>
             </div>
             <div class="repo-tags">${tagsHtml}</div>
             <div class="repo-actions">
-                <a href="${project.repo}" target="_blank" class="repo-action repo-source">开源地址 ${iconExternal}</a>
+                <a href="${safeExternalUrl(project.repo)}" target="_blank" rel="noopener noreferrer" class="repo-action repo-source">开源地址 ${iconExternal}</a>
                 ${demoLink}
             </div>
         `;
@@ -672,19 +699,48 @@ function initMobileMenu() {
     const mobileMenu = document.getElementById('mobileMenu');
 
     if (menuToggle && mobileMenu) {
+        const setMenuOpen = isOpen => {
+            mobileMenu.classList.toggle('active', isOpen);
+            menuToggle.classList.toggle('active', isOpen);
+            menuToggle.setAttribute('aria-expanded', String(isOpen));
+            menuToggle.setAttribute('aria-label', isOpen ? '关闭菜单' : '打开菜单');
+            mobileMenu.setAttribute('aria-hidden', String(!isOpen));
+        };
+
         menuToggle.addEventListener('click', () => {
-            mobileMenu.classList.toggle('active');
-            menuToggle.classList.toggle('active');
+            setMenuOpen(!mobileMenu.classList.contains('active'));
         });
 
         // 点击链接关闭菜单
         mobileMenu.querySelectorAll('a').forEach(link => {
             link.addEventListener('click', () => {
-                mobileMenu.classList.remove('active');
-                menuToggle.classList.remove('active');
+                setMenuOpen(false);
             });
         });
+
+        document.addEventListener('keydown', event => {
+            if (event.key === 'Escape' && mobileMenu.classList.contains('active')) {
+                setMenuOpen(false);
+                menuToggle.focus();
+            }
+        });
     }
+}
+
+function initExternalLinks() {
+    document.querySelectorAll('a[target="_blank"]').forEach(link => {
+        link.rel = 'noopener noreferrer';
+    });
+}
+
+function initAvatarFallback() {
+    document.querySelectorAll('img[data-fallback]').forEach(img => {
+        img.addEventListener('error', () => {
+            img.classList.add('avatar-hidden');
+            const fallback = document.getElementById(img.dataset.fallback);
+            if (fallback) fallback.classList.add('visible');
+        }, { once: true });
+    });
 }
 
 // ===== 复制联系方式 =====
@@ -820,7 +876,7 @@ function initScrollReveal() {
     document.querySelectorAll('.card, .repo-card').forEach((card, index) => {
         card.style.opacity = '0';
         card.style.transform = 'translateY(30px)';
-        card.style.transition = `all 0.6s ease ${index * 0.05}s`;
+        card.style.transition = `opacity 0.6s ease ${index * 0.05}s, transform 0.6s ease ${index * 0.05}s`;
         observer.observe(card);
     });
 
@@ -828,7 +884,7 @@ function initScrollReveal() {
     document.querySelectorAll('.about-content, .contact-content, .opensource-intro').forEach(el => {
         el.style.opacity = '0';
         el.style.transform = 'translateY(30px)';
-        el.style.transition = 'all 0.8s ease';
+        el.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
         observer.observe(el);
     });
 }
@@ -848,6 +904,8 @@ function initVisibilityChange() {
 document.addEventListener('DOMContentLoaded', () => {
     renderProjects();
     renderOpenSourceProjects();
+    initExternalLinks();
+    initAvatarFallback();
     initLoader();
     initGsapMotion();
     initMobileMenu();

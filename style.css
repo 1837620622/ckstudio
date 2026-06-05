@@ -272,13 +272,18 @@ nav {
     gap: 6px;
     cursor: pointer;
     padding: 10px;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    appearance: none;
+    -webkit-appearance: none;
 }
 
 .menu-toggle span {
     width: 24px;
     height: 2px;
     background: #fff;
-    transition: all 0.3s;
+    transition: transform 0.3s, opacity 0.3s;
 }
 
 /* ===== 移动端菜单 ===== */
@@ -602,7 +607,7 @@ h1 .line.bold {
     font-weight: 600;
     font-size: 14px;
     letter-spacing: 1px;
-    transition: all 0.3s;
+    transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
 }
 
 .btn-primary:hover {
@@ -627,7 +632,7 @@ h1 .line.bold {
     border: 1px solid rgba(255,255,255,0.3);
     font-size: 14px;
     letter-spacing: 1px;
-    transition: all 0.3s;
+    transition: background 0.3s, border-color 0.3s, transform 0.3s;
 }
 
 .btn-secondary:hover {
@@ -822,7 +827,7 @@ h1 .line.bold {
     letter-spacing: 2px;
     padding: 15px 30px;
     border: 1px solid var(--border-color);
-    transition: all 0.3s;
+    transition: border-color 0.3s, color 0.3s, transform 0.3s;
 }
 
 .more-link:hover {
@@ -899,7 +904,7 @@ h1 .line.bold {
     justify-content: space-between;
     position: relative;
     overflow: hidden;
-    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), border-color 0.4s, background 0.4s, box-shadow 0.4s;
     cursor: pointer;
 }
 
@@ -978,7 +983,7 @@ h1 .line.bold {
     font-size: 20px;
     opacity: 0;
     transform: translateX(-10px);
-    transition: all 0.3s;
+    transition: opacity 0.3s, transform 0.3s;
 }
 
 .card:hover .card-arrow {
@@ -1122,7 +1127,7 @@ h1 .line.bold {
     border: 1px solid var(--border-color);
     font-family: var(--font-mono);
     font-size: 12px;
-    transition: all 0.3s;
+    transition: background 0.3s, color 0.3s, border-color 0.3s, transform 0.3s;
 }
 
 .card-link:hover {
@@ -1182,7 +1187,7 @@ h1 .line.bold {
     padding: 10px 18px;
     border: 1px solid var(--border-color);
     border-radius: 30px;
-    transition: all 0.3s;
+    transition: background 0.3s, color 0.3s, border-color 0.3s, transform 0.3s;
     cursor: default;
 }
 
@@ -1232,7 +1237,7 @@ h1 .line.bold {
     border: 1px solid var(--border-color);
     padding: 30px;
     text-align: center;
-    transition: all 0.3s;
+    transition: transform 0.3s, border-color 0.3s, background 0.3s, box-shadow 0.3s;
     cursor: pointer;
     position: relative;
     overflow: hidden;
@@ -1295,7 +1300,7 @@ h1 .line.bold {
     opacity: 0;
     display: flex;
     transform: translateY(5px);
-    transition: all 0.3s;
+    transition: opacity 0.3s, transform 0.3s, color 0.3s;
 }
 
 .contact-card:hover .contact-hint {
@@ -1316,7 +1321,7 @@ h1 .line.bold {
     letter-spacing: 2px;
     padding: 20px 50px;
     border: 1px solid var(--accent);
-    transition: all 0.3s;
+    transition: background 0.3s, color 0.3s, transform 0.3s;
 }
 
 .cta-btn:hover {
@@ -1864,11 +1869,19 @@ img.card-avatar {
     color: #000;
     font-size: 28px;
     font-weight: 700;
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
     border-radius: 16px;
     box-shadow: 0 8px 24px rgba(255, 255, 255, 0.15);
+}
+
+.card-avatar-fallback.visible {
+    display: flex;
+}
+
+img.card-avatar.avatar-hidden {
+    display: none;
 }
 
 @media (max-width: 768px) {
@@ -1962,7 +1975,7 @@ img.card-avatar {
     font-size: 28px;
     margin-bottom: 15px;
     color: rgba(255, 255, 255, 0.6);
-    transition: all 0.3s ease;
+    transition: color 0.3s ease, transform 0.3s ease;
 }
 
 .contact-icon svg {
@@ -2119,7 +2132,7 @@ img.card-avatar {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.15);
     color: rgba(255, 255, 255, 0.7);
-    transition: all 0.3s ease;
+    transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
 
 .card:hover .card-tags span {
@@ -2321,7 +2334,7 @@ footer {
 .footer-nav-group a {
     font-size: 14px;
     color: rgba(255, 255, 255, 0.7);
-    transition: all 0.3s ease;
+    transition: color 0.3s ease, transform 0.3s ease;
     position: relative;
 }
 
@@ -2380,7 +2393,7 @@ footer {
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 10px;
     color: rgba(255, 255, 255, 0.6);
-    transition: all 0.3s ease;
+    transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
 }
 
 .social-icon:hover {
@@ -4240,6 +4253,17 @@ nav {
     -webkit-backdrop-filter: none;
 }
 
+.mobile-menu {
+    background:
+        radial-gradient(circle at 22% 18%, rgba(255,255,255,0.055), transparent 30%),
+        radial-gradient(circle at 78% 82%, rgba(255,255,255,0.032), transparent 28%),
+        #000000;
+}
+
+.mobile-menu a {
+    color: #f7f8fb;
+}
+
 .card,
 .repo-card,
 .about-card,
@@ -4255,6 +4279,15 @@ nav {
         background 0.22s ease,
         box-shadow 0.22s ease,
         opacity 0.22s ease;
+}
+
+.works-section,
+.opensource-section,
+.about-section,
+.contact-section,
+footer {
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 720px;
 }
 
 .card:hover,
