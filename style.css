@@ -39,7 +39,8 @@ body {
     font-family: var(--font-main);
     line-height: 1.6;
     overflow-x: hidden;
-    cursor: none;
+    /* 修复：恢复系统光标（原来 cursor: none 会让鼠标消失） */
+    cursor: default;
 }
 
 /* ===== 背景网格 ===== */
@@ -4387,3 +4388,167 @@ footer {
         transform: none;
     }
 }
+
+
+/* ---------------------------------------------------------------
+ * 16. Three.js 3D 场景（全屏 fixed 背景，跨 section 渐进式动画）
+ * --------------------------------------------------------------- */
+#scene-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+    pointer-events: none;
+    display: block;
+    background: #02060d;
+}
+
+/* 取消旧的 hero 区域覆盖样式（canvas 已移到 body 顶层） */
+#home {
+    position: relative;
+}
+
+#home > .hero-content,
+#home > .scroll-hint {
+    position: relative;
+    z-index: 2;
+}
+
+/* 关键：让所有 section 及其内容都在 canvas 之上（注意不要覆盖 .mobile-menu 的 position: fixed） */
+header,
+section,
+footer,
+nav {
+    position: relative;
+    z-index: 1;
+}
+
+/* 各 section 透明背景，让 canvas 透出 */
+header#home,
+.works-section,
+.opensource-section,
+.about-section,
+.contact-section {
+    background: transparent;
+}
+
+/* ---------------------------------------------------------------
+ * 17. 加载页（自主创新：节奏点阵 + 大数字 + 进度条）
+ * --------------------------------------------------------------- */
+.loader-stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+    width: min(420px, 86vw);
+    position: relative;
+}
+
+/* 顶部节奏点阵（10 个圆点依次亮起） */
+.loader-dots {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    height: 18px;
+}
+.loader-dots span {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.18);
+    transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+.loader-dots span.is-on {
+    background: #22d3ee;
+    transform: scale(1.4);
+    box-shadow: 0 0 14px rgba(34, 211, 238, 0.85);
+}
+
+/* 中央大数字 */
+.loader-counter {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 4px;
+    line-height: 0.9;
+}
+.loader-num {
+    font-family: 'JetBrains Mono', 'Space Mono', ui-monospace, monospace;
+    font-size: clamp(96px, 16vw, 156px);
+    font-weight: 500;
+    font-style: normal;
+    color: #f5f7fa;
+    letter-spacing: -0.05em;
+    background: linear-gradient(180deg, #ffffff 0%, #22d3ee 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    /* 固定宽度槽位避免数字递增时抖动 */
+    display: inline-block;
+    width: 1.65em;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+.loader-unit {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(36px, 6vw, 56px);
+    font-weight: 300;
+    color: rgba(34, 211, 238, 0.55);
+    font-style: normal;
+    padding-bottom: 0.18em;
+}
+
+/* 副标 + 进度条 */
+.loader-meta {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+}
+.loader-meta-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.32em;
+    color: rgba(245, 247, 250, 0.6);
+}
+.loader-meta-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #22d3ee;
+    box-shadow: 0 0 10px rgba(34, 211, 238, 0.9);
+    animation: loaderDotPulse 1.2s ease-in-out infinite;
+}
+@keyframes loaderDotPulse {
+    0%, 100% { opacity: 0.4; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.2); }
+}
+.progress-bar {
+    width: min(360px, 78vw);
+    height: 1px;
+    background: rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+    position: relative;
+}
+.progress-fill {
+    position: absolute;
+    inset: 0;
+    width: 0;
+    background: linear-gradient(90deg, #22d3ee 0%, #fbbf24 100%);
+    transition: width 0.18s ease-out;
+    box-shadow: 0 0 12px rgba(34, 211, 238, 0.5);
+}
+.loader-meta-hint {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.42em;
+    color: rgba(245, 247, 250, 0.32);
+}
+

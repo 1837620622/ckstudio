@@ -1,0 +1,12 @@
+# 备份与临时文件（不同步到 GitHub）
+备份文件/
+style.css.bak.original
+
+# 部署/同步工具的本地缓存
+.wrangler/
+.playwright-mcp/
+
+# 截图与历史存档
+预览截图/
+activetheory-reference-home.png
+ckstudio-*.png

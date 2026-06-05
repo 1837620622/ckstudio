@@ -397,18 +397,18 @@ function renderOpenSourceProjects() {
 let scrollRevealStarted = false;
 
 function startScrollRevealOnce() {
-    if (scrollRevealStarted) return;
-    scrollRevealStarted = true;
-    window.setTimeout(initScrollReveal, 180);
+    // 已迁移至 initReveal（基于 reveal class）
 }
 
-// ===== 加载动画控制 =====
+// ===== 加载动画控制（自主创新版） =====
 function initLoader() {
     const loader = document.getElementById('loader');
-    const percent = document.querySelector('.loader-percent');
+    const numEl = loader ? loader.querySelector('.loader-num') : null;
+    const fillEl = loader ? loader.querySelector('.progress-fill') : null;
+    const dots = loader ? Array.from(loader.querySelectorAll('.loader-dots span')) : [];
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const startTime = performance.now();
-    const minDuration = reduceMotion ? 1200 : 5000;
+    const minDuration = reduceMotion ? 1200 : 3200;
     let completed = false;
     let windowLoaded = document.readyState === 'complete';
 
@@ -420,6 +420,7 @@ function initLoader() {
         if (completed) return;
         completed = true;
         if (loader) loader.classList.add('hidden');
+        document.body.classList.remove('is-loading');
         animateHero();
         animateNumbers();
         startScrollRevealOnce();
@@ -437,84 +438,35 @@ function initLoader() {
         return;
     }
 
-    if (percent) percent.textContent = '0%';
+    // 进度驱动：RAF 平滑递进
+    const totalSteps = Math.max(1, Math.floor(minDuration / 16));
+    let stepIndex = 0;
+    const tick = () => {
+        if (completed) return;
+        stepIndex++;
+        const p = Math.min(stepIndex / totalSteps, 1);
+        // 缓动（先快后慢）
+        const eased = 1 - Math.pow(1 - p, 2.4);
+        const value = Math.floor(eased * 100);
 
-    if (window.gsap && !reduceMotion) {
-        window.setTimeout(requestFinish, 6500);
-        const progressState = { value: 0 };
-        const drawTargets = loader.querySelectorAll('.loader-draw, .loader-ring');
+        if (numEl) numEl.textContent = value;
+        if (fillEl) fillEl.style.width = `${value}%`;
 
-        drawTargets.forEach(target => {
-            const length = typeof target.getTotalLength === 'function' ? target.getTotalLength() : 680;
-            gsap.set(target, {
-                strokeDasharray: length,
-                strokeDashoffset: length
-            });
+        // 顶部点阵：根据进度点亮对应数量
+        const activeCount = Math.floor((value / 100) * dots.length);
+        dots.forEach((dot, i) => {
+            dot.classList.toggle('is-on', i < activeCount);
         });
 
-        gsap.set('.loader-starfield circle', { autoAlpha: 0, scale: 0.6, transformOrigin: '50% 50%' });
-        gsap.set('.loader-frame-line, .loader-shard', { autoAlpha: 0 });
-        gsap.set('.loader-core-frame, .loader-core-grid, .loader-ck-text, .loader-halo', { autoAlpha: 0, scale: 0.92, transformOrigin: '50% 50%' });
-        gsap.set('.loader-scan', { autoAlpha: 0, x: -44 });
-        gsap.set('.loader-hud', { autoAlpha: 0, y: 16 });
-        gsap.set('.progress-fill', { scaleX: 0, transformOrigin: 'left center' });
-
-        const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
-        tl.to(progressState, {
-            value: 100,
-            duration: 4.45,
-            ease: 'power2.inOut',
-            onUpdate: () => {
-                if (percent) percent.textContent = `${Math.round(progressState.value)}%`;
-            }
-        }, 0)
-            .to('.progress-fill', { scaleX: 1, duration: 4.45, ease: 'power2.inOut' }, 0)
-            .to('.loader-starfield circle', {
-                autoAlpha: 1,
-                scale: 1,
-                duration: 0.9,
-                stagger: { each: 0.035, from: 'random' }
-            }, 0.05)
-            .to(drawTargets, {
-                strokeDashoffset: 0,
-                duration: 2.0,
-                stagger: { each: 0.055, from: 'center' }
-            }, 0.22)
-            .to('.loader-frame-line, .loader-shard', {
-                autoAlpha: 1,
-                duration: 0.7,
-                stagger: { each: 0.05, from: 'center' }
-            }, 0.62)
-            .to('.loader-halo', { autoAlpha: 1, scale: 1, duration: 0.9 }, 0.82)
-            .to('.loader-core-frame, .loader-core-grid', {
-                autoAlpha: 1,
-                scale: 1,
-                duration: 1.0,
-                stagger: 0.08
-            }, 1.05)
-            .to('.loader-ck-text', { autoAlpha: 1, scale: 1, duration: 0.76, ease: 'back.out(1.35)' }, 1.52)
-            .to('.loader-scan', { autoAlpha: 1, x: 44, duration: 1.2, ease: 'power2.inOut' }, 1.75)
-            .to('.loader-hud', { autoAlpha: 1, y: 0, duration: 0.62 }, 2.05)
-            .to('.loader-ring-a', { rotation: 42, transformOrigin: '50% 50%', duration: 2.25 }, 2.0)
-            .to('.loader-ring-b', { rotation: -48, transformOrigin: '50% 50%', duration: 2.25 }, 2.0)
-            .to('.loader-ring-c', { rotation: 34, transformOrigin: '50% 50%', duration: 2.25 }, 2.0)
-            .to('.loader-scene', { scale: 1.045, duration: 1.15, ease: 'power2.inOut' }, 3.42)
-            .to(loader, { autoAlpha: 0, duration: 0.62, ease: 'power2.inOut' }, 4.72)
-            .call(requestFinish);
-        return;
-    }
-
-    let progress = 0;
-    const interval = setInterval(() => {
-        progress += 8;
-        if (progress > 100) progress = 100;
-        if (percent) percent.textContent = `${progress}%`;
-
-        if (progress >= 100) {
-            clearInterval(interval);
+        if (p < 1) {
+            requestAnimationFrame(tick);
+        } else {
+            // 收尾：让最后一个点短暂亮起再结束
+            dots.forEach(d => d.classList.add('is-on'));
             requestFinish();
         }
-    }, 48);
+    };
+    requestAnimationFrame(tick);
 }
 
 // ===== 数字递增动画 =====
@@ -571,126 +523,9 @@ function animateHero() {
     });
 }
 
-// ===== GSAP 装饰动效 =====
+// ===== 装饰动效（已迁移至 three-scene.js） =====
 function initGsapMotion() {
-    if (!window.gsap) return;
-
-    const mm = gsap.matchMedia();
-    mm.add(
-        {
-            canMove: '(prefers-reduced-motion: no-preference)',
-            isDesktop: '(min-width: 861px)',
-            finePointer: '(hover: hover) and (pointer: fine)'
-        },
-        context => {
-            const { canMove, isDesktop, finePointer } = context.conditions;
-            if (!canMove) {
-                gsap.set('.bg-letter, .orbit-ring, .ck-backdrop-svg *', { clearProps: 'all' });
-                return;
-            }
-
-            gsap.set('.ck-vector-lines path, .ck-scan-bars path, .ck-data-arcs path', {
-                strokeDasharray: '18 24'
-            });
-            gsap.set('.ck-starfield circle', {
-                autoAlpha: isDesktop ? 0.5 : 0.28,
-                scale: 1,
-                transformOrigin: '50% 50%'
-            });
-            gsap.set('.ck-nodes circle, .orbit-nodes circle', {
-                autoAlpha: isDesktop ? 0.74 : 0.42,
-                scale: 1,
-                transformOrigin: '50% 50%'
-            });
-
-            if (!isDesktop) {
-                gsap.to('.ck-backdrop-svg', { autoAlpha: 0.42, duration: 0.8, ease: 'power2.out' });
-                gsap.to('.bg-letter', {
-                    autoAlpha: 0.24,
-                    y: 0,
-                    scale: 1,
-                    duration: 0.8,
-                    ease: 'power2.out'
-                });
-                return;
-            }
-
-            gsap.timeline({ repeat: -1, yoyo: true, defaults: { duration: 7.5, ease: 'sine.inOut' } })
-                .to('.bg-letter:first-child', { y: -10, rotationY: -5 }, 0)
-                .to('.bg-letter:nth-child(2)', { y: 10, rotationY: 5 }, 0)
-                .to('.hero-bg-text', { scale: 1.025 }, 0);
-
-            gsap.to('.ck-orbit-lines ellipse', {
-                rotation: index => (index % 2 === 0 ? 360 : -360),
-                transformOrigin: '50% 50%',
-                duration: index => 72 + index * 16,
-                repeat: -1,
-                ease: 'none'
-            });
-
-            gsap.to('.ck-vector-lines path, .ck-scan-bars path', {
-                strokeDashoffset: '-=160',
-                duration: index => 16 + index * 0.8,
-                repeat: -1,
-                ease: 'none',
-                stagger: { amount: 0.7, from: 'center' }
-            });
-
-            gsap.to('.ck-data-arcs path', {
-                autoAlpha: 0.24,
-                duration: 5.8,
-                repeat: -1,
-                yoyo: true,
-                ease: 'sine.inOut',
-                stagger: { amount: 1.2, from: 'edges' }
-            });
-
-            gsap.to('.ck-starfield circle', {
-                autoAlpha: 0.18,
-                scale: 1.28,
-                transformOrigin: '50% 50%',
-                duration: 4.4,
-                repeat: -1,
-                yoyo: true,
-                ease: 'sine.inOut',
-                stagger: { amount: 1.8, from: 'random' }
-            });
-
-            gsap.to('.ck-nodes circle', {
-                scale: 1.18,
-                autoAlpha: 0.42,
-                transformOrigin: '50% 50%',
-                repeat: -1,
-                yoyo: true,
-                duration: 3.8,
-                stagger: { amount: 1.0, from: 'random' },
-                ease: 'sine.inOut'
-            });
-
-            gsap.to('.orbit-ring-1', { rotation: 360, transformOrigin: '50% 50%', duration: 82, repeat: -1, ease: 'none' });
-            gsap.to('.orbit-ring-2', { rotation: -360, transformOrigin: '50% 50%', duration: 96, repeat: -1, ease: 'none' });
-            gsap.to('.orbit-ring-3', { rotation: 360, transformOrigin: '50% 50%', duration: 112, repeat: -1, ease: 'none' });
-
-            if (finePointer) {
-                gsap.to('.repo-panel', { y: -6, duration: 4.8, repeat: -1, yoyo: true, ease: 'sine.inOut' });
-            }
-            gsap.to('.brand-scan', {
-                x: 18,
-                autoAlpha: 0.34,
-                duration: 4.6,
-                repeat: -1,
-                yoyo: true,
-                ease: 'sine.inOut'
-            });
-            gsap.to('.logo-mark', {
-                y: -1,
-                duration: 5.2,
-                repeat: -1,
-                yoyo: true,
-                ease: 'sine.inOut'
-            });
-        }
-    );
+    // 原 GSAP 装饰动效已由 WebGL 3D 场景接管，此函数保留为空占位
 }
 
 // ===== 移动端菜单 =====
@@ -769,71 +604,7 @@ function initCopyContact() {
 
 // ===== 鼠标跟随 =====
 function initCursor() {
-    const cursor = document.querySelector('.cursor-follower');
-    if (!cursor) return;
-
-    const canUseCustomCursor = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-    if (!canUseCustomCursor) {
-        cursor.style.display = 'none';
-        document.body.style.cursor = 'auto';
-        return;
-    }
-
-    document.body.style.cursor = 'none';
-
-    let latestX = window.innerWidth / 2;
-    let latestY = window.innerHeight / 2;
-    let cssVarFrame = 0;
-    let fallbackFrame = 0;
-    let hoverScale = 1;
-
-    const syncSpotlight = () => {
-        document.documentElement.style.setProperty('--cursor-x', `${latestX}px`);
-        document.documentElement.style.setProperty('--cursor-y', `${latestY}px`);
-        cssVarFrame = 0;
-    };
-
-    const moveFallback = () => {
-        cursor.style.transform = `translate3d(${latestX}px, ${latestY}px, 0) scale(${hoverScale})`;
-        fallbackFrame = 0;
-    };
-
-    let moveX = value => {
-        latestX = value;
-        if (!fallbackFrame) fallbackFrame = requestAnimationFrame(moveFallback);
-    };
-    let moveY = value => {
-        latestY = value;
-        if (!fallbackFrame) fallbackFrame = requestAnimationFrame(moveFallback);
-    };
-
-    if (window.gsap) {
-        gsap.set(cursor, { x: latestX, y: latestY, scale: 1 });
-        moveX = gsap.quickTo(cursor, 'x', { duration: 0.14, ease: 'power3.out' });
-        moveY = gsap.quickTo(cursor, 'y', { duration: 0.14, ease: 'power3.out' });
-    }
-
-    document.addEventListener('mousemove', (e) => {
-        latestX = e.clientX;
-        latestY = e.clientY;
-        moveX(e.clientX);
-        moveY(e.clientY);
-        if (!cssVarFrame) cssVarFrame = requestAnimationFrame(syncSpotlight);
-    }, { passive: true });
-
-    // 悬停效果
-    document.querySelectorAll('a, button, .card, .repo-card, .contact-card, .skill-tag, .github-source-link').forEach(el => {
-        el.addEventListener('mouseenter', () => {
-            cursor.classList.add('hover');
-            hoverScale = 1.14;
-            if (window.gsap) gsap.to(cursor, { scale: 1.14, duration: 0.16, ease: 'power2.out', overwrite: 'auto' });
-        });
-        el.addEventListener('mouseleave', () => {
-            cursor.classList.remove('hover');
-            hoverScale = 1;
-            if (window.gsap) gsap.to(cursor, { scale: 1, duration: 0.16, ease: 'power2.out', overwrite: 'auto' });
-        });
-    });
+    // 已移除自定义光标（Active Theory 风格不需要）
 }
 
 // ===== 平滑滚动 =====
@@ -858,35 +629,120 @@ function initSmoothScroll() {
 
 // ===== 滚动显示动画 =====
 function initScrollReveal() {
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
+    // 已迁移至 initReveal（基于 reveal class）
+}
+
+// ===== 页面可见性 =====
+function initVisibilityChange() {
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            document.title = '快回来看看 | CK Studio';
+        } else {
+            document.title = '传康KK Studio | Creative Developer';
+        }
+    });
+}
+
+// =====================================================================
+// Active Theory 风格新增功能
+// =====================================================================
+
+// ===== Three.js 3D 场景初始化 =====
+function initThreeScene() {
+    if (window.CKScene && typeof window.CKScene.init === 'function') {
+        window.CKScene.init();
+    }
+}
+
+// ===== 滚动时导航栏变实底 =====
+function initScrollNav() {
+    const nav = document.querySelector('nav');
+    if (!nav) return;
+
+    let ticking = false;
+    const update = () => {
+        if (window.scrollY > 60) {
+            nav.classList.add('is-stuck');
+        } else {
+            nav.classList.remove('is-stuck');
+        }
+        ticking = false;
     };
+
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            requestAnimationFrame(update);
+            ticking = true;
+        }
+    }, { passive: true });
+    update();
+}
+
+// ===== 滚动入场动画（IntersectionObserver） =====
+function initReveal() {
+    if (!('IntersectionObserver' in window)) return;
+
+    const targets = document.querySelectorAll(
+        '.section-header, .works-intro, .opensource-intro, .work-card, ' +
+        '.repo-row, .about-content, .about-card, .about-right, ' +
+        '.contact-hero, .contact-grid, .contact-cta'
+    );
+    if (targets.length === 0) return;
+
+    targets.forEach((el, i) => {
+        el.classList.add('reveal');
+        el.style.transitionDelay = `${Math.min(i % 6, 5) * 60}ms`;
+    });
 
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
+                entry.target.classList.add('is-visible');
+                observer.unobserve(entry.target);
             }
         });
-    }, observerOptions);
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
 
-    // 观察项目卡片
-    document.querySelectorAll('.card, .repo-card').forEach((card, index) => {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(30px)';
-        card.style.transition = `opacity 0.6s ease ${index * 0.05}s, transform 0.6s ease ${index * 0.05}s`;
-        observer.observe(card);
-    });
+    targets.forEach(el => observer.observe(el));
+}
 
-    // 观察区块
-    document.querySelectorAll('.about-content, .contact-content, .opensource-intro').forEach(el => {
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(30px)';
-        el.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
-        observer.observe(el);
-    });
+// ===== 数字滚动计数（用于卡片统计） =====
+function initCountUp() {
+    const nums = document.querySelectorAll('[data-count]');
+    if (nums.length === 0) return;
+
+    const animateNum = (el) => {
+        const target = parseFloat(el.getAttribute('data-count')) || 0;
+        const duration = 1400;
+        const start = performance.now();
+        const isFloat = target % 1 !== 0;
+
+        const tick = (now) => {
+            const t = Math.min((now - start) / duration, 1);
+            const eased = 1 - Math.pow(1 - t, 3);
+            const value = target * eased;
+            el.textContent = isFloat ? value.toFixed(1) : Math.floor(value);
+            if (t < 1) requestAnimationFrame(tick);
+            else el.textContent = isFloat ? target.toFixed(1) : target;
+        };
+        requestAnimationFrame(tick);
+    };
+
+    if (!('IntersectionObserver' in window)) {
+        nums.forEach(animateNum);
+        return;
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                animateNum(entry.target);
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.5 });
+
+    nums.forEach(n => observer.observe(n));
 }
 
 // ===== 页面可见性 =====
@@ -907,11 +763,15 @@ document.addEventListener('DOMContentLoaded', () => {
     initExternalLinks();
     initAvatarFallback();
     initLoader();
-    initGsapMotion();
     initMobileMenu();
     initCopyContact();
     initSmoothScroll();
-    initCursor();
+
+    // Active Theory 风格新增
+    initThreeScene();
+    initScrollNav();
+    initReveal();
+    initCountUp();
 
     initVisibilityChange();
 

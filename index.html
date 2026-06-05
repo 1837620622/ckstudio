@@ -10,90 +10,33 @@
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
     <link rel="stylesheet" href="style.css?v=ck-secure-perf">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js" defer></script>
 </head>
 <body>
 
-    <!-- ===== 极光背景效果 ===== -->
-    <div class="aurora-bg">
-        <div class="aurora-layer aurora-1"></div>
-        <div class="aurora-layer aurora-2"></div>
-        <div class="aurora-layer aurora-3"></div>
-        <div class="aurora-layer aurora-4"></div>
-    </div>
-
-    <!-- ===== 背景网格 ===== -->
-    <div class="grid-bg"></div>
-    
-    <!-- ===== 鼠标跟随 ===== -->
-    <div class="cursor-follower"></div>
-
-    <!-- ===== 加载动画 ===== -->
-    <div id="loader">
+    <!-- ===== 加载动画（自主创新：节奏点阵 + 大数字） ===== -->
+    <div id="loader" aria-hidden="true">
         <div class="loader-stage">
-            <svg class="loader-scene" viewBox="0 0 720 720" aria-hidden="true">
-                <defs>
-                    <linearGradient id="loaderMetal" x1="14%" y1="0%" x2="86%" y2="100%">
-                        <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
-                        <stop offset="38%" stop-color="#7e858f" stop-opacity="0.52"/>
-                        <stop offset="64%" stop-color="#ffffff" stop-opacity="0.86"/>
-                        <stop offset="100%" stop-color="#2e343d" stop-opacity="0.34"/>
-                    </linearGradient>
-                    <radialGradient id="loaderGlow" cx="50%" cy="50%" r="50%">
-                        <stop offset="0%" stop-color="#ffffff" stop-opacity="0.36"/>
-                        <stop offset="54%" stop-color="#ffffff" stop-opacity="0.08"/>
-                        <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
-                    </radialGradient>
-                </defs>
-                <rect class="loader-space" x="0" y="0" width="720" height="720"/>
-                <g class="loader-starfield">
-                    <circle cx="72" cy="104" r="1.4"/><circle cx="148" cy="198" r="1"/><circle cx="232" cy="92" r="1.7"/>
-                    <circle cx="606" cy="126" r="1.2"/><circle cx="652" cy="258" r="1.6"/><circle cx="520" cy="72" r="1"/>
-                    <circle cx="92" cy="512" r="1.7"/><circle cx="182" cy="628" r="1.1"/><circle cx="318" cy="652" r="1.5"/>
-                    <circle cx="548" cy="606" r="1.8"/><circle cx="646" cy="492" r="1.2"/><circle cx="424" cy="84" r="1.3"/>
-                </g>
-                <g class="loader-frame-lines">
-                    <path class="loader-draw loader-frame-line" d="M128 156H226M128 156V254"/>
-                    <path class="loader-draw loader-frame-line" d="M592 156H494M592 156V254"/>
-                    <path class="loader-draw loader-frame-line" d="M128 564H226M128 564V466"/>
-                    <path class="loader-draw loader-frame-line" d="M592 564H494M592 564V466"/>
-                </g>
-                <g class="loader-shards">
-                    <path class="loader-draw loader-shard" d="M188 304L242 282"/>
-                    <path class="loader-draw loader-shard" d="M214 430L268 456"/>
-                    <path class="loader-draw loader-shard" d="M506 282L558 302"/>
-                    <path class="loader-draw loader-shard" d="M486 458L548 426"/>
-                    <path class="loader-draw loader-shard" d="M326 166L360 206L394 166"/>
-                    <path class="loader-draw loader-shard" d="M326 554L360 514L394 554"/>
-                </g>
-                <g class="loader-circuit">
-                    <path class="loader-draw" d="M78 360H202L258 304H310"/>
-                    <path class="loader-draw" d="M642 360H518L462 416H410"/>
-                    <path class="loader-draw" d="M360 78V202L414 256V310"/>
-                    <path class="loader-draw" d="M360 642V518L306 464V410"/>
-                    <path class="loader-draw" d="M126 184L252 252"/>
-                    <path class="loader-draw" d="M594 536L468 468"/>
-                    <path class="loader-draw" d="M128 536L252 468"/>
-                    <path class="loader-draw" d="M592 184L468 252"/>
-                </g>
-                <g class="loader-orbits">
-                    <ellipse class="loader-ring loader-ring-a" cx="360" cy="360" rx="248" ry="72"/>
-                    <ellipse class="loader-ring loader-ring-b" cx="360" cy="360" rx="220" ry="126" transform="rotate(27 360 360)"/>
-                    <ellipse class="loader-ring loader-ring-c" cx="360" cy="360" rx="168" ry="208" transform="rotate(-33 360 360)"/>
-                </g>
-                <g class="loader-core">
-                    <circle class="loader-halo" cx="360" cy="360" r="156"/>
-                    <rect class="loader-core-frame" x="236" y="236" width="248" height="248" rx="44"/>
-                    <path class="loader-core-grid" d="M236 302H484M236 418H484M302 236V484M418 236V484"/>
-                    <path class="loader-scan" d="M250 270H470"/>
-                    <text class="loader-ck-text" x="360" y="388" text-anchor="middle">CK</text>
-                </g>
-            </svg>
-            <div class="loader-hud">
-                <span>LNG // PRELOAD</span>
-                <span class="loader-percent">0%</span>
+            <!-- 顶部节奏点阵（10 个圆点依次亮起） -->
+            <div class="loader-dots" aria-hidden="true">
+                <span></span><span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span><span></span>
             </div>
-            <div class="progress-bar">
-                <div class="progress-fill"></div>
+
+            <!-- 中央大数字（斜体等宽风格，视觉中心） -->
+            <div class="loader-counter" aria-live="polite">
+                <span class="loader-num" data-target="100">0</span>
+                <span class="loader-unit">%</span>
+            </div>
+
+            <!-- 副标 + 进度条 -->
+            <div class="loader-meta">
+                <div class="loader-meta-label">
+                    <span class="loader-meta-dot"></span>
+                    <span>INITIALIZING</span>
+                </div>
+                <div class="progress-bar"><div class="progress-fill"></div></div>
+                <div class="loader-meta-hint">CK STUDIO // 2026</div>
             </div>
         </div>
     </div>
@@ -144,115 +87,11 @@
         <a href="https://github.com/1837620622" target="_blank" rel="noopener noreferrer">GITHUB <svg class="inline-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17L17 7M10 7h7v7"/></svg></a>
     </div>
 
-    <!-- ===== 全局背景效果 ===== -->
-    <div class="global-bg">
-        <!-- 大字背景 -->
-        <div class="hero-bg-text">
-            <span class="bg-letter">C</span>
-            <span class="bg-letter">K</span>
-        </div>
-
-        <!-- SVG 动态场 -->
-        <svg class="ck-backdrop-svg" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-            <defs>
-                <linearGradient id="ckStroke" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="rgba(255,255,255,0.08)"/>
-                    <stop offset="50%" stop-color="rgba(255,255,255,0.55)"/>
-                    <stop offset="100%" stop-color="rgba(255,255,255,0.08)"/>
-                </linearGradient>
-                <radialGradient id="ckNode" cx="50%" cy="50%" r="50%">
-                    <stop offset="0%" stop-color="#ffffff"/>
-                    <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
-                </radialGradient>
-            </defs>
-            <g class="ck-vector-lines">
-                <path d="M90 164 H338 L438 264 H650"/>
-                <path d="M120 684 H316 L414 586 H620"/>
-                <path d="M820 164 H1040 L1152 276 H1342"/>
-                <path d="M802 682 H1018 L1134 566 H1340"/>
-                <path d="M720 78 V824"/>
-                <path d="M508 138 L922 760"/>
-                <path d="M930 138 L516 760"/>
-                <path d="M260 450 H1180"/>
-            </g>
-            <g class="ck-orbit-lines">
-                <ellipse cx="720" cy="450" rx="520" ry="118"/>
-                <ellipse cx="720" cy="450" rx="420" ry="188" transform="rotate(18 720 450)"/>
-                <ellipse cx="720" cy="450" rx="360" ry="252" transform="rotate(-22 720 450)"/>
-            </g>
-            <g class="ck-scan-bars">
-                <path d="M180 250 H480"/>
-                <path d="M940 250 H1260"/>
-                <path d="M176 610 H520"/>
-                <path d="M914 610 H1288"/>
-            </g>
-            <g class="ck-data-arcs">
-                <path d="M230 342 C326 228 462 194 612 242"/>
-                <path d="M838 244 C996 196 1138 230 1234 352"/>
-                <path d="M238 552 C358 666 520 696 668 624"/>
-                <path d="M788 626 C944 704 1122 658 1246 532"/>
-                <path d="M420 118 C586 70 864 70 1030 118"/>
-                <path d="M410 782 C600 846 846 844 1030 782"/>
-            </g>
-            <g class="ck-starfield">
-                <circle cx="154" cy="116" r="1.4"/>
-                <circle cx="242" cy="224" r="1"/>
-                <circle cx="326" cy="742" r="1.8"/>
-                <circle cx="450" cy="112" r="1.3"/>
-                <circle cx="548" cy="336" r="1"/>
-                <circle cx="618" cy="812" r="1.6"/>
-                <circle cx="718" cy="152" r="1.5"/>
-                <circle cx="836" cy="326" r="1.1"/>
-                <circle cx="934" cy="764" r="1.8"/>
-                <circle cx="1016" cy="184" r="1.2"/>
-                <circle cx="1118" cy="418" r="1.6"/>
-                <circle cx="1226" cy="706" r="1.3"/>
-                <circle cx="1308" cy="132" r="1.7"/>
-                <circle cx="1372" cy="512" r="1.1"/>
-            </g>
-            <g class="ck-nodes">
-                <circle cx="338" cy="164" r="5"/>
-                <circle cx="650" cy="264" r="4"/>
-                <circle cx="316" cy="684" r="5"/>
-                <circle cx="620" cy="586" r="4"/>
-                <circle cx="1040" cy="164" r="5"/>
-                <circle cx="1342" cy="276" r="4"/>
-                <circle cx="1018" cy="682" r="5"/>
-                <circle cx="1340" cy="566" r="4"/>
-                <circle cx="720" cy="450" r="6"/>
-            </g>
-        </svg>
-        
-        <!-- 光线效果 -->
-        <div class="light-rays">
-            <div class="ray"></div>
-            <div class="ray"></div>
-            <div class="ray"></div>
-        </div>
-        
-        <!-- 粒子效果 -->
-        <div class="particles">
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
-        </div>
-    </div>
+    <!-- ===== 全局 3D 场景画布（fixed 铺满全屏，跨 section 渐进式动画） ===== -->
+    <canvas id="scene-canvas" aria-hidden="true"></canvas>
 
     <!-- ===== Hero 区域 ===== -->
     <header id="home">
-        <!-- 浮动元素 -->
-        <div class="floating-shapes">
-            <div class="shape shape-1"></div>
-            <div class="shape shape-2"></div>
-            <div class="shape shape-3"></div>
-            <div class="shape shape-4"></div>
-        </div>
-        
         <div class="hero-content">
             <div class="hero-badge">
                 <span class="badge-dot"></span>
@@ -263,13 +102,13 @@
                 <span class="line">EXPLORE THE</span>
                 <span class="line bold">DIGITAL <span class="highlight">UNIVERSE</span></span>
             </h1>
-            <p class="hero-desc"><strong>传康KK</strong> 的数字展厅。<br>别只看封面，往里点。每一个入口后面，都有一套正在运行的现场。</p>
-            
+            <p class="hero-desc">面向产品的全栈开发与创意工程交付。<br>覆盖网站、API、数据看板、AI 工具、浏览器自动化全流程。<br>所有项目均已部署上线，支持直接访问体验。</p>
+
             <div class="hero-buttons">
                 <a href="#works" class="btn-primary">查看作品 <span><svg class="inline-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
                 <a href="https://github.com/1837620622" target="_blank" rel="noopener noreferrer" class="btn-secondary">GitHub <span><svg class="inline-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17L17 7M10 7h7v7"/></svg></span></a>
             </div>
-            
+
             <div class="hero-stats">
                 <div class="stat">
                     <span class="stat-num" data-count="17">0</span>
@@ -285,81 +124,7 @@
                 </div>
             </div>
         </div>
-        
-        <!-- 右侧装饰 -->
-        <div class="hero-visual">
-            <svg class="orbit-map" viewBox="0 0 560 560" aria-hidden="true">
-                <defs>
-                    <linearGradient id="orbitLine" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stop-color="#ffffff"/>
-                        <stop offset="52%" stop-color="#ffffff"/>
-                        <stop offset="100%" stop-color="#9aa1ad"/>
-                    </linearGradient>
-                    <radialGradient id="planetGlow" cx="50%" cy="45%" r="55%">
-                        <stop offset="0%" stop-color="rgba(255,255,255,0.22)"/>
-                        <stop offset="62%" stop-color="rgba(255,255,255,0.08)"/>
-                        <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
-                    </radialGradient>
-                </defs>
-                <circle class="planet-core" cx="280" cy="280" r="132" fill="url(#planetGlow)"/>
-                <ellipse class="orbit-ring orbit-ring-1" cx="280" cy="280" rx="232" ry="84" fill="none" stroke="url(#orbitLine)" stroke-width="1.2"/>
-                <ellipse class="orbit-ring orbit-ring-2" cx="280" cy="280" rx="210" ry="118" fill="none" stroke="rgba(125, 211, 252, 0.55)" stroke-width="1" transform="rotate(32 280 280)"/>
-                <ellipse class="orbit-ring orbit-ring-3" cx="280" cy="280" rx="184" ry="150" fill="none" stroke="rgba(251, 191, 36, 0.44)" stroke-width="1" transform="rotate(-28 280 280)"/>
-                <path class="circuit-line" d="M38 214 H116 L148 182 H236 M416 116 H482 L530 68 M392 420 H482 L522 460 M88 406 H172 L212 366" fill="none"/>
-                <g class="orbit-nodes">
-                    <circle cx="116" cy="214" r="5"/>
-                    <circle cx="236" cy="182" r="4"/>
-                    <circle cx="482" cy="116" r="5"/>
-                    <circle cx="392" cy="420" r="6"/>
-                    <circle cx="212" cy="366" r="4"/>
-                    <circle cx="432" cy="260" r="8"/>
-                    <circle cx="148" cy="330" r="7"/>
-                </g>
-            </svg>
-            <div class="code-block">
-                <div class="code-header">
-                    <span class="dot red"></span>
-                    <span class="dot yellow"></span>
-                    <span class="dot green"></span>
-                    <span class="filename">portfolio.js</span>
-                </div>
-                <pre><code><span class="keyword">const</span> developer = {
-  name: <span class="string">'传康KK'</span>,
-  role: <span class="string">'Full Stack'</span>,
-  skills: [<span class="string">'Web'</span>, <span class="string">'API'</span>, <span class="string">'AI'</span>],
-  projects: <span class="number">17</span>,
-  passion: <span class="boolean">true</span>
-};</code></pre>
-            </div>
-            <div class="repo-panel">
-                <div class="repo-panel-head">
-                    <span>Open Source</span>
-                    <a href="https://github.com/1837620622" target="_blank" rel="noopener noreferrer">View all <svg class="inline-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17L17 7M10 7h7v7"/></svg></a>
-                </div>
-                <div class="repo-panel-row">
-                    <span class="repo-dot"></span>
-                    <div>
-                        <strong>cloudflare-bypass-2026</strong>
-                        <small>367 stars · Python</small>
-                    </div>
-                </div>
-                <div class="repo-panel-row">
-                    <span class="repo-dot amber"></span>
-                    <div>
-                        <strong>windsurf-account-manager</strong>
-                        <small>66 stars · Desktop</small>
-                    </div>
-                </div>
-                <div class="repo-panel-row">
-                    <span class="repo-dot"></span>
-                    <div>
-                        <strong>cto-new-openai-proxy</strong>
-                        <small>32 stars · Python</small>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
+
         <div class="scroll-hint">
             <div class="mouse">
                 <div class="wheel"></div>
@@ -377,7 +142,8 @@
         </div>
         
         <div class="works-intro">
-            <p>每张卡片都不是摆设。点开它，直接进入一个可以玩的、可以用的、可以体验的现场。</p>
+            <p>17 个已上线项目，覆盖视频、音乐、图床、接口平台、云游戏、量化监控六大方向。</p>
+            <p>每张卡片对应一个真实运行的应用，点击即可直接打开。</p>
         </div>
 
         <div class="grid" id="projectGrid"></div>
@@ -399,7 +165,8 @@
         </div>
 
         <div class="opensource-intro">
-            <p>喜欢拆东西的人，可以从这里开始。代码、思路、部署方式，都摆在明面上。</p>
+            <p>47 个公开仓库，累计获得上千次 Star 与 Fork。</p>
+            <p>涵盖 Cloudflare 绕过、AI 代理、桌面工具、效率脚本等可复用模块，全部采用 MIT 协议开源。</p>
             <a href="https://github.com/1837620622?tab=repositories" target="_blank" rel="noopener noreferrer" class="github-source-link">查看全部开源仓库 <svg class="inline-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17L17 7M10 7h7v7"/></svg></a>
         </div>
 
@@ -452,10 +219,12 @@
             </div>
             <div class="about-right">
                 <h3 class="about-title">WHO I AM</h3>
-                <p class="about-text"><strong>传康KK</strong>，全栈开发者。喜欢把一个想法从脚本、接口、界面一路做成真正能访问的产品。</p>
-                
+                <p class="about-text">独立开发者，主攻全栈工程与 AI 应用方向。</p>
+                <p class="about-text">多年跨领域项目交付经验，擅长从需求拆解、技术选型到上线运维的完整闭环。</p>
+
                 <h3 class="about-title">WHAT I DO</h3>
-                <p class="about-text">网站、接口、数据面板、AI 工具、浏览器自动化。风格可以克制，功能必须锋利，作品要经得起点击。</p>
+                <p class="about-text">服务范围：网站搭建、API 平台、数据可视化、AI 集成、浏览器自动化。</p>
+                <p class="about-text">交付标准：可直接访问、性能可控、长期可维护。</p>
                 
                 <div class="skills-section">
                     <h4 class="skills-title">TECH STACK</h4>
@@ -483,7 +252,8 @@
         
         <div class="contact-hero">
             <h2 class="contact-heading">LET'S <span class="highlight">WORK</span> TOGETHER</h2>
-            <p class="contact-desc">有任何项目合作或问题咨询，欢迎随时联系我</p>
+            <p class="contact-desc">支持项目合作、技术咨询、商务洽谈等多种合作方式。</p>
+            <p class="contact-desc">承诺 24 小时内首次响应，48 小时内输出初步方案。</p>
         </div>
         
         <div class="contact-grid">
@@ -561,7 +331,7 @@
                         <span class="footer-logo-text">STUDIO</span>
                     </span>
                 </div>
-                <p class="footer-tagline">Crafting Digital Experiences</p>
+                <p class="footer-tagline">Full Stack · API · AI Engineering</p>
             </div>
             
             <div class="footer-nav">
@@ -611,7 +381,7 @@
         </div>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js" integrity="sha384-HOvlOYPIs/zjoIkWUGXkVmXsjr8GuZLV+Q+rcPwmJOVZVpvTSXQChiN4t9Euv9Vc" crossorigin="anonymous"></script>
-    <script src="script.js?v=ck-secure-perf"></script>
+    <script src="js/three-scene.js" defer></script>
+    <script src="script.js?v=ck-secure-perf" defer></script>
 </body>
 </html>
