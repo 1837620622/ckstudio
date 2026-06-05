@@ -4552,3 +4552,978 @@ header#home,
     color: rgba(245, 247, 250, 0.32);
 }
 
+/* ---------------------------------------------------------------
+ * 最终覆盖：CK 黑场空间、移动端重排、低负载动效
+ * --------------------------------------------------------------- */
+html,
+body {
+    max-width: 100%;
+    background: #000000;
+}
+
+body {
+    background:
+        radial-gradient(circle at 50% 8%, rgba(255, 255, 255, 0.055), transparent 34%),
+        radial-gradient(circle at 78% 18%, rgba(34, 211, 238, 0.055), transparent 28%),
+        linear-gradient(180deg, #000000 0%, #02050b 52%, #000000 100%);
+}
+
+#scene-canvas {
+    background: #000000;
+}
+
+nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 120;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.90), rgba(0, 0, 0, 0.18));
+}
+
+nav.is-stuck {
+    background: rgba(0, 0, 0, 0.78);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+header,
+section {
+    scroll-margin-top: 96px;
+}
+
+.menu-toggle.active span:first-child {
+    transform: translateY(5px) rotate(45deg);
+}
+
+.menu-toggle.active span:last-child {
+    transform: translateY(-5px) rotate(-45deg);
+}
+
+.hero-badge,
+.btn-secondary,
+.more-link,
+.github-source-link,
+.card,
+.repo-card,
+.about-card,
+.contact-card {
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+}
+
+.hero-desc,
+.works-intro p,
+.opensource-intro p,
+.about-text,
+.contact-desc,
+.card-desc,
+.repo-card p {
+    color: rgba(245, 247, 250, 0.78);
+}
+
+.card,
+.repo-card,
+.about-card,
+.contact-card {
+    border-color: rgba(255, 255, 255, 0.13);
+    background:
+        linear-gradient(150deg, rgba(255, 255, 255, 0.070), rgba(255, 255, 255, 0.018)),
+        rgba(0, 0, 0, 0.70);
+}
+
+.card-title,
+.repo-card h3,
+.about-title,
+.contact-heading,
+h1 .line {
+    text-wrap: balance;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .card:hover,
+    .repo-card:hover,
+    .contact-card:hover {
+        transform: translate3d(0, -6px, 0);
+    }
+}
+
+@media (max-width: 860px) {
+    body {
+        background:
+            radial-gradient(circle at 48% 20%, rgba(34, 211, 238, 0.10), transparent 30%),
+            radial-gradient(circle at 50% 70%, rgba(255, 255, 255, 0.045), transparent 38%),
+            #000000;
+    }
+
+    nav {
+        padding: 20px 20px 12px;
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0.88), rgba(0, 0, 0, 0));
+    }
+
+    .logo {
+        gap: 12px;
+    }
+
+    .logo-mark {
+        width: 54px;
+        height: 54px;
+        border-radius: 16px;
+    }
+
+    .logo-cn {
+        font-size: 24px;
+        line-height: 1;
+    }
+
+    .menu-toggle {
+        width: 48px;
+        height: 48px;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .menu-toggle span {
+        width: 30px;
+        height: 2px;
+        background: #ffffff;
+    }
+
+    .mobile-menu {
+        width: 100%;
+        height: 100svh;
+        right: -100%;
+        padding: 112px 24px 34px;
+        align-items: flex-start;
+        background:
+            radial-gradient(circle at 70% 12%, rgba(34, 211, 238, 0.10), transparent 30%),
+            linear-gradient(180deg, #000000 0%, #03060c 100%);
+        border-left: 0;
+        z-index: 110;
+    }
+
+    .mobile-menu a {
+        width: 100%;
+        padding: 16px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        font-size: 22px;
+        letter-spacing: 0.10em;
+    }
+
+    header#home {
+        min-height: 100svh;
+        padding: 92px 20px 26px;
+        align-items: flex-end;
+    }
+
+    header#home::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        pointer-events: none;
+        background:
+            linear-gradient(180deg, rgba(0, 0, 0, 0.05) 0%, rgba(0, 0, 0, 0.22) 38%, rgba(0, 0, 0, 0.82) 100%),
+            linear-gradient(90deg, rgba(0, 0, 0, 0.72) 0%, rgba(0, 0, 0, 0.18) 58%, rgba(0, 0, 0, 0.48) 100%);
+    }
+
+    #home > .hero-content {
+        width: 100%;
+        max-width: 100%;
+        padding-bottom: 0;
+    }
+
+    .hero-badge {
+        margin: 0 0 12px;
+        padding: 7px 12px;
+        max-width: max-content;
+        font-size: 9px;
+        letter-spacing: 0.18em;
+    }
+
+    .hero-tag {
+        max-width: 250px;
+        margin-bottom: 12px;
+        font-size: 10px;
+        line-height: 1.55;
+        letter-spacing: 0.18em;
+        color: rgba(245, 247, 250, 0.64);
+    }
+
+    h1 {
+        margin-bottom: 15px;
+    }
+
+    h1 .line {
+        font-size: clamp(2.85rem, 14.5vw, 4rem);
+        line-height: 0.92;
+        letter-spacing: -0.055em;
+    }
+
+    .hero-desc {
+        max-width: 335px;
+        margin-bottom: 18px;
+        font-size: 15px;
+        line-height: 1.62;
+        color: rgba(245, 247, 250, 0.84);
+    }
+
+    .hero-buttons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        width: 100%;
+        min-height: 48px;
+        padding: 13px 14px;
+        justify-content: center;
+        border-radius: 999px;
+        font-size: 14px;
+        letter-spacing: 0.04em;
+    }
+
+    .hero-stats {
+        display: none;
+    }
+
+    .stat-num {
+        font-size: clamp(2rem, 10vw, 2.8rem);
+        line-height: 1;
+    }
+
+    .stat-label {
+        max-width: 82px;
+        margin-top: 8px;
+        font-size: 8px;
+        line-height: 1.45;
+        letter-spacing: 0.22em;
+    }
+
+    .scroll-hint {
+        display: none;
+    }
+
+    .works-section,
+    .opensource-section,
+    .about-section,
+    .contact-section {
+        padding: 74px 20px;
+        min-height: auto;
+        scroll-margin-top: 92px;
+    }
+
+    .section-header {
+        gap: 12px;
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+    }
+
+    .section-title {
+        font-size: 12px;
+        letter-spacing: 0.18em;
+    }
+
+    .section-count {
+        width: 100%;
+        margin-left: 0;
+    }
+
+    .works-intro,
+    .opensource-intro {
+        max-width: 100%;
+        margin-bottom: 26px;
+    }
+
+    .works-intro p,
+    .opensource-intro p {
+        font-size: 14px;
+        line-height: 1.7;
+    }
+
+    .works-intro p + p,
+    .opensource-intro p + p {
+        display: none;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .category-header {
+        margin-top: 22px;
+        padding: 15px 0 9px;
+        gap: 10px;
+    }
+
+    .category-icon {
+        width: 28px;
+        height: 28px;
+    }
+
+    .category-name {
+        font-size: 12px;
+        letter-spacing: 0.22em;
+    }
+
+    .card {
+        min-height: auto;
+        padding: 18px;
+        border-radius: 14px;
+    }
+
+    .card-number {
+        margin-bottom: 10px;
+    }
+
+    .card-title {
+        font-size: 19px;
+        line-height: 1.18;
+        margin-bottom: 8px;
+    }
+
+    .card-desc {
+        font-size: 13.5px;
+        line-height: 1.55;
+    }
+
+    .card-tags {
+        margin-top: 13px;
+        gap: 6px;
+    }
+
+    .card-tags span,
+    .repo-tags span {
+        font-size: 9px;
+        padding: 4px 8px;
+    }
+
+    .card-bottom {
+        margin-top: 22px;
+    }
+
+    .card-arrow {
+        opacity: 1;
+        transform: none;
+    }
+
+    .more-link,
+    .github-source-link {
+        width: 100%;
+        justify-content: center;
+        padding: 14px 18px;
+    }
+
+    .opensource-grid {
+        gap: 12px;
+    }
+
+    .repo-card {
+        padding: 18px;
+        border-radius: 14px;
+    }
+
+    .repo-card h3 {
+        font-size: 18px;
+        line-height: 1.2;
+    }
+
+    .repo-card p {
+        font-size: 13.5px;
+        line-height: 1.55;
+    }
+
+    .repo-actions {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .about-content {
+        gap: 26px;
+    }
+
+    .about-card {
+        padding: 22px;
+        border-radius: 16px;
+    }
+
+    .about-right,
+    .about-text {
+        text-align: left;
+    }
+
+    .about-title {
+        font-size: 12px;
+        letter-spacing: 0.20em;
+    }
+
+    .skills {
+        gap: 8px;
+    }
+
+    .skill-tag {
+        font-size: 11px;
+        padding: 7px 10px;
+    }
+
+    .contact-heading {
+        font-size: clamp(2.2rem, 12vw, 3.3rem);
+        line-height: 0.95;
+    }
+
+    .contact-desc {
+        font-size: 14px;
+    }
+
+    .contact-card {
+        padding: 20px;
+        border-radius: 14px;
+    }
+
+    .contact-value {
+        overflow-wrap: anywhere;
+    }
+
+    footer {
+        padding-top: 64px;
+    }
+}
+
+@media (max-width: 380px) {
+    h1 .line {
+        font-size: clamp(2.55rem, 14vw, 3.35rem);
+    }
+
+    .hero-buttons {
+        grid-template-columns: 1fr;
+    }
+
+    .hero-desc {
+        font-size: 14px;
+    }
+}
+
+/* ---------------------------------------------------------------
+ * 质感修正：少霓虹、少模板、每个内容区采用不同结构
+ * --------------------------------------------------------------- */
+:root {
+    --ck-black: #000000;
+    --ck-ink: #050608;
+    --ck-panel: rgba(5, 6, 8, 0.78);
+    --ck-panel-strong: rgba(10, 11, 14, 0.92);
+    --ck-line: rgba(255, 255, 255, 0.14);
+    --ck-line-strong: rgba(255, 255, 255, 0.24);
+    --ck-text: #f5f6f8;
+    --ck-muted: rgba(245, 246, 248, 0.58);
+    --ck-soft: rgba(245, 246, 248, 0.76);
+}
+
+body {
+    background:
+        radial-gradient(circle at 70% 8%, rgba(255, 255, 255, 0.045), transparent 28%),
+        radial-gradient(circle at 12% 18%, rgba(255, 255, 255, 0.035), transparent 24%),
+        linear-gradient(180deg, #000000 0%, #020305 48%, #000000 100%);
+}
+
+#scene-canvas {
+    background: #000000;
+    filter: saturate(0.24) contrast(1.08);
+}
+
+.aurora-layer,
+.floating-shapes,
+.particles,
+.light-rays,
+.hero-bg-text {
+    opacity: 0 !important;
+}
+
+.loader-dots span.is-on,
+.loader-meta-dot,
+.badge-dot,
+.repo-dot,
+.repo-dot.amber {
+    background: #ffffff !important;
+    box-shadow: 0 0 16px rgba(255, 255, 255, 0.45) !important;
+}
+
+.loader-num,
+.highlight,
+.contact-heading .highlight,
+.loader-logo {
+    background: linear-gradient(180deg, #ffffff 0%, #c8ccd3 48%, #7f858f 100%) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+}
+
+.loader-unit {
+    color: rgba(255, 255, 255, 0.44) !important;
+}
+
+.progress-fill {
+    background: linear-gradient(90deg, #ffffff 0%, #7f858f 100%) !important;
+    box-shadow: 0 0 14px rgba(255, 255, 255, 0.22) !important;
+}
+
+.hero-badge,
+.btn-secondary,
+.more-link,
+.github-source-link,
+.card-link,
+.repo-demo {
+    border-color: var(--ck-line);
+    background: rgba(255, 255, 255, 0.045);
+    box-shadow: none;
+}
+
+.btn-primary,
+.repo-source {
+    background: linear-gradient(180deg, #ffffff 0%, #cfd3da 100%);
+    color: #030405;
+    box-shadow: 0 18px 40px rgba(255, 255, 255, 0.10);
+}
+
+.btn-primary::before,
+.btn-secondary::before,
+.card::after,
+.skill-tag::before {
+    display: none !important;
+}
+
+.hero-desc,
+.works-intro p,
+.opensource-intro p,
+.about-text,
+.contact-desc,
+.card-desc,
+.repo-card p,
+.footer-tagline {
+    color: var(--ck-soft);
+}
+
+.card,
+.repo-card,
+.about-card,
+.contact-card {
+    background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.010)),
+        var(--ck-panel);
+    border-color: var(--ck-line);
+    box-shadow:
+        0 26px 80px rgba(0, 0, 0, 0.36),
+        inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+.card:hover,
+.repo-card:hover,
+.contact-card:hover {
+    border-color: var(--ck-line-strong);
+    background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.085), rgba(255, 255, 255, 0.020)),
+        var(--ck-panel-strong);
+    box-shadow:
+        0 32px 90px rgba(0, 0, 0, 0.42),
+        inset 0 1px 0 rgba(255, 255, 255, 0.10);
+}
+
+/* Works：不规则作品墙，避免所有内容长成同一种卡片 */
+.works-section {
+    padding-top: 130px;
+}
+
+.grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-auto-flow: dense;
+    align-items: stretch;
+    gap: 16px;
+}
+
+.category-header {
+    grid-column: 1 / -1;
+    margin-top: 46px;
+    padding: 18px 0 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.11);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.11);
+}
+
+.category-header:first-child {
+    margin-top: 0;
+}
+
+.category-icon {
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.045);
+}
+
+.card {
+    grid-column: span 3;
+    min-height: 232px;
+    border-radius: 10px;
+    padding: 24px;
+}
+
+.card:nth-child(8n + 3),
+.card:nth-child(8n + 7) {
+    grid-column: span 4;
+}
+
+.card-featured {
+    grid-column: span 6;
+    min-height: 320px;
+}
+
+.card-featured .card-title {
+    font-size: clamp(28px, 3.1vw, 44px);
+    line-height: 0.98;
+    letter-spacing: -0.055em;
+}
+
+.card-featured .card-desc {
+    max-width: 430px;
+    font-size: 15px;
+}
+
+.card-badge {
+    box-shadow: 0 12px 28px rgba(255, 255, 255, 0.08);
+}
+
+/* Open Source：改为仓库行列表，和作品墙区分开 */
+.opensource-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border-top: 1px solid var(--ck-line);
+}
+
+.repo-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 18px 28px;
+    min-height: auto;
+    padding: 26px 0;
+    border-width: 0 0 1px;
+    border-radius: 0;
+    box-shadow: none;
+    background: transparent;
+}
+
+.repo-card:hover {
+    transform: none;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.055), transparent 72%);
+    box-shadow: none;
+}
+
+.repo-card h3 {
+    max-width: 760px;
+    font-size: clamp(22px, 2.8vw, 42px);
+    line-height: 1.02;
+    letter-spacing: -0.045em;
+}
+
+.repo-card p {
+    max-width: 640px;
+}
+
+.repo-tags {
+    grid-column: 1 / 2;
+}
+
+.repo-actions {
+    grid-column: 2 / 3;
+    grid-row: 1 / span 3;
+    align-self: center;
+    min-width: 190px;
+}
+
+.repo-card-featured::after {
+    top: 26px;
+    right: 0;
+}
+
+/* About：像个人信息面板，不和项目卡片混在一起 */
+.about-content {
+    display: grid;
+    grid-template-columns: minmax(280px, 380px) minmax(0, 1fr);
+    align-items: stretch;
+}
+
+.about-card {
+    border-radius: 10px;
+}
+
+.about-right {
+    padding: clamp(12px, 2vw, 30px) 0;
+}
+
+.about-title {
+    color: #ffffff;
+}
+
+/* Contact：信息面板化，避免四个同款卡片 */
+.contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 0.95fr 1.2fr;
+    gap: 0;
+    border: 1px solid var(--ck-line);
+    background: rgba(0, 0, 0, 0.34);
+}
+
+.contact-card {
+    border-width: 0 1px 0 0;
+    border-radius: 0;
+    box-shadow: none;
+    background: transparent;
+}
+
+.contact-card:last-child {
+    border-right: 0;
+}
+
+.contact-card::before {
+    display: none;
+}
+
+.contact-icon {
+    color: rgba(255, 255, 255, 0.78);
+}
+
+.footer-wave {
+    opacity: 0.16;
+}
+
+@media (max-width: 1180px) {
+    .card,
+    .card:nth-child(8n + 3),
+    .card:nth-child(8n + 7) {
+        grid-column: span 6;
+    }
+
+    .card-featured {
+        grid-column: span 12;
+    }
+
+    .contact-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .contact-card:nth-child(2n) {
+        border-right: 0;
+    }
+
+    .contact-card {
+        border-bottom: 1px solid var(--ck-line);
+    }
+}
+
+@media (max-width: 860px) {
+    body {
+        background:
+            radial-gradient(circle at 50% 18%, rgba(255, 255, 255, 0.050), transparent 32%),
+            #000000;
+    }
+
+    #scene-canvas {
+        filter: saturate(0.12) contrast(1.05);
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .card,
+    .card:nth-child(8n + 3),
+    .card:nth-child(8n + 7),
+    .card-featured {
+        grid-column: 1 / -1;
+        min-height: 0;
+        border-radius: 12px;
+    }
+
+    .card-featured .card-title {
+        font-size: 28px;
+        line-height: 1.08;
+    }
+
+    .opensource-grid {
+        border-top: 1px solid var(--ck-line);
+    }
+
+    .repo-card {
+        grid-template-columns: 1fr;
+        padding: 22px 0;
+        gap: 12px;
+    }
+
+    .repo-card h3 {
+        font-size: 24px;
+    }
+
+    .repo-tags,
+    .repo-actions {
+        grid-column: 1;
+        grid-row: auto;
+        min-width: 0;
+    }
+
+    .about-content {
+        grid-template-columns: 1fr;
+    }
+
+    .contact-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .contact-card,
+    .contact-card:nth-child(2n) {
+        border-right: 0;
+        border-bottom: 1px solid var(--ck-line);
+    }
+
+    .contact-card:last-child {
+        border-bottom: 0;
+    }
+}
+
+/* ================================================================
+ * 抽象 CK 修正：移动端锚点、固定导航遮挡、黑场质感
+ * ================================================================ */
+html {
+    scroll-padding-top: 104px;
+}
+
+section {
+    scroll-margin-top: 104px;
+}
+
+@media (max-width: 860px) {
+    nav,
+    nav.is-stuck {
+        background:
+            linear-gradient(180deg, rgba(0, 0, 0, 0.96), rgba(0, 0, 0, 0.76));
+        border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+    }
+
+    .works-section,
+    .opensource-section,
+    .about-section,
+    .contact-section {
+        padding-top: clamp(7rem, 18vw, 9rem);
+    }
+
+    .contact-section {
+        min-height: auto;
+    }
+
+    .contact-grid {
+        margin-top: 2.2rem;
+    }
+}
+
+/* ================================================================
+ * 统一作品框体：所有项目卡片等宽等高，Featured 只保留标签差异
+ * ================================================================ */
+.grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    grid-auto-flow: row !important;
+    align-items: stretch;
+    gap: 16px;
+}
+
+.category-header {
+    grid-column: 1 / -1 !important;
+}
+
+.card,
+.card:nth-child(8n + 3),
+.card:nth-child(8n + 7),
+.card-featured {
+    grid-column: auto !important;
+    min-height: 286px !important;
+    height: 286px;
+    padding: 24px;
+    border-radius: 12px;
+}
+
+.card-title,
+.card-featured .card-title {
+    font-size: clamp(22px, 1.72vw, 30px);
+    line-height: 1.06;
+    letter-spacing: -0.035em;
+}
+
+.card-desc,
+.card-featured .card-desc {
+    max-width: none;
+    font-size: 14px;
+}
+
+.card-featured .card-badge {
+    box-shadow: 0 10px 28px rgba(255, 255, 255, 0.10);
+}
+
+@media (max-width: 1180px) {
+    .grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+
+    .card,
+    .card:nth-child(8n + 3),
+    .card:nth-child(8n + 7),
+    .card-featured {
+        min-height: 268px !important;
+        height: 268px;
+    }
+}
+
+@media (max-width: 860px) {
+    .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 12px;
+    }
+
+    .card,
+    .card:nth-child(8n + 3),
+    .card:nth-child(8n + 7),
+    .card-featured {
+        min-height: 246px !important;
+        height: 246px;
+        padding: 20px;
+    }
+
+    .card-title,
+    .card-featured .card-title {
+        font-size: 22px;
+        line-height: 1.08;
+    }
+}
+
+@media (max-width: 560px) {
+    .grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .card,
+    .card:nth-child(8n + 3),
+    .card:nth-child(8n + 7),
+    .card-featured {
+        min-height: 236px !important;
+        height: 236px;
+    }
+}
+
+/* 锚点落位由各 section 自身 padding 负责，避免跳转后露出上一屏内容。 */
+html {
+    scroll-padding-top: 0 !important;
+}
+
+section {
+    scroll-margin-top: 0 !important;
+}

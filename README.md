@@ -44,16 +44,16 @@ motto: "技术可以让生活更美好"
   <img src="https://img.shields.io/badge/Theme-Cinematic_Dark-02060d?style=flat-square" />
 </p>
 
-个人主页采用 **Active Theory 风格渐进式 3D** 设计：每个 section 都有专属 WebGL 动画。
+个人主页采用 **黑白星空 + 抽象 CK 金属视觉** 设计：首屏聚焦 CK 字体本体，内容区保持规整、清晰、可直接访问。
 
 | ✨ 特性 | 📝 描述 |
 |--------|---------|
-| 🌌 **三层粒子系统** | 远/中/近 2350 颗粒子分层漂浮，自定义顶点 shader |
-| 💎 **三层 CK 字符** | 背层+前层+外辉光，AdditiveBlending 叠加发光 |
-| 🎯 **5 段渐进式动画** | 滚动驱动 Hero→Works→OpenSource→About→Contact |
-| 🖱️ **鼠标能量涟漪** | 点击/移动时在 CK 中心生成扩散环 |
-| 🎬 **电影级色调** | ACES Filmic Tone Mapping，曝光 1.05 |
-| 📱 **响应式** | 桌面/平板/手机完美适配 |
+| 🌌 **三层粒子系统** | 远/中/近粒子分层漂浮，自定义顶点 shader |
+| 💎 **金属 CK 字体** | Canvas 纹理绘制金属渐变、内切线、暗面和边缘高光 |
+| 🎯 **渐进式场景** | 滚动驱动 Hero→Works→OpenSource→About→Contact |
+| 🖱️ **线性扫光动效** | 点击/移动时生成短促切线闪光，避免圆环模板感 |
+| 🎬 **电影级色调** | ACES Filmic Tone Mapping，黑白星空基底 |
+| 📱 **响应式** | 桌面、平板、手机统一排版检查 |
 
 ---
 
@@ -61,11 +61,11 @@ motto: "技术可以让生活更美好"
 
 | 段落 | 3D 内容 |
 |------|---------|
-| **Hero（首页）** | 三层金属环（外层青/中层银/远层绿）+ 三层 CK + 三层粒子 |
-| **Works（作品）** | 主环偏移至右侧 + 缩放至 0.6，淡出 30%，CK 同步缩小 |
-| **OpenSource（开源）** | 28 节点网络拓扑 + 连接线，cyan 青色脉冲 |
-| **About（关于）** | IcosahedronGeometry 二十面体线框，绿色自发光 |
-| **Contact（联系）** | 三层 TorusGeometry 脉冲环向外扩散，节奏式呼吸 |
+| **Hero（首页）** | 金属 CK 字体 + 少量线性扫光 + 黑白星空粒子 |
+| **Works（作品）** | CK 作为背景焦点，作品卡片统一等宽等高矩阵 |
+| **OpenSource（开源）** | 节点网络拓扑 + 连接线，保持黑白银灰色系 |
+| **About（关于）** | IcosahedronGeometry 二十面体线框，低饱和金属质感 |
+| **Contact（联系）** | 水平切线组呼吸动画，避免圆环式扩散 |
 
 ---
 

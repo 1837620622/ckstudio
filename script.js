@@ -3,19 +3,19 @@
 // ===== 项目分类数据 =====
 const projectCategories = {
     entertainment: {
-        name: "娱乐",
+        name: "PLAY",
         icon: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10.5h10l2.3 5.4c.5 1.2-.4 2.6-1.7 2.6-.6 0-1.1-.3-1.5-.7l-1.6-1.8h-5l-1.6 1.8c-.4.5-.9.7-1.5.7-1.3 0-2.2-1.4-1.7-2.6L7 10.5Z"/><path d="M9 13v3M7.5 14.5h3M15.5 14h.01M17.2 15.7h.01"/></svg>'
     },
     tools: {
-        name: "工具",
+        name: "TOOLS",
         icon: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.7 6.3a4.5 4.5 0 0 0-5.6 5.6l-4.8 4.8a2 2 0 0 0 2.8 2.8l4.8-4.8a4.5 4.5 0 0 0 5.6-5.6l-3 3-3-3 3.2-2.8Z"/></svg>'
     },
     finance: {
-        name: "金融",
+        name: "MARKETS",
         icon: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18h16M6 18V9M12 18V6M18 18v-5"/><path d="M4 9l8-5 8 5"/></svg>'
     },
     ai: {
-        name: "AI智能",
+        name: "AI",
         icon: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="3"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/><path d="M10 11.5h.01M14 11.5h.01M10 15h4"/></svg>'
     }
 };
@@ -25,7 +25,7 @@ const projects = [
     // ===== 娱乐类 =====
     {
         name: "CKTV 传康播放器",
-        desc: "片荒的时候点这里，热门内容和播放入口都准备好了。",
+        desc: "打开就是片场，想看的内容先摆到眼前。",
         url: "https://tv.chuankangkk.top/",
         code: "01",
         tags: ["视频", "影视"],
@@ -34,7 +34,7 @@ const projects = [
     },
     {
         name: "CK Music",
-        desc: "戴上耳机再打开，歌、词和节奏会自己对上。",
+        desc: "音乐、歌词、播放感放在一起，点开就能听。",
         url: "https://ckmusic.chuankangkk.top/",
         code: "02",
         tags: ["音乐", "播放器"],
@@ -42,7 +42,7 @@ const projects = [
     },
     {
         name: "传康云游戏平台",
-        desc: "不用安装，不用等待，点进去就能开一局。",
+        desc: "把游戏入口放进浏览器，少一步安装，多一点开局。",
         url: "https://game.chuankangkk.top/",
         code: "03",
         tags: ["游戏", "在线"],
@@ -51,7 +51,7 @@ const projects = [
     },
     {
         name: "传康烟花秀",
-        desc: "黑屏亮起来的那一刻，烟花会替你把气氛拉满。",
+        desc: "黑场亮起来，光点和节奏一起炸开。",
         url: "https://yanhua.chuankangkk.top/",
         code: "04",
         tags: ["烟花", "Canvas"],
@@ -59,7 +59,7 @@ const projects = [
     },
     {
         name: "CK 3D 展示",
-        desc: "拖动一下，空间感会比文字更快说话。",
+        desc: "拖动一下再看，空间感会自己说话。",
         url: "https://3d.chuankangkk.top/",
         code: "05",
         tags: ["3D", "可视化", "交互"],
@@ -69,7 +69,7 @@ const projects = [
     // ===== 工具类 =====
     {
         name: "传康KKAPI",
-        desc: "需要能力时别从零开始，这里已经接好一排接口。",
+        desc: "常用能力已经接好，拿接口就能继续做。",
         url: "https://api.chuankangkk.top/",
         code: "06",
         tags: ["API", "接口", "免费"],
@@ -78,7 +78,7 @@ const projects = [
     },
     {
         name: "CK 图床",
-        desc: "把素材丢进去，拿到链接就走，干净利落。",
+        desc: "图片上传，链接返回，素材流转不拖泥带水。",
         url: "https://ck-img.chuankangkk.top/",
         code: "07",
         tags: ["图床", "存储"],
@@ -86,7 +86,7 @@ const projects = [
     },
     {
         name: "小米运动刷步数",
-        desc: "步数想动一下的时候，这个入口最直接。",
+        desc: "步数入口做得直接，需要时一键处理。",
         url: "https://sport.chuankangkk.top/",
         code: "08",
         tags: ["运动", "工具"],
@@ -94,7 +94,7 @@ const projects = [
     },
     {
         name: "睡眠助手",
-        desc: "把声音调低一点，给睡前留一块安静区域。",
+        desc: "睡前打开，声音和节奏都往安静里走。",
         url: "https://sleep-3s3.pages.dev/",
         code: "09",
         tags: ["白噪音", "助眠"],
@@ -102,7 +102,7 @@ const projects = [
     },
     {
         name: "ProxyPool 代理池",
-        desc: "代理不用到处翻，打开就能取。",
+        desc: "代理采集和输出放在一处，需要就取。",
         url: "https://proxy.chuankangkk.top/",
         code: "10",
         tags: ["代理", "工具"],
@@ -110,7 +110,7 @@ const projects = [
     },
     {
         name: "IP检测工具",
-        desc: "当前网络从哪里出去，一打开就看清楚。",
+        desc: "一屏看清出口网络，省掉反复排查。",
         url: "https://ip-check.chuankangkk.top/",
         code: "11",
         tags: ["IP检测", "网络"],
@@ -121,7 +121,7 @@ const projects = [
     // ===== 金融类 =====
     {
         name: "黄金价格检测系统",
-        desc: "金价跳动的时候，这块屏幕会先给出信号。",
+        desc: "金价变化放进看板，波动更早被看见。",
         url: "https://gold.chuankangkk.top/",
         code: "12",
         tags: ["金融", "AI", "量化"],
@@ -130,7 +130,7 @@ const projects = [
     },
     {
         name: "海外基金估值",
-        desc: "盘中想看海外基金动向，打开就有答案。",
+        desc: "海外基金盘中动向集中到一屏，打开就能判断。",
         url: "https://fund.chuankangkk.top/",
         code: "13",
         tags: ["基金", "估值"],
@@ -138,7 +138,7 @@ const projects = [
     },
     {
         name: "中国基金数据",
-        desc: "自选基金放到一张屏上，涨跌不用来回翻。",
+        desc: "自选、涨跌、数据入口放在一起，少来回翻。",
         url: "https://fund-cn.chuankangkk.top/",
         code: "14",
         tags: ["基金", "数据分析"],
@@ -149,7 +149,7 @@ const projects = [
     // ===== AI智能类 =====
     {
         name: "CET6听力预测",
-        desc: "考前想抓重点，先让历史数据说话。",
+        desc: "把听力趋势做成预测入口，考前少盲猜。",
         url: "https://cet6.chuankangkk.top/",
         code: "15",
         tags: ["六级", "AI预测"],
@@ -157,7 +157,7 @@ const projects = [
     },
     {
         name: "CK Diviner 占卜师",
-        desc: "问一个问题，看看算法会给出什么暗号。",
+        desc: "丢进一个问题，让算法给出有趣的回声。",
         url: "https://diviner.chuankangkk.top/",
         code: "16",
         tags: ["AI", "占卜", "预测"],
@@ -165,7 +165,7 @@ const projects = [
     },
     {
         name: "Trump-X 情绪分析",
-        desc: "一句动态背后的情绪和波动，放到图里看。",
+        desc: "一句动态拆成情绪和波动，放进图里看。",
         url: "https://trump-x.chuankangkk.top/",
         code: "17",
         tags: ["AI", "情绪分析", "社交"],
@@ -178,7 +178,7 @@ const projects = [
 const openSourceProjects = [
     {
         name: "cloudflare-bypass-2026",
-        desc: "想研究浏览器自动化，这个仓库值得拆开看。",
+        desc: "浏览器自动化的硬核样本，流程和实战痕迹都在。",
         language: "Python",
         stars: 367,
         forks: 61,
@@ -188,7 +188,7 @@ const openSourceProjects = [
     },
     {
         name: "windsurf-account-manager-releases",
-        desc: "账号切换这件麻烦事，被整理成一个桌面面板。",
+        desc: "账号切换做成桌面工具，少来回折腾。",
         language: "Desktop",
         stars: 66,
         forks: 5,
@@ -198,7 +198,7 @@ const openSourceProjects = [
     },
     {
         name: "cto-new-openai-proxy",
-        desc: "把模型接口、账号池和面板串起来，入口更像网关。",
+        desc: "模型接口、账号池、面板连成网关，适合拆架构。",
         language: "Python",
         stars: 32,
         forks: 10,
@@ -208,7 +208,7 @@ const openSourceProjects = [
     },
     {
         name: "winsurf-switch",
-        desc: "想切号快一点，这个小工具就是为它存在的。",
+        desc: "更轻的切换入口，动手快，逻辑也清楚。",
         language: "Python",
         stars: 32,
         forks: 3,
@@ -217,7 +217,7 @@ const openSourceProjects = [
     },
     {
         name: "fund-cn",
-        desc: "行情怎么来、页面怎么跑、部署怎么接，都能看到。",
+        desc: "基金看板从数据到部署都能拆，适合拿来改。",
         language: "JavaScript",
         stars: 21,
         forks: 6,
@@ -228,7 +228,7 @@ const openSourceProjects = [
     },
     {
         name: "wifi-security-toolkit",
-        desc: "偏硬核的无线安全工具箱，适合慢慢翻。",
+        desc: "无线安全工具箱，偏实战，适合慢慢翻。",
         language: "Shell",
         stars: 16,
         forks: 5,
@@ -237,7 +237,7 @@ const openSourceProjects = [
     },
     {
         name: "Gold-Price-Quantitative-Monitoring-System",
-        desc: "把黄金行情做成开源看板，信号就在页面里跳。",
+        desc: "黄金行情的开源版本，看板和信号都能追。",
         language: "JavaScript",
         stars: 8,
         forks: 5,
@@ -247,7 +247,7 @@ const openSourceProjects = [
     },
     {
         name: "chatgpt-specimen-toolbox",
-        desc: "敏感数据不出本地，转换动作就在浏览器里完成。",
+        desc: "敏感文本留在本地，转换动作在浏览器里完成。",
         language: "JavaScript",
         stars: 5,
         forks: 2,
@@ -256,7 +256,7 @@ const openSourceProjects = [
     },
     {
         name: "proxypool",
-        desc: "从采集到接口输出，一套代理池的骨架都在这里。",
+        desc: "采集、清洗、接口输出都在，代理池骨架完整。",
         language: "JavaScript",
         stars: 5,
         forks: 1,
@@ -588,9 +588,9 @@ function initCopyContact() {
             navigator.clipboard.writeText(text).then(() => {
                 if (hint) {
                     const original = hint.textContent;
-                    hint.textContent = '✓ 已复制!';
+                    hint.textContent = '已复制';
                     hint.style.opacity = '1';
-                    hint.style.color = '#00ff88';
+                    hint.style.color = '#ffffff';
 
                     setTimeout(() => {
                         hint.textContent = original;
@@ -636,9 +636,9 @@ function initScrollReveal() {
 function initVisibilityChange() {
     document.addEventListener('visibilitychange', () => {
         if (document.hidden) {
-            document.title = '快回来看看 | CK Studio';
+            document.title = 'CK Studio | Paused';
         } else {
-            document.title = '传康KK Studio | Creative Developer';
+            document.title = 'CK Studio | Motion Web Lab';
         }
     });
 }
@@ -749,9 +749,9 @@ function initCountUp() {
 function initVisibilityChange() {
     document.addEventListener('visibilitychange', () => {
         if (document.hidden) {
-            document.title = '快回来看看 | CK Studio';
+            document.title = 'CK Studio | Paused';
         } else {
-            document.title = '传康KK Studio | Creative Developer';
+            document.title = 'CK Studio | Motion Web Lab';
         }
     });
 }
@@ -776,6 +776,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initVisibilityChange();
 
     console.log('%c\n  ██████╗██╗  ██╗\n ██╔════╝██║ ██╔╝\n ██║     █████╔╝ \n ██║     ██╔═██╗ \n  ██████╗██║  ██╗\n  ══════╝══╝  ══╝\n', 'color: #fff; font-size: 10px;');
-    console.log('%cCK Studio 已加载完成!', 'color: #fff; font-size: 14px; font-weight: bold;');
+    console.log('%cCK Studio ready.', 'color: #fff; font-size: 14px; font-weight: bold;');
     console.log('%cGitHub: github.com/1837620622 | Email: 2040168455@qq.com', 'color: #888;');
 });
