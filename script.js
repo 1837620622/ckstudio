@@ -367,6 +367,14 @@ function renderOpenSourceProjects() {
     });
 }
 
+let scrollRevealStarted = false;
+
+function startScrollRevealOnce() {
+    if (scrollRevealStarted) return;
+    scrollRevealStarted = true;
+    window.setTimeout(initScrollReveal, 180);
+}
+
 // ===== 加载动画控制 =====
 function initLoader() {
     const loader = document.getElementById('loader');
@@ -387,6 +395,7 @@ function initLoader() {
         if (loader) loader.classList.add('hidden');
         animateHero();
         animateNumbers();
+        startScrollRevealOnce();
     };
 
     const requestFinish = () => {
@@ -543,83 +552,112 @@ function initGsapMotion() {
     mm.add(
         {
             canMove: '(prefers-reduced-motion: no-preference)',
-            isDesktop: '(min-width: 861px)'
+            isDesktop: '(min-width: 861px)',
+            finePointer: '(hover: hover) and (pointer: fine)'
         },
         context => {
-            const { canMove, isDesktop } = context.conditions;
+            const { canMove, isDesktop, finePointer } = context.conditions;
             if (!canMove) {
                 gsap.set('.bg-letter, .orbit-ring, .ck-backdrop-svg *', { clearProps: 'all' });
                 return;
             }
 
-            gsap.timeline({ repeat: -1, yoyo: true, defaults: { duration: 4.2, ease: 'sine.inOut' } })
-                .to('.bg-letter:first-child', { y: -18, rotationY: -8, skewX: -2 }, 0)
-                .to('.bg-letter:nth-child(2)', { y: 18, rotationY: 8, skewX: 2 }, 0)
-                .to('.hero-bg-text', { scale: isDesktop ? 1.035 : 1.015 }, 0);
+            gsap.set('.ck-vector-lines path, .ck-scan-bars path, .ck-data-arcs path', {
+                strokeDasharray: '18 24'
+            });
+            gsap.set('.ck-starfield circle', {
+                autoAlpha: isDesktop ? 0.5 : 0.28,
+                scale: 1,
+                transformOrigin: '50% 50%'
+            });
+            gsap.set('.ck-nodes circle, .orbit-nodes circle', {
+                autoAlpha: isDesktop ? 0.74 : 0.42,
+                scale: 1,
+                transformOrigin: '50% 50%'
+            });
+
+            if (!isDesktop) {
+                gsap.to('.ck-backdrop-svg', { autoAlpha: 0.42, duration: 0.8, ease: 'power2.out' });
+                gsap.to('.bg-letter', {
+                    autoAlpha: 0.24,
+                    y: 0,
+                    scale: 1,
+                    duration: 0.8,
+                    ease: 'power2.out'
+                });
+                return;
+            }
+
+            gsap.timeline({ repeat: -1, yoyo: true, defaults: { duration: 7.5, ease: 'sine.inOut' } })
+                .to('.bg-letter:first-child', { y: -10, rotationY: -5 }, 0)
+                .to('.bg-letter:nth-child(2)', { y: 10, rotationY: 5 }, 0)
+                .to('.hero-bg-text', { scale: 1.025 }, 0);
 
             gsap.to('.ck-orbit-lines ellipse', {
                 rotation: index => (index % 2 === 0 ? 360 : -360),
                 transformOrigin: '50% 50%',
-                duration: index => 36 + index * 9,
+                duration: index => 72 + index * 16,
                 repeat: -1,
                 ease: 'none'
             });
 
             gsap.to('.ck-vector-lines path, .ck-scan-bars path', {
-                strokeDashoffset: '-=260',
-                duration: index => 7 + index * 0.38,
+                strokeDashoffset: '-=160',
+                duration: index => 16 + index * 0.8,
                 repeat: -1,
                 ease: 'none',
-                stagger: { each: 0.08, from: 'center' }
+                stagger: { amount: 0.7, from: 'center' }
             });
 
             gsap.to('.ck-data-arcs path', {
-                strokeDashoffset: '+=180',
-                autoAlpha: 0.22,
-                duration: index => 9 + index * 0.45,
+                autoAlpha: 0.24,
+                duration: 5.8,
                 repeat: -1,
                 yoyo: true,
                 ease: 'sine.inOut',
-                stagger: { each: 0.12, from: 'edges' }
+                stagger: { amount: 1.2, from: 'edges' }
             });
 
             gsap.to('.ck-starfield circle', {
-                autoAlpha: 0.16,
-                scale: 1.9,
+                autoAlpha: 0.18,
+                scale: 1.28,
                 transformOrigin: '50% 50%',
-                duration: 1.6,
+                duration: 4.4,
                 repeat: -1,
                 yoyo: true,
                 ease: 'sine.inOut',
-                stagger: { each: 0.14, from: 'random' }
+                stagger: { amount: 1.8, from: 'random' }
             });
 
-            gsap.to('.ck-nodes circle, .orbit-nodes circle', {
-                scale: 1.55,
-                autoAlpha: 0.48,
+            gsap.to('.ck-nodes circle', {
+                scale: 1.18,
+                autoAlpha: 0.42,
                 transformOrigin: '50% 50%',
                 repeat: -1,
                 yoyo: true,
-                duration: 1.8,
-                stagger: { each: 0.16, from: 'random' },
+                duration: 3.8,
+                stagger: { amount: 1.0, from: 'random' },
                 ease: 'sine.inOut'
             });
 
-            gsap.to('.orbit-ring-1', { rotation: 360, transformOrigin: '50% 50%', duration: 36, repeat: -1, ease: 'none' });
-            gsap.to('.orbit-ring-2', { rotation: -360, transformOrigin: '50% 50%', duration: 44, repeat: -1, ease: 'none' });
-            gsap.to('.orbit-ring-3', { rotation: 360, transformOrigin: '50% 50%', duration: 52, repeat: -1, ease: 'none' });
-            gsap.to('.repo-panel', { y: -10, duration: 3.2, repeat: -1, yoyo: true, ease: 'sine.inOut' });
+            gsap.to('.orbit-ring-1', { rotation: 360, transformOrigin: '50% 50%', duration: 82, repeat: -1, ease: 'none' });
+            gsap.to('.orbit-ring-2', { rotation: -360, transformOrigin: '50% 50%', duration: 96, repeat: -1, ease: 'none' });
+            gsap.to('.orbit-ring-3', { rotation: 360, transformOrigin: '50% 50%', duration: 112, repeat: -1, ease: 'none' });
+
+            if (finePointer) {
+                gsap.to('.repo-panel', { y: -6, duration: 4.8, repeat: -1, yoyo: true, ease: 'sine.inOut' });
+            }
             gsap.to('.brand-scan', {
                 x: 18,
                 autoAlpha: 0.34,
-                duration: 2.8,
+                duration: 4.6,
                 repeat: -1,
                 yoyo: true,
                 ease: 'sine.inOut'
             });
             gsap.to('.logo-mark', {
-                y: -1.5,
-                duration: 3.6,
+                y: -1,
+                duration: 5.2,
                 repeat: -1,
                 yoyo: true,
                 ease: 'sine.inOut'
@@ -685,27 +723,60 @@ function initCursor() {
         return;
     }
 
+    document.body.style.cursor = 'none';
+
+    let latestX = window.innerWidth / 2;
+    let latestY = window.innerHeight / 2;
+    let cssVarFrame = 0;
+    let fallbackFrame = 0;
+    let hoverScale = 1;
+
+    const syncSpotlight = () => {
+        document.documentElement.style.setProperty('--cursor-x', `${latestX}px`);
+        document.documentElement.style.setProperty('--cursor-y', `${latestY}px`);
+        cssVarFrame = 0;
+    };
+
+    const moveFallback = () => {
+        cursor.style.transform = `translate3d(${latestX}px, ${latestY}px, 0) scale(${hoverScale})`;
+        fallbackFrame = 0;
+    };
+
     let moveX = value => {
-        cursor.style.left = `${value}px`;
+        latestX = value;
+        if (!fallbackFrame) fallbackFrame = requestAnimationFrame(moveFallback);
     };
     let moveY = value => {
-        cursor.style.top = `${value}px`;
+        latestY = value;
+        if (!fallbackFrame) fallbackFrame = requestAnimationFrame(moveFallback);
     };
 
     if (window.gsap) {
-        moveX = gsap.quickTo(cursor, 'left', { duration: 0.18, ease: 'power3.out' });
-        moveY = gsap.quickTo(cursor, 'top', { duration: 0.18, ease: 'power3.out' });
+        gsap.set(cursor, { x: latestX, y: latestY, scale: 1 });
+        moveX = gsap.quickTo(cursor, 'x', { duration: 0.14, ease: 'power3.out' });
+        moveY = gsap.quickTo(cursor, 'y', { duration: 0.14, ease: 'power3.out' });
     }
 
     document.addEventListener('mousemove', (e) => {
+        latestX = e.clientX;
+        latestY = e.clientY;
         moveX(e.clientX);
         moveY(e.clientY);
-    });
+        if (!cssVarFrame) cssVarFrame = requestAnimationFrame(syncSpotlight);
+    }, { passive: true });
 
     // 悬停效果
     document.querySelectorAll('a, button, .card, .repo-card, .contact-card, .skill-tag, .github-source-link').forEach(el => {
-        el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
-        el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+        el.addEventListener('mouseenter', () => {
+            cursor.classList.add('hover');
+            hoverScale = 1.14;
+            if (window.gsap) gsap.to(cursor, { scale: 1.14, duration: 0.16, ease: 'power2.out', overwrite: 'auto' });
+        });
+        el.addEventListener('mouseleave', () => {
+            cursor.classList.remove('hover');
+            hoverScale = 1;
+            if (window.gsap) gsap.to(cursor, { scale: 1, duration: 0.16, ease: 'power2.out', overwrite: 'auto' });
+        });
     });
 }
 
@@ -783,9 +854,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initCopyContact();
     initSmoothScroll();
     initCursor();
-
-    // 延迟执行滚动动画初始化
-    setTimeout(initScrollReveal, 2500);
 
     initVisibilityChange();
 

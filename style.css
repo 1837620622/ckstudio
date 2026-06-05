@@ -4116,3 +4116,241 @@ nav {
         letter-spacing: 0.12em;
     }
 }
+
+/* ===== 性能优先动效层：保留 CK 启动页，降低主页常驻负载 ===== */
+:root {
+    --cursor-x: 50vw;
+    --cursor-y: 50vh;
+}
+
+html,
+body {
+    background: #000000;
+}
+
+body {
+    background:
+        radial-gradient(circle at 50% -12%, rgba(255,255,255,0.07), transparent 32%),
+        radial-gradient(circle at 14% 18%, rgba(255,255,255,0.025), transparent 28%),
+        radial-gradient(circle at 88% 12%, rgba(255,255,255,0.022), transparent 24%),
+        linear-gradient(135deg, #000000 0%, #030407 48%, #000000 100%);
+}
+
+.aurora-bg,
+.light-rays,
+.particles,
+.floating-shapes {
+    display: none;
+}
+
+.grid-bg {
+    opacity: 0.48;
+    background-size: 72px 72px;
+    background-image:
+        linear-gradient(rgba(255,255,255,0.028) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.028) 1px, transparent 1px);
+}
+
+.global-bg {
+    overflow: hidden;
+    background:
+        radial-gradient(ellipse at 50% 46%, rgba(255,255,255,0.035) 0%, rgba(255,255,255,0.012) 32%, transparent 62%),
+        radial-gradient(circle at 24% 72%, rgba(255,255,255,0.018), transparent 32%),
+        #000000;
+    contain: paint;
+}
+
+.global-bg::before,
+.global-bg::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+}
+
+.global-bg::before {
+    inset: -10%;
+    opacity: 0.36;
+    background-image:
+        linear-gradient(rgba(255,255,255,0.032) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.026) 1px, transparent 1px);
+    background-size: 120px 120px;
+    mask-image: radial-gradient(circle at 50% 50%, #000 0%, transparent 68%);
+}
+
+.global-bg::after {
+    width: 420px;
+    height: 420px;
+    left: -210px;
+    top: -210px;
+    border-radius: 50%;
+    opacity: 0.30;
+    transform: translate3d(var(--cursor-x), var(--cursor-y), 0);
+    background:
+        radial-gradient(circle, rgba(255,255,255,0.13), rgba(255,255,255,0.035) 34%, transparent 68%);
+    will-change: transform;
+}
+
+.hero-bg-text {
+    opacity: 0.38;
+    filter: none;
+    will-change: transform;
+}
+
+.bg-letter {
+    animation: none;
+    text-shadow: none;
+    filter: none;
+    -webkit-text-stroke: 1.4px rgba(255,255,255,0.45);
+    background: linear-gradient(180deg, rgba(255,255,255,0.17), rgba(255,255,255,0.025) 58%, rgba(255,255,255,0));
+    -webkit-background-clip: text;
+    background-clip: text;
+    will-change: transform, opacity;
+}
+
+.ck-backdrop-svg {
+    opacity: 0.68;
+    filter: none;
+    will-change: transform, opacity;
+}
+
+.ck-vector-lines path,
+.ck-scan-bars path,
+.ck-data-arcs path,
+.ck-orbit-lines ellipse {
+    vector-effect: non-scaling-stroke;
+}
+
+.ck-starfield circle,
+.ck-nodes circle,
+.orbit-nodes circle,
+.brand-shell,
+.brand-scan,
+.category-icon svg,
+.loader-core-frame,
+.loader-scan,
+.loader-ck-text,
+.loader-scene,
+.loader-shard {
+    filter: none;
+}
+
+nav {
+    background: linear-gradient(180deg, rgba(0,0,0,0.88), rgba(0,0,0,0.14));
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+.card,
+.repo-card,
+.about-card,
+.contact-card,
+.code-block,
+.repo-panel {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    box-shadow: 0 18px 48px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.07);
+    transition:
+        transform 0.22s ease,
+        border-color 0.22s ease,
+        background 0.22s ease,
+        box-shadow 0.22s ease,
+        opacity 0.22s ease;
+}
+
+.card:hover,
+.repo-card:hover,
+.contact-card:hover {
+    transform: translate3d(0, -4px, 0);
+    box-shadow: 0 22px 58px rgba(0,0,0,0.42), 0 0 24px rgba(255,255,255,0.055);
+}
+
+.card::before,
+.card::after,
+.card-glow,
+.card-glow-effect,
+.footer-line,
+.wheel,
+.shape,
+.particle {
+    animation: none;
+}
+
+.cursor-follower {
+    left: 0;
+    top: 0;
+    transform: translate3d(-40px, -40px, 0);
+    transition: filter 0.16s ease, opacity 0.16s ease;
+    will-change: transform;
+    contain: layout paint style;
+    filter: none;
+}
+
+.cursor-follower.hover {
+    transform: none;
+    filter: drop-shadow(0 0 14px rgba(255,255,255,0.18));
+}
+
+@media (max-width: 860px) {
+    body {
+        background:
+            radial-gradient(circle at 50% 0%, rgba(255,255,255,0.055), transparent 34%),
+            linear-gradient(135deg, #000000 0%, #030407 58%, #000000 100%);
+    }
+
+    .global-bg::after {
+        display: none;
+    }
+
+    .global-bg::before {
+        opacity: 0.24;
+        background-size: 92px 92px;
+    }
+
+    .hero-bg-text {
+        opacity: 0.24;
+        filter: none;
+    }
+
+    .bg-letter {
+        font-size: clamp(176px, 48vw, 260px);
+        -webkit-text-stroke: 1px rgba(255,255,255,0.30);
+    }
+
+    .ck-backdrop-svg {
+        opacity: 0.38;
+        transform: scale(1.08);
+    }
+
+    .card,
+    .repo-card,
+    .about-card,
+    .contact-card,
+    .code-block,
+    .repo-panel {
+        box-shadow: 0 12px 28px rgba(0,0,0,0.30), inset 0 1px 0 rgba(255,255,255,0.06);
+    }
+
+    .card:hover,
+    .repo-card:hover,
+    .contact-card:hover {
+        transform: none;
+        box-shadow: 0 12px 28px rgba(0,0,0,0.30), inset 0 1px 0 rgba(255,255,255,0.06);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .global-bg::after,
+    .global-bg::before {
+        display: none;
+    }
+
+    .bg-letter,
+    .ck-backdrop-svg,
+    .orbit-ring,
+    .brand-scan,
+    .logo-mark {
+        animation: none;
+        transition: none;
+        transform: none;
+    }
+}
