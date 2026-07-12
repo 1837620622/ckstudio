@@ -1,0 +1,10 @@
+# Cloudflare Pages — static portfolio
+# Deploy: npm run deploy
+# Or link this repo in Cloudflare Dashboard → Pages → Connect Git
+
+name = "ckstudio"
+compatibility_date = "2026-07-12"
+pages_build_output_dir = "."
+
+[vars]
+SITE_NAME = "CK Studio"

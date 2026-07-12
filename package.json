@@ -1,0 +1,18 @@
+{
+  "name": "ckstudio",
+  "version": "1.1.0",
+  "private": true,
+  "description": "CK Studio — 传康KK personal portfolio (Cloudflare Pages)",
+  "scripts": {
+    "dev": "npx --yes serve -l 8765 .",
+    "preview": "npx wrangler pages dev . --port 8788",
+    "deploy": "npx wrangler pages deploy . --project-name=ckstudio --commit-dirty=true",
+    "wrangler:update": "npm install wrangler@latest --save-dev"
+  },
+  "devDependencies": {
+    "wrangler": "^4.110.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

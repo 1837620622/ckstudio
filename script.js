@@ -26,7 +26,7 @@ const projects = [
     // ===== 娱乐 / 媒体 =====
     {
         name: "CKTV 传康播放器",
-        desc: "跨站影视聚合，打开就是片场。",
+        desc: "跨平台影视聚合播放器，多源内容统一入口。",
         url: "https://tv.chuankangkk.top/",
         code: "01",
         tags: ["视频", "Next.js"],
@@ -35,7 +35,7 @@ const projects = [
     },
     {
         name: "CK Music",
-        desc: "多源音乐播放，点开就能听。",
+        desc: "多源音乐播放器，沉浸式听歌体验。",
         url: "https://ckmusic.chuankangkk.top/",
         code: "02",
         tags: ["音乐", "播放器"],
@@ -44,7 +44,7 @@ const projects = [
     },
     {
         name: "传康云游戏",
-        desc: "浏览器里直接开玩，免安装。",
+        desc: "浏览器端云游戏大厅，即点即玩。",
         url: "https://game.chuankangkk.top/",
         code: "03",
         tags: ["游戏", "H5"],
@@ -53,7 +53,7 @@ const projects = [
     },
     {
         name: "传康烟花秀",
-        desc: "Canvas 烟花，光点与节奏同场。",
+        desc: "Canvas 烟花动效实验，节奏与光影联动。",
         url: "https://yanhua.chuankangkk.top/",
         code: "04",
         tags: ["Canvas", "动效"],
@@ -61,7 +61,7 @@ const projects = [
     },
     {
         name: "CK 3D 展示",
-        desc: "可拖拽的 3D 空间实验页。",
+        desc: "可交互的 3D 展示实验，空间感与操作一体。",
         url: "https://3d.chuankangkk.top/",
         code: "05",
         tags: ["3D", "交互"],
@@ -71,7 +71,7 @@ const projects = [
     // ===== 工具 =====
     {
         name: "CK 图床",
-        desc: "上传即链，素材流转极简。",
+        desc: "轻量图床服务，上传后即时返回可用链接。",
         url: "https://ck-img.chuankangkk.top/",
         code: "06",
         tags: ["图床", "存储"],
@@ -80,7 +80,7 @@ const projects = [
     },
     {
         name: "IP 质量检测",
-        desc: "终端风出口检测 · 流媒体解锁。",
+        desc: "终端风格 IP 质量检测，含流媒体解锁探测。",
         url: "https://ip-check.chuankangkk.top/",
         code: "07",
         tags: ["IP", "网络"],
@@ -89,7 +89,7 @@ const projects = [
     },
     {
         name: "免费 VPN 情报站",
-        desc: "公开节点 / 试用机场聚合，每日同步。",
+        desc: "免费节点与试用机场情报聚合，按日更新。",
         url: "https://free-vpn.chuankangkk.top/",
         code: "08",
         tags: ["VPN", "订阅"],
@@ -98,7 +98,7 @@ const projects = [
     },
     {
         name: "小米运动刷步",
-        desc: "微信/支付宝步数工具，一键处理。",
+        desc: "微信 / 支付宝运动步数辅助工具。",
         url: "https://sport-xiaomi.vercel.app/",
         code: "09",
         tags: ["运动", "工具"],
@@ -106,7 +106,7 @@ const projects = [
     },
     {
         name: "睡眠助手",
-        desc: "白噪音助眠，睡前一键安静。",
+        desc: "白噪音助眠页，轻量专注与放松场景。",
         url: "https://sleep-3s3.pages.dev/",
         code: "10",
         tags: ["白噪音", "助眠"],
@@ -114,7 +114,7 @@ const projects = [
     },
     {
         name: "CK Card Tools",
-        desc: "虚拟卡生成与校验，中英双语。",
+        desc: "虚拟卡号生成与校验工具，中英双语界面。",
         url: "https://ck-card-tools.vercel.app/",
         code: "11",
         tags: ["工具", "React"],
@@ -122,7 +122,7 @@ const projects = [
     },
     {
         name: "Codex Inviter",
-        desc: "一键发送 ChatGPT Codex 邀请。",
+        desc: "ChatGPT Codex 邀请发送工具，支持一键部署。",
         url: "https://codex-inviter.vercel.app/",
         code: "12",
         tags: ["Codex", "邀请"],
@@ -132,7 +132,7 @@ const projects = [
     // ===== 金融 / 数据 =====
     {
         name: "黄金量化监控",
-        desc: "Vue3 + AI 的金价看板与信号。",
+        desc: "Vue3 黄金行情看板，结合 AI 量化分析。",
         url: "https://gold.chuankangkk.top/",
         code: "13",
         tags: ["金融", "AI", "量化"],
@@ -141,7 +141,7 @@ const projects = [
     },
     {
         name: "中国基金实时行情",
-        desc: "盘中估值 · 涨跌榜 · 自选管理。",
+        desc: "国内基金盘中估值、涨跌榜与自选管理。",
         url: "https://fund-cn.chuankangkk.top/",
         code: "14",
         tags: ["基金", "Workers"],
@@ -150,7 +150,7 @@ const projects = [
     },
     {
         name: "全球基金估值",
-        desc: "中外基金双源融合，中英双语。",
+        desc: "海外与全球基金估值，双数据源 · 中英双语。",
         url: "https://fund.chuankangkk.top/",
         code: "15",
         tags: ["基金", "估值"],
@@ -160,7 +160,7 @@ const projects = [
     // ===== AI =====
     {
         name: "谁是 AI 大嘉豪",
-        desc: "硬核 AI 能力测评 · 四段位抽题。",
+        desc: "AI 能力测评与人格签发，多段位随机出题。",
         url: "https://ai-jiahao.chuankangkk.top/",
         code: "16",
         tags: ["AI", "测评"],
@@ -169,7 +169,7 @@ const projects = [
     },
     {
         name: "Trump Tracker",
-        desc: "Truth Social 实时动态 · 监控推送。",
+        desc: "Truth Social 动态实时监控与推送。",
         url: "https://trump-x.chuankangkk.top/",
         code: "17",
         tags: ["AI", "监控"],
@@ -178,7 +178,7 @@ const projects = [
     },
     {
         name: "玄机子 Diviner",
-        desc: "AI 命理玄学助手，问题换回声。",
+        desc: "AI 命理玄学助手，结构化趣味解读。",
         url: "https://diviner.chuankangkk.top/",
         code: "18",
         tags: ["AI", "趣味"],
@@ -190,7 +190,7 @@ const projects = [
 const openSourceProjects = [
     {
         name: "cloudflare-bypass-2026",
-        desc: "Cloudflare Turnstile 绕过工具链，跨平台硬核样本。",
+        desc: "Cloudflare Turnstile 绕过研究工具，跨平台工程实现。",
         language: "Python",
         stars: 391,
         forks: 71,
@@ -200,7 +200,7 @@ const openSourceProjects = [
     },
     {
         name: "windsurf-account-manager-releases",
-        desc: "Windsurf 多账号桌面端：切换 · Token · 额度。",
+        desc: "Windsurf 多账号桌面端：切换、Token 刷新与额度监控。",
         language: "Desktop",
         stars: 65,
         forks: 5,
@@ -210,7 +210,7 @@ const openSourceProjects = [
     },
     {
         name: "chatgpt-specimen-toolbox",
-        desc: "Session ↔ 9 种认证格式 N×N 互转，本地零上报。",
+        desc: "ChatGPT Session 与九种认证格式双向转换，本地处理。",
         language: "JavaScript",
         stars: 50,
         forks: 18,
@@ -220,7 +220,7 @@ const openSourceProjects = [
     },
     {
         name: "cto-new-openai-proxy",
-        desc: "OpenAI / Anthropic 兼容反代 · 账号池 · Dashboard。",
+        desc: "OpenAI / Anthropic 兼容网关，含账号池与运维面板。",
         language: "Python",
         stars: 35,
         forks: 9,
@@ -230,7 +230,7 @@ const openSourceProjects = [
     },
     {
         name: "winsurf-switch",
-        desc: "Windsurf 多账号切换，突破模型等待限制。",
+        desc: "轻量级 Windsurf 账号切换，缓解模型限流等待。",
         language: "Python",
         stars: 33,
         forks: 3,
@@ -239,7 +239,7 @@ const openSourceProjects = [
     },
     {
         name: "wifi-security-toolkit",
-        desc: "WPA 研究 + hashcat，本地 / 云 GPU 工具链。",
+        desc: "WPA 安全研究与 hashcat 破解流水线，支持云 GPU。",
         language: "Shell",
         stars: 23,
         forks: 7,
@@ -248,7 +248,7 @@ const openSourceProjects = [
     },
     {
         name: "fund-cn",
-        desc: "国内基金实时估值，Cloudflare Workers 部署。",
+        desc: "国内基金实时估值系统，Cloudflare Workers 部署。",
         language: "JavaScript",
         stars: 22,
         forks: 7,
@@ -259,7 +259,7 @@ const openSourceProjects = [
     },
     {
         name: "free-vps",
-        desc: "25+ 免费 VPS / 容器平台对比与部署笔记。",
+        desc: "25+ 免费 VPS / 容器平台对比与部署指南。",
         language: "Docs",
         stars: 15,
         forks: 7,
@@ -268,7 +268,7 @@ const openSourceProjects = [
     },
     {
         name: "Gold-Price-Quantitative-Monitoring-System",
-        desc: "黄金行情 + DeepSeek 量化分析开源版。",
+        desc: "黄金行情监控与 DeepSeek 量化分析开源实现。",
         language: "JavaScript",
         stars: 12,
         forks: 5,
@@ -278,7 +278,7 @@ const openSourceProjects = [
     },
     {
         name: "codex-red-team-prompt",
-        desc: "Codex 系统提示注入研究工具，红队向。",
+        desc: "Codex 系统提示注入研究工具，面向安全红队场景。",
         language: "Python",
         stars: 8,
         forks: 1,
@@ -287,7 +287,7 @@ const openSourceProjects = [
     },
     {
         name: "codex-inviter",
-        desc: "一键发送 ChatGPT Codex 邀请页。",
+        desc: "ChatGPT Codex 邀请发送页面，支持 Vercel 部署。",
         language: "HTML",
         stars: 6,
         forks: 3,
@@ -297,7 +297,7 @@ const openSourceProjects = [
     },
     {
         name: "proxypool",
-        desc: "多协议代理池：采集 · 检测 · REST API。",
+        desc: "多协议代理池：采集、存活检测与 REST API。",
         language: "JavaScript",
         stars: 5,
         forks: 2,
