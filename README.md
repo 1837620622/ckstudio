@@ -1,169 +1,76 @@
-<h1 align="center">
-  <a href="https://git.io/typing-svg">
-    <img src="https://readme-typing-svg.herokuapp.com?font=Orbitron&weight=900&size=35&pause=1000&color=06B6D4&center=true&vCenter=true&width=600&lines=Hi%2C+I'm+Chuankang+KK!;%E4%B8%87%E8%83%BD%E7%A8%8B%E5%BA%8F%E5%91%98;Full+Stack+%26+AI+Developer" alt="Typing SVG" />
-  </a>
-</h1>
+# CK Studio
 
-<p align="center">
-  <a href="http://www.chuankangkk.top"><img src="https://img.shields.io/badge/🌐_Portfolio-chuankangkk.top-06b6d4?style=for-the-badge" /></a>
-  <a href="mailto:2040168455@qq.com"><img src="https://img.shields.io/badge/📧_Email-Contact_Me-22d3ee?style=for-the-badge" /></a>
-  <img src="https://img.shields.io/badge/💬_WeChat-1837620622-07C160?style=for-the-badge" />
-  <img src="https://komarev.com/ghpvc/?username=1837620622&style=for-the-badge&color=22d3ee" />
-</p>
+传康KK 个人作品集官网 · [www.chuankangkk.top](https://www.chuankangkk.top)
 
-<p align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,8,12,20&height=100&section=header&text=&fontSize=0" width="100%" />
-</p>
+黑白星空 / 抽象 CK 金属视觉 / Three.js 渐进场景 / 在线作品与高星开源双入口。
 
----
+## 在线作品（实测可访问）
 
-### 🚀 About Me
+| 项目 | 预览 |
+|------|------|
+| CKTV 传康播放器 | https://tv.chuankangkk.top |
+| CK Music | https://ckmusic.chuankangkk.top |
+| 传康云游戏 | https://game.chuankangkk.top |
+| 传康烟花秀 | https://yanhua.chuankangkk.top |
+| CK 3D 展示 | https://3d.chuankangkk.top |
+| CK 图床 | https://ck-img.chuankangkk.top |
+| IP 质量检测 | https://ip-check.chuankangkk.top |
+| 免费 VPN 情报站 | https://free-vpn.chuankangkk.top |
+| Stripe 邮箱风控 | https://stripe-email.chuankangkk.top |
+| 小米运动刷步 | https://sport-xiaomi.vercel.app |
+| 睡眠助手 | https://sleep-3s3.pages.dev |
+| CK Card Tools | https://ck-card-tools.vercel.app |
+| Codex Inviter | https://codex-inviter.vercel.app |
+| 黄金量化监控 | https://gold.chuankangkk.top |
+| 中国基金实时行情 | https://fund-cn.chuankangkk.top |
+| 全球基金估值 | https://fund.chuankangkk.top |
+| 谁是 AI 大嘉豪 | https://ai-jiahao.chuankangkk.top |
+| Trump Tracker | https://trump-x.chuankangkk.top |
+| 玄机子 Diviner | https://diviner.chuankangkk.top |
 
-```yaml
-name: Chuankang KK
-alias: 万能程序员 (Universal Programmer)
-location: China
-focus: [Full Stack Development, AI Agents, Quantitative Analysis, Creative Tools]
-current_work: [Gold Price Quant Monitor, DeepSeek AI, Windsurf Tools, CK Studio]
-contact:
-  website: www.chuankangkk.top
-  wechat: 1837620622
-  email: 2040168455@qq.com
-platforms: [CSDN, 咸鱼, B站]
-motto: "技术可以让生活更美好"
-```
+> 已下线 / 404（未再挂载）：`api.chuankangkk.top`、`proxy.chuankangkk.top`、`cet6` Railway、`sport.chuankangkk.top`
 
----
+## 开源精选（按 Stars）
 
-### 🎨 CK Studio - Personal Portfolio
+| Stars | 仓库 | Demo |
+|------:|------|------|
+| 391 | [cloudflare-bypass-2026](https://github.com/1837620622/cloudflare-bypass-2026) | — |
+| 65 | [windsurf-account-manager-releases](https://github.com/1837620622/windsurf-account-manager-releases) | — |
+| 50 | [chatgpt-specimen-toolbox](https://github.com/1837620622/chatgpt-specimen-toolbox) | — |
+| 35 | [cto-new-openai-proxy](https://github.com/1837620622/cto-new-openai-proxy) | — |
+| 33 | [winsurf-switch](https://github.com/1837620622/winsurf-switch) | — |
+| 23 | [wifi-security-toolkit](https://github.com/1837620622/wifi-security-toolkit) | — |
+| 22 | [fund-cn](https://github.com/1837620622/fund-cn) | [fund-cn.chuankangkk.top](https://fund-cn.chuankangkk.top) |
+| 15 | [free-vps](https://github.com/1837620622/free-vps) | — |
+| 12 | [Gold-Price…](https://github.com/1837620622/Gold-Price-Quantitative-Monitoring-System) | [gold.chuankangkk.top](https://gold.chuankangkk.top) |
+| … | 其余见站点 SOURCE VAULT | 含 Stripe / VPN / IP / Trump / AI 嘉豪 等 |
 
-<p align="center">
-  <img src="https://img.shields.io/badge/3D_Engine-Three.js-000000?style=flat-square&logo=three.js" />
-  <img src="https://img.shields.io/badge/Style-Progressive_Sections-06b6d4?style=flat-square" />
-  <img src="https://img.shields.io/badge/Render-WebGL-ACES_Filmic?style=flat-square&logo=webgl" />
-  <img src="https://img.shields.io/badge/Theme-Cinematic_Dark-02060d?style=flat-square" />
-</p>
-
-个人主页采用 **黑白星空 + 抽象 CK 金属视觉** 设计：首屏聚焦 CK 字体本体，内容区保持规整、清晰、可直接访问。
-
-| ✨ 特性 | 📝 描述 |
-|--------|---------|
-| 🌌 **三层粒子系统** | 远/中/近粒子分层漂浮，自定义顶点 shader |
-| 💎 **金属 CK 字体** | Canvas 纹理绘制金属渐变、内切线、暗面和边缘高光 |
-| 🎯 **渐进式场景** | 滚动驱动 Hero→Works→OpenSource→About→Contact |
-| 🖱️ **线性扫光动效** | 点击/移动时生成短促切线闪光，避免圆环模板感 |
-| 🎬 **电影级色调** | ACES Filmic Tone Mapping，黑白星空基底 |
-| 📱 **响应式** | 桌面、平板、手机统一排版检查 |
-
----
-
-### 🎬 5 段渐进式 3D 场景
-
-| 段落 | 3D 内容 |
-|------|---------|
-| **Hero（首页）** | 金属 CK 字体 + 少量线性扫光 + 黑白星空粒子 |
-| **Works（作品）** | CK 作为背景焦点，作品卡片统一等宽等高矩阵 |
-| **OpenSource（开源）** | 节点网络拓扑 + 连接线，保持黑白银灰色系 |
-| **About（关于）** | IcosahedronGeometry 二十面体线框，低饱和金属质感 |
-| **Contact（联系）** | 水平切线组呼吸动画，避免圆环式扩散 |
-
----
-
-### 🛠️ Tech Stack
-
-<p align="center">
-  <img src="https://skillicons.dev/icons?i=threejs,javascript,html,css,python,nodejs&theme=dark" />
-</p>
-<p align="center">
-  <img src="https://skillicons.dev/icons?i=cloudflare,git,github,vercel,netlify&theme=dark" />
-</p>
-
----
-
-### 📊 GitHub Stats
-
-<p align="center">
-  <img src="https://github-readme-stats.zohan.tech/api?username=1837620622&show_icons=true&theme=tokyonight&hide_border=true&bg_color=02060d&icon_color=22d3ee&title_color=06b6d4" width="49%" />
-  <img src="https://github-readme-stats.zohan.tech/api/top-langs/?username=1837620622&layout=compact&theme=tokyonight&hide_border=true&bg_color=02060d&title_color=06b6d4" width="40%" />
-</p>
-
----
-
-### 📈 Activity Graph
-
-<p align="center">
-  <img src="https://github-readme-activity-graph.vercel.app/graph?username=1837620622&theme=tokyo-night&hide_border=true&bg_color=02060d&color=22d3ee&line=06b6d4&point=a855f7" width="100%" />
-</p>
-
----
-
-### 💻 Featured Projects
-
-<p align="center">
-  <a href="https://github.com/1837620622/ckstudio">
-    <img src="https://github-readme-stats.zohan.tech/api/pin/?username=1837620622&repo=ckstudio&theme=tokyonight&hide_border=true&bg_color=02060d&icon_color=22d3ee&title_color=06b6d4" width="49%" />
-  </a>
-  <a href="https://github.com/1837620622/winsurf-switch">
-    <img src="https://github-readme-stats.zohan.tech/api/pin/?username=1837620622&repo=winsurf-switch&theme=tokyonight&hide_border=true&bg_color=02060d&icon_color=22d3ee&title_color=06b6d4" width="49%" />
-  </a>
-</p>
-<p align="center">
-  <a href="https://github.com/1837620622/Windsurf-Switcher-Free">
-    <img src="https://github-readme-stats.zohan.tech/api/pin/?username=1837620622&repo=Windsurf-Switcher-Free&theme=tokyonight&hide_border=true&bg_color=02060d&icon_color=22d3ee&title_color=06b6d4" width="49%" />
-  </a>
-  <a href="https://github.com/1837620622/ck-img">
-    <img src="https://github-readme-stats.zohan.tech/api/pin/?username=1837620622&repo=ck-img&theme=tokyonight&hide_border=true&bg_color=02060d&icon_color=22d3ee&title_color=06b6d4" width="49%" />
-  </a>
-</p>
-
----
-
-### 🌐 Online Projects
-
-| 项目 | 描述 | 链接 |
-|------|------|------|
-| 🎬 CKTV | 在线视频播放平台 | [tv.chuankangkk.top](https://tv.chuankangkk.top) |
-| 🎵 CK Music | 多源音乐播放器 | [ckmusic.chuankangkk.top](https://ckmusic.chuankangkk.top) |
-| 🖼️ CK 图床 | 免费图片托管 | [ck-img.chuankangkk.top](https://ck-img.chuankangkk.top) |
-| 🔌 传康KKAPI | 271+ 免费接口 | [api.chuankangkk.top](https://api.chuankangkk.top) |
-| 🎮 云游戏 | 80+ 在线小游戏 | [game.chuankangkk.top](https://game.chuankangkk.top) |
-| 📈 黄金监控 | AI 量化分析 | [gold.chuankangkk.top](https://gold.chuankangkk.top) |
-
----
-
-### 🚀 本地运行
+## 本地预览
 
 ```bash
-# 1. 克隆仓库
-git clone https://github.com/1837620622/ckstudio.git
 cd ckstudio
-
-# 2. 启动本地服务器（任选其一）
 python3 -m http.server 8765
-# 或：npx serve -l 8765
-# 或：php -S localhost:8765
-
-# 3. 浏览器打开
-open http://localhost:8765
+# 或
+npm run preview   # wrangler pages dev
 ```
 
-> 详细部署说明（含 Cloudflare Pages / GitHub Pages 配置）请见 [改造说明.md](./改造说明.md)
+## 部署（Cloudflare Pages）
 
----
+```bash
+npm install
+npm run deploy    # wrangler pages deploy
+```
 
-### 📞 Contact Me
+或在 Cloudflare Dashboard 连接本仓库 `main` 分支自动构建。
 
-<p align="center">
-  <a href="http://www.chuankangkk.top"><img src="https://img.shields.io/badge/Website-chuankangkk.top-06b6d4?style=for-the-badge&logo=safari&logoColor=white" /></a>
-  <a href="mailto:2040168455@qq.com"><img src="https://img.shields.io/badge/Email-2040168455@qq.com-EA4335?style=for-the-badge&logo=gmail&logoColor=white" /></a>
-</p>
-<p align="center">
-  <img src="https://img.shields.io/badge/WeChat-1837620622-07C160?style=for-the-badge&logo=wechat&logoColor=white" />
-  <img src="https://img.shields.io/badge/B站/咸鱼-万能程序员-00AEEC?style=for-the-badge&logo=bilibili&logoColor=white" />
-</p>
+- Node：`wrangler@^4.110`
+- 输出目录：站点根目录（静态）
 
----
+## 联系
 
-<p align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,8,12,20&height=100&section=footer" width="100%" />
-</p>
+- 网站：https://www.chuankangkk.top  
+- 邮箱：2040168455@qq.com  
+- 微信：1837620622  
+- GitHub：[@1837620622](https://github.com/1837620622)
+
+技术可以让生活更美好。
