@@ -8,7 +8,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
-    <link rel="stylesheet" href="style.css?v=20260712-copy">
+    <link rel="stylesheet" href="style.css?v=20260712-v2">
+    <link rel="stylesheet" href="design-system.css?v=20260712-v2">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js" defer></script>
 </head>
@@ -33,10 +34,10 @@
             <div class="loader-meta">
                 <div class="loader-meta-label">
                     <span class="loader-meta-dot"></span>
-                    <span>INITIALIZING</span>
+                    <span>加载中</span>
                 </div>
                 <div class="progress-bar"><div class="progress-fill"></div></div>
-                <div class="loader-meta-hint">CK CORE // LOADING</div>
+                <div class="loader-meta-hint">CK Studio</div>
             </div>
         </div>
     </div>
@@ -66,11 +67,11 @@
             </span>
         </div>
         <div class="menu-items">
-            <a href="#works">WORKS</a>
-            <a href="#opensource">OPEN SOURCE</a>
-            <a href="#about">ABOUT</a>
-            <a href="#contact">CONTACT</a>
-            <a href="https://github.com/1837620622" target="_blank" rel="noopener noreferrer" class="github-link">GITHUB <svg class="inline-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17L17 7M10 7h7v7"/></svg></a>
+            <a href="#works">作品</a>
+            <a href="#opensource">开源</a>
+            <a href="#about">关于</a>
+            <a href="#contact">联系</a>
+            <a href="https://github.com/1837620622" target="_blank" rel="noopener noreferrer" class="github-link">GitHub <svg class="inline-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17L17 7M10 7h7v7"/></svg></a>
         </div>
         <button class="menu-toggle" id="menuToggle" type="button" aria-label="打开菜单" aria-controls="mobileMenu" aria-expanded="false">
             <span></span>
@@ -80,11 +81,11 @@
 
     <!-- ===== 移动端菜单 ===== -->
     <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
-        <a href="#works">WORKS</a>
-        <a href="#opensource">OPEN SOURCE</a>
-        <a href="#about">ABOUT</a>
-        <a href="#contact">CONTACT</a>
-        <a href="https://github.com/1837620622" target="_blank" rel="noopener noreferrer">GITHUB <svg class="inline-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17L17 7M10 7h7v7"/></svg></a>
+        <a href="#works">作品</a>
+        <a href="#opensource">开源</a>
+        <a href="#about">关于</a>
+        <a href="#contact">联系</a>
+        <a href="https://github.com/1837620622" target="_blank" rel="noopener noreferrer">GitHub <svg class="inline-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17L17 7M10 7h7v7"/></svg></a>
     </div>
 
     <!-- ===== 全局 3D 场景画布（fixed 铺满全屏，跨 section 渐进式动画） ===== -->
@@ -136,9 +137,9 @@
     <!-- ===== 作品展示 ===== -->
     <section class="works-section" id="works">
         <div class="section-header">
-            <div class="section-tag">// 02</div>
+            <div class="section-tag">02</div>
             <div class="section-title">在线作品</div>
-            <div class="section-count" id="worksCount">(19)</div>
+            <div class="section-count" id="worksCount">19</div>
         </div>
         
         <div class="works-intro">
@@ -159,9 +160,9 @@
     <!-- ===== 开源精选 ===== -->
     <section class="opensource-section" id="opensource">
         <div class="section-header">
-            <div class="section-tag">// 03</div>
+            <div class="section-tag">03</div>
             <div class="section-title">开源仓库</div>
-            <div class="section-count" id="sourceCount">(TOP ⭐)</div>
+            <div class="section-count" id="sourceCount">精选</div>
         </div>
 
         <div class="opensource-intro">
@@ -176,7 +177,7 @@
     <!-- ===== 关于区域 ===== -->
     <section class="about-section" id="about">
         <div class="section-header">
-            <div class="section-tag">// 04</div>
+            <div class="section-tag">04</div>
             <div class="section-title">关于我</div>
         </div>
         <div class="about-content">
@@ -247,7 +248,7 @@
     <!-- ===== 联系区域 ===== -->
     <section class="contact-section" id="contact">
         <div class="section-header">
-            <div class="section-tag">// 05</div>
+            <div class="section-tag">05</div>
             <div class="section-title">联系</div>
         </div>
         
@@ -264,9 +265,9 @@
                         <path d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 01.213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.326.326 0 00.167-.054l1.903-1.114a.864.864 0 01.717-.098 10.16 10.16 0 002.837.403c.276 0 .543-.027.811-.05-.857-2.578.157-4.972 1.932-6.446 1.703-1.415 3.882-1.98 5.853-1.838-.576-3.583-4.196-6.348-8.596-6.348zM5.785 5.991c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 01-1.162 1.178A1.17 1.17 0 014.623 7.17c0-.651.52-1.18 1.162-1.18zm5.813 0c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 01-1.162 1.178 1.17 1.17 0 01-1.162-1.178c0-.651.52-1.18 1.162-1.18zm5.34 2.867c-1.797-.052-3.746.512-5.28 1.786-1.72 1.428-2.687 3.72-1.78 6.22.942 2.453 3.666 4.229 6.884 4.229.826 0 1.622-.12 2.361-.336a.722.722 0 01.598.082l1.584.926a.272.272 0 00.139.045c.133 0 .241-.108.241-.241 0-.06-.023-.118-.039-.177l-.326-1.233a.49.49 0 01.178-.553C23.002 18.504 24 16.774 24 14.835c0-3.164-3.129-5.753-7.062-5.977zm-2.07 2.342c.535 0 .969.44.969.983a.976.976 0 01-.969.983.976.976 0 01-.969-.983c0-.543.434-.983.97-.983zm4.141 0c.535 0 .969.44.969.983a.976.976 0 01-.969.983.976.976 0 01-.969-.983c0-.543.434-.983.969-.983z"/>
                     </svg>
                 </div>
-                <div class="contact-label">WECHAT</div>
+                <div class="contact-label">微信</div>
                 <div class="contact-value">1837620622</div>
-                <div class="contact-hint">复制微信</div>
+                <div class="contact-hint">点击复制</div>
             </div>
             <div class="contact-card email" data-copy="2040168455@qq.com">
                 <div class="contact-icon">
@@ -275,9 +276,9 @@
                         <path d="M22 6L12 13L2 6"/>
                     </svg>
                 </div>
-                <div class="contact-label">EMAIL</div>
+                <div class="contact-label">邮箱</div>
                 <div class="contact-value">2040168455@qq.com</div>
-                <div class="contact-hint">复制邮箱</div>
+                <div class="contact-hint">点击复制</div>
             </div>
             <div class="contact-card bilibili">
                 <div class="contact-icon">
@@ -285,7 +286,7 @@
                         <path d="M17.813 4.653h.854c1.51.054 2.769.578 3.773 1.574 1.004.995 1.524 2.249 1.56 3.76v7.36c-.036 1.51-.556 2.769-1.56 3.773s-2.262 1.524-3.773 1.56H5.333c-1.51-.036-2.769-.556-3.773-1.56S.036 18.858 0 17.347v-7.36c.036-1.511.556-2.765 1.56-3.76 1.004-.996 2.262-1.52 3.773-1.574h.774l-1.174-1.12a1.234 1.234 0 01-.373-.906c0-.356.124-.658.373-.907l.027-.027c.267-.249.573-.373.92-.373.347 0 .653.124.92.373L9.653 4.44c.071.071.134.142.187.213h4.267a.836.836 0 01.16-.213l2.853-2.747c.267-.249.573-.373.92-.373.347 0 .662.151.929.4.267.249.391.551.391.907 0 .355-.124.657-.373.906L17.813 4.653zM5.333 7.24c-.746.018-1.373.276-1.88.773-.506.498-.769 1.13-.786 1.894v7.52c.017.764.28 1.395.786 1.893.507.498 1.134.756 1.88.773h13.334c.746-.017 1.373-.275 1.88-.773.506-.498.769-1.129.786-1.893v-7.52c-.017-.765-.28-1.396-.786-1.894-.507-.497-1.134-.755-1.88-.773H5.333zM8 11.107c.373 0 .684.124.933.373.25.249.383.569.4.96v1.173c-.017.391-.15.711-.4.96-.249.25-.56.374-.933.374s-.684-.125-.933-.374c-.25-.249-.383-.569-.4-.96V12.44c0-.373.129-.689.386-.947.258-.257.574-.386.947-.386zm8 0c.373 0 .684.124.933.373.25.249.383.569.4.96v1.173c-.017.391-.15.711-.4.96-.249.25-.56.374-.933.374s-.684-.125-.933-.374c-.25-.249-.383-.569-.4-.96V12.44c.017-.391.15-.711.4-.96.249-.249.56-.373.933-.373z"/>
                     </svg>
                 </div>
-                <div class="contact-label">BILIBILI / XIANYU</div>
+                <div class="contact-label">B站 / 闲鱼</div>
                 <div class="contact-value">万能程序员</div>
             </div>
             <a href="https://github.com/1837620622" target="_blank" rel="noopener noreferrer" class="contact-card github">
@@ -294,7 +295,7 @@
                         <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
                     </svg>
                 </div>
-                <div class="contact-label">GITHUB</div>
+                <div class="contact-label">GitHub</div>
                 <div class="contact-value">@1837620622</div>
                 <div class="contact-hint">打开主页 <svg class="inline-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17L17 7M10 7h7v7"/></svg></div>
             </a>
@@ -310,10 +311,8 @@
 
     <!-- ===== 页脚 ===== -->
     <footer>
-        <!-- 页脚装饰线 -->
         <div class="footer-decoration">
             <div class="footer-line"></div>
-            <div class="footer-glow"></div>
         </div>
         
         <div class="footer-content">
@@ -344,27 +343,27 @@
                 </div>
                 <div class="footer-nav-group">
                     <h4>联系</h4>
-                    <a href="https://github.com/1837620622" target="_blank" rel="noopener noreferrer">GitHub <svg class="inline-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17L17 7M10 7h7v7"/></svg></a>
-                    <a href="mailto:2040168455@qq.com">Email <svg class="inline-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17L17 7M10 7h7v7"/></svg></a>
-                    <a href="#contact">WeChat</a>
+                    <a href="https://github.com/1837620622" target="_blank" rel="noopener noreferrer">GitHub</a>
+                    <a href="mailto:2040168455@qq.com">邮箱</a>
+                    <a href="#contact">微信</a>
                 </div>
             </div>
             
             <div class="footer-bottom">
-                <div class="footer-text">© CHUANKANGKK. ALL RIGHTS RESERVED.</div>
+                <div class="footer-text">© 传康KK</div>
                 <div class="footer-social">
-                    <a href="https://github.com/1837620622" target="_blank" rel="noopener noreferrer" class="social-icon" title="GitHub">
+                    <a href="https://github.com/1837620622" target="_blank" rel="noopener noreferrer" class="social-icon" title="GitHub" aria-label="GitHub">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
                         </svg>
                     </a>
-                    <a href="mailto:2040168455@qq.com" class="social-icon" title="Email">
+                    <a href="mailto:2040168455@qq.com" class="social-icon" title="邮箱" aria-label="邮箱">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <rect x="2" y="4" width="20" height="16" rx="2"/>
                             <path d="M22 6L12 13L2 6"/>
                         </svg>
                     </a>
-                    <a href="#contact" class="social-icon" title="WeChat">
+                    <a href="#contact" class="social-icon" title="微信" aria-label="微信">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 01.213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.326.326 0 00.167-.054l1.903-1.114a.864.864 0 01.717-.098 10.16 10.16 0 002.837.403c.276 0 .543-.027.811-.05-.857-2.578.157-4.972 1.932-6.446 1.703-1.415 3.882-1.98 5.853-1.838-.576-3.583-4.196-6.348-8.596-6.348zM5.785 5.991c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 01-1.162 1.178A1.17 1.17 0 014.623 7.17c0-.651.52-1.18 1.162-1.18zm5.813 0c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 01-1.162 1.178 1.17 1.17 0 01-1.162-1.178c0-.651.52-1.18 1.162-1.18zm5.34 2.867c-1.797-.052-3.746.512-5.28 1.786-1.72 1.428-2.687 3.72-1.78 6.22.942 2.453 3.666 4.229 6.884 4.229.826 0 1.622-.12 2.361-.336a.722.722 0 01.598.082l1.584.926a.272.272 0 00.139.045c.133 0 .241-.108.241-.241 0-.06-.023-.118-.039-.177l-.326-1.233a.49.49 0 01.178-.553C23.002 18.504 24 16.774 24 14.835c0-3.164-3.129-5.753-7.062-5.977zm-2.07 2.342c.535 0 .969.44.969.983a.976.976 0 01-.969.983.976.976 0 01-.969-.983c0-.543.434-.983.97-.983zm4.141 0c.535 0 .969.44.969.983a.976.976 0 01-.969.983.976.976 0 01-.969-.983c0-.543.434-.983.969-.983z"/>
                         </svg>
@@ -372,17 +371,9 @@
                 </div>
             </div>
         </div>
-        
-        <!-- 底部波浪装饰 -->
-        <div class="footer-wave">
-            <svg viewBox="0 0 1440 100" preserveAspectRatio="none">
-                <path d="M0,50 C150,20 350,80 500,50 C650,20 850,80 1000,50 C1150,20 1350,80 1440,50 L1440,100 L0,100 Z" fill="rgba(255, 255, 255, 0.05)"/>
-                <path d="M0,60 C200,30 400,90 600,60 C800,30 1000,90 1200,60 C1300,45 1400,75 1440,60 L1440,100 L0,100 Z" fill="rgba(200, 200, 200, 0.03)"/>
-            </svg>
-        </div>
     </footer>
 
-    <script src="js/three-scene.js?v=20260712-copy" defer></script>
-    <script src="script.js?v=20260712-copy" defer></script>
+    <script src="js/three-scene.js?v=20260712-v2" defer></script>
+    <script src="script.js?v=20260712-v2" defer></script>
 </body>
 </html>

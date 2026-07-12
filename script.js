@@ -3,15 +3,15 @@
 // ===== 项目分类数据 =====
 const projectCategories = {
     entertainment: {
-        name: "PLAY",
+        name: "娱乐",
         icon: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10.5h10l2.3 5.4c.5 1.2-.4 2.6-1.7 2.6-.6 0-1.1-.3-1.5-.7l-1.6-1.8h-5l-1.6 1.8c-.4.5-.9.7-1.5.7-1.3 0-2.2-1.4-1.7-2.6L7 10.5Z"/><path d="M9 13v3M7.5 14.5h3M15.5 14h.01M17.2 15.7h.01"/></svg>'
     },
     tools: {
-        name: "TOOLS",
+        name: "工具",
         icon: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.7 6.3a4.5 4.5 0 0 0-5.6 5.6l-4.8 4.8a2 2 0 0 0 2.8 2.8l4.8-4.8a4.5 4.5 0 0 0 5.6-5.6l-3 3-3-3 3.2-2.8Z"/></svg>'
     },
     finance: {
-        name: "MARKETS",
+        name: "行情",
         icon: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18h16M6 18V9M12 18V6M18 18v-5"/><path d="M4 9l8-5 8 5"/></svg>'
     },
     ai: {
@@ -115,10 +115,10 @@ function syncVaultMetrics() {
     const totalStars = openSourceProjects.reduce((sum, p) => sum + (Number(p.stars) || 0), 0);
 
     const worksCount = document.getElementById('worksCount');
-    if (worksCount) worksCount.textContent = `(${live})`;
+    if (worksCount) worksCount.textContent = String(live);
 
     const sourceCount = document.getElementById('sourceCount');
-    if (sourceCount) sourceCount.textContent = `(${openRepos} · ${totalStars}+ ⭐)`;
+    if (sourceCount) sourceCount.textContent = `${openRepos} 仓 · ${totalStars}+ stars`;
 
     document.querySelectorAll('.hero-stats .stat-num').forEach((el, idx) => {
         if (idx === 0) el.setAttribute('data-count', String(live));
@@ -176,7 +176,7 @@ function renderProjects() {
 
             card.innerHTML = `
                 <div class="card-top">
-                    <div class="card-number">// ${escapeHtml(proj.code)}</div>
+                    <div class="card-number">${escapeHtml(proj.code)}</div>
                     <div class="card-title">${escapeHtml(proj.name)}</div>
                     <div class="card-desc">${escapeHtml(proj.desc)}</div>
                     <div class="card-tags">${tagsHtml}</div>
@@ -210,15 +210,15 @@ function renderOpenSourceProjects() {
             <div class="repo-card-top">
                 <div class="repo-meta">
                     <span class="repo-language">${escapeHtml(project.language)}</span>
-                    <span>${escapeHtml(project.stars)} stars</span>
-                    <span>${escapeHtml(project.forks)} forks</span>
+                    <span class="repo-stars"><span class="repo-metric-num">${escapeHtml(project.stars)}</span> stars</span>
+                    <span class="repo-forks"><span class="repo-metric-num">${escapeHtml(project.forks)}</span> forks</span>
                 </div>
                 <h3>${escapeHtml(project.name)}</h3>
                 <p>${escapeHtml(project.desc)}</p>
             </div>
             <div class="repo-tags">${tagsHtml}</div>
             <div class="repo-actions">
-                <a href="${safeExternalUrl(project.repo)}" target="_blank" rel="noopener noreferrer" class="repo-action repo-source">开源地址 ${iconExternal}</a>
+                <a href="${safeExternalUrl(project.repo)}" target="_blank" rel="noopener noreferrer" class="repo-action repo-source">仓库 ${iconExternal}</a>
                 ${demoLink}
             </div>
         `;
@@ -609,6 +609,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initVisibilityChange();
 
     console.log('%c\n  ██████╗██╗  ██╗\n ██╔════╝██║ ██╔╝\n ██║     █████╔╝ \n ██║     ██╔═██╗ \n  ██████╗██║  ██╗\n  ══════╝══╝  ══╝\n', 'color: #fff; font-size: 10px;');
-    console.log('%cCK Studio ready · vault 2026-07', 'color: #58a6ff; font-size: 14px; font-weight: bold;');
+    console.log('%cCK Studio', 'color: #c8ccd2; font-size: 12px;');
     console.log('%cGitHub: github.com/1837620622 | Email: 2040168455@qq.com | WeChat: 1837620622', 'color: #888;');
 });

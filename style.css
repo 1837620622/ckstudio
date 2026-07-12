@@ -536,11 +536,12 @@ header {
 }
 
 .badge-dot {
-    width: 8px;
-    height: 8px;
-    background: #00ff88;
+    width: 6px;
+    height: 6px;
+    background: #ffffff;
     border-radius: 50%;
-    animation: pulse 2s infinite;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.28);
+    animation: pulse 2.4s ease-in-out infinite;
 }
 
 @keyframes pulse {
@@ -1984,52 +1985,19 @@ img.card-avatar.avatar-hidden {
     margin: 0 auto;
 }
 
-/* 微信卡片悬停 */
-.contact-card.wechat:hover {
-    border-color: rgba(7, 193, 96, 0.5);
+/* 联系卡片 hover：统一金属白，不用平台色 */
+.contact-card.wechat:hover,
+.contact-card.email:hover,
+.contact-card.bilibili:hover,
+.contact-card.github:hover {
+    border-color: rgba(255, 255, 255, 0.22);
 }
 
-.contact-card.wechat:hover .contact-icon {
-    color: #07c160;
-}
-
-.contact-card.wechat:hover::before {
-    background: linear-gradient(90deg, transparent, #07c160, transparent);
-}
-
-/* 邮箱卡片悬停 */
-.contact-card.email:hover {
-    border-color: rgba(234, 67, 53, 0.5);
-}
-
-.contact-card.email:hover .contact-icon {
-    color: #ea4335;
-}
-
-.contact-card.email:hover::before {
-    background: linear-gradient(90deg, transparent, #ea4335, transparent);
-}
-
-/* B站卡片悬停 */
-.contact-card.bilibili:hover {
-    border-color: rgba(0, 174, 236, 0.5);
-}
-
-.contact-card.bilibili:hover .contact-icon {
-    color: #00aeec;
-}
-
-.contact-card.bilibili:hover::before {
-    background: linear-gradient(90deg, transparent, #00aeec, transparent);
-}
-
-/* GitHub卡片悬停 */
+.contact-card.wechat:hover .contact-icon,
+.contact-card.email:hover .contact-icon,
+.contact-card.bilibili:hover .contact-icon,
 .contact-card.github:hover .contact-icon {
     color: #fff;
-}
-
-.contact-card.github:hover::before {
-    background: linear-gradient(90deg, transparent, #fff, transparent);
 }
 
 /* ----- CTA 按钮增强 ----- */
@@ -2092,8 +2060,8 @@ img.card-avatar.avatar-hidden {
 }
 
 .badge-dot {
-    background: #00ff88;
-    box-shadow: 0 0 10px #00ff88;
+    background: #ffffff;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.28);
 }
 
 /* ----- Highlight 渐变文字增强 ----- */
@@ -2963,18 +2931,8 @@ h1 {
 }
 
 .repo-card-featured::after {
-    content: 'FEATURED';
-    position: absolute;
-    top: 18px;
-    right: 18px;
-    padding: 5px 10px;
-    border: 1px solid rgba(247, 200, 115, 0.42);
-    border-radius: 999px;
-    color: #fff1c7;
-    background: rgba(247, 200, 115, 0.12);
-    font-family: var(--font-mono);
-    font-size: 10px;
-    letter-spacing: 1px;
+    content: none;
+    display: none;
 }
 
 .repo-card:hover {
@@ -4462,9 +4420,9 @@ header#home,
     transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 .loader-dots span.is-on {
-    background: #22d3ee;
-    transform: scale(1.4);
-    box-shadow: 0 0 14px rgba(34, 211, 238, 0.85);
+    background: #ffffff;
+    transform: scale(1.25);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.35);
 }
 
 /* 中央大数字 */
@@ -4482,7 +4440,7 @@ header#home,
     font-style: normal;
     color: #f5f7fa;
     letter-spacing: -0.05em;
-    background: linear-gradient(180deg, #ffffff 0%, #22d3ee 100%);
+    background: linear-gradient(180deg, #ffffff 0%, #c8ccd3 48%, #7f858f 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -4496,7 +4454,7 @@ header#home,
     font-family: 'JetBrains Mono', monospace;
     font-size: clamp(36px, 6vw, 56px);
     font-weight: 300;
-    color: rgba(34, 211, 238, 0.55);
+    color: rgba(255, 255, 255, 0.45);
     font-style: normal;
     padding-bottom: 0.18em;
 }
@@ -4522,8 +4480,8 @@ header#home,
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: #22d3ee;
-    box-shadow: 0 0 10px rgba(34, 211, 238, 0.9);
+    background: #ffffff;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
     animation: loaderDotPulse 1.2s ease-in-out infinite;
 }
 @keyframes loaderDotPulse {
@@ -4541,9 +4499,9 @@ header#home,
     position: absolute;
     inset: 0;
     width: 0;
-    background: linear-gradient(90deg, #22d3ee 0%, #fbbf24 100%);
+    background: linear-gradient(90deg, #ffffff 0%, #7f858f 100%);
     transition: width 0.18s ease-out;
-    box-shadow: 0 0 12px rgba(34, 211, 238, 0.5);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
 }
 .loader-meta-hint {
     font-family: 'JetBrains Mono', monospace;
@@ -4787,18 +4745,20 @@ h1 .line {
     }
 
     .hero-stats {
-        display: none;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 18px 28px;
     }
 
     .stat-num {
-        font-size: clamp(2rem, 10vw, 2.8rem);
+        font-size: 1.35rem;
         line-height: 1;
     }
 
     .stat-label {
-        max-width: 82px;
-        margin-top: 8px;
-        font-size: 8px;
+        max-width: none;
+        margin-top: 4px;
+        font-size: 10px;
         line-height: 1.45;
         letter-spacing: 0.22em;
     }
@@ -5519,100 +5479,13 @@ section {
     }
 }
 
-/* 锚点落位由各 section 自身 padding 负责，避免跳转后露出上一屏内容。 */
+/* 锚点与固定导航对齐（最终值由 design-system 统一） */
 html {
-    scroll-padding-top: 0 !important;
+    scroll-padding-top: 80px;
 }
 
 section {
-    scroll-margin-top: 0 !important;
+    scroll-margin-top: 80px;
 }
 
-/* ===== 2026-07 vault refresh polish ===== */
-:root {
-    --ck-accent: #58a6ff;
-    --ck-accent-2: #a371f7;
-    --ck-glow: rgba(88, 166, 255, 0.18);
-}
-
-.card,
-.repo-card {
-    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-        border-color 0.35s ease,
-        box-shadow 0.35s ease,
-        background 0.35s ease;
-}
-
-.card:hover,
-.repo-card:hover {
-    transform: translateY(-6px);
-    border-color: rgba(88, 166, 255, 0.35);
-    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(88, 166, 255, 0.12);
-}
-
-.card-featured,
-.repo-card-featured {
-    box-shadow: 0 0 0 1px rgba(163, 113, 247, 0.2), 0 12px 40px rgba(0, 0, 0, 0.28);
-}
-
-.card-badge {
-    letter-spacing: 0.08em;
-}
-
-.hero-badge {
-    border-color: rgba(88, 166, 255, 0.35);
-    background: linear-gradient(90deg, rgba(88, 166, 255, 0.1), rgba(163, 113, 247, 0.08));
-}
-
-.btn-primary {
-    box-shadow: 0 0 24px var(--ck-glow);
-}
-
-.btn-primary:hover {
-    box-shadow: 0 0 36px rgba(88, 166, 255, 0.35);
-}
-
-.skill-tag {
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    transition: border-color 0.25s ease, color 0.25s ease, transform 0.25s ease;
-}
-
-.skill-tag:hover {
-    border-color: rgba(88, 166, 255, 0.45);
-    color: #fff;
-    transform: translateY(-1px);
-}
-
-.section-count {
-    font-variant-numeric: tabular-nums;
-    opacity: 0.85;
-}
-
-.category-header {
-    margin-top: 0.5rem;
-}
-
-/* reduce motion: less lift for accessibility */
-@media (prefers-reduced-motion: reduce) {
-    .card,
-    .repo-card,
-    .skill-tag {
-        transition: none;
-    }
-    .card:hover,
-    .repo-card:hover {
-        transform: none;
-    }
-}
-
-/* mobile grid breathing room */
-@media (max-width: 768px) {
-    .card:hover,
-    .repo-card:hover {
-        transform: none;
-    }
-    .grid,
-    .opensource-grid {
-        gap: 0.9rem;
-    }
-}
+/* vault blue/purple polish removed — final look lives in design-system.css */
