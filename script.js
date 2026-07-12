@@ -20,249 +20,289 @@ const projectCategories = {
     }
 };
 
-// ===== 项目数据 =====
+// ===== 项目数据（线上入口，2026-07 实测可访问优先） =====
+// 失效域名已替换：sport→vercel，api 暂链仓库；cet6 / proxy 线上 404 已移出 Works
 const projects = [
-    // ===== 娱乐类 =====
+    // ===== 娱乐 / 媒体 =====
     {
         name: "CKTV 传康播放器",
-        desc: "打开就是片场，想看的内容先摆到眼前。",
+        desc: "跨站影视聚合，打开就是片场。",
         url: "https://tv.chuankangkk.top/",
         code: "01",
-        tags: ["视频", "影视"],
+        tags: ["视频", "Next.js"],
         category: "entertainment",
         featured: true
     },
     {
         name: "CK Music",
-        desc: "音乐、歌词、播放感放在一起，点开就能听。",
+        desc: "多源音乐播放，点开就能听。",
         url: "https://ckmusic.chuankangkk.top/",
         code: "02",
         tags: ["音乐", "播放器"],
-        category: "entertainment"
+        category: "entertainment",
+        featured: true
     },
     {
-        name: "传康云游戏平台",
-        desc: "把游戏入口放进浏览器，少一步安装，多一点开局。",
+        name: "传康云游戏",
+        desc: "浏览器里直接开玩，免安装。",
         url: "https://game.chuankangkk.top/",
         code: "03",
-        tags: ["游戏", "在线"],
+        tags: ["游戏", "H5"],
         category: "entertainment",
         featured: true
     },
     {
         name: "传康烟花秀",
-        desc: "黑场亮起来，光点和节奏一起炸开。",
+        desc: "Canvas 烟花，光点与节奏同场。",
         url: "https://yanhua.chuankangkk.top/",
         code: "04",
-        tags: ["烟花", "Canvas"],
+        tags: ["Canvas", "动效"],
         category: "entertainment"
     },
     {
         name: "CK 3D 展示",
-        desc: "拖动一下再看，空间感会自己说话。",
+        desc: "可拖拽的 3D 空间实验页。",
         url: "https://3d.chuankangkk.top/",
         code: "05",
-        tags: ["3D", "可视化", "交互"],
+        tags: ["3D", "交互"],
         category: "entertainment"
     },
 
-    // ===== 工具类 =====
+    // ===== 工具 =====
     {
-        name: "传康KKAPI",
-        desc: "常用能力已经接好，拿接口就能继续做。",
-        url: "https://api.chuankangkk.top/",
+        name: "CK 图床",
+        desc: "上传即链，素材流转极简。",
+        url: "https://ck-img.chuankangkk.top/",
         code: "06",
-        tags: ["API", "接口", "免费"],
+        tags: ["图床", "存储"],
         category: "tools",
         featured: true
     },
     {
-        name: "CK 图床",
-        desc: "图片上传，链接返回，素材流转不拖泥带水。",
-        url: "https://ck-img.chuankangkk.top/",
+        name: "IP 质量检测",
+        desc: "终端风出口检测 · 流媒体解锁。",
+        url: "https://ip-check.chuankangkk.top/",
         code: "07",
-        tags: ["图床", "存储"],
-        category: "tools"
+        tags: ["IP", "网络"],
+        category: "tools",
+        featured: true
     },
     {
-        name: "小米运动刷步数",
-        desc: "步数入口做得直接，需要时一键处理。",
-        url: "https://sport.chuankangkk.top/",
+        name: "免费 VPN 情报站",
+        desc: "公开节点 / 试用机场聚合，每日同步。",
+        url: "https://free-vpn.chuankangkk.top/",
         code: "08",
+        tags: ["VPN", "订阅"],
+        category: "tools",
+        featured: true
+    },
+    {
+        name: "小米运动刷步",
+        desc: "微信/支付宝步数工具，一键处理。",
+        url: "https://sport-xiaomi.vercel.app/",
+        code: "09",
         tags: ["运动", "工具"],
         category: "tools"
     },
     {
         name: "睡眠助手",
-        desc: "睡前打开，声音和节奏都往安静里走。",
+        desc: "白噪音助眠，睡前一键安静。",
         url: "https://sleep-3s3.pages.dev/",
-        code: "09",
+        code: "10",
         tags: ["白噪音", "助眠"],
         category: "tools"
     },
     {
-        name: "ProxyPool 代理池",
-        desc: "代理采集和输出放在一处，需要就取。",
-        url: "https://proxy.chuankangkk.top/",
-        code: "10",
-        tags: ["代理", "工具"],
+        name: "CK Card Tools",
+        desc: "虚拟卡生成与校验，中英双语。",
+        url: "https://ck-card-tools.vercel.app/",
+        code: "11",
+        tags: ["工具", "React"],
         category: "tools"
     },
     {
-        name: "IP检测工具",
-        desc: "一屏看清出口网络，省掉反复排查。",
-        url: "https://ip-check.chuankangkk.top/",
-        code: "11",
-        tags: ["IP检测", "网络"],
-        category: "tools",
-        featured: true
+        name: "Codex Inviter",
+        desc: "一键发送 ChatGPT Codex 邀请。",
+        url: "https://codex-inviter.vercel.app/",
+        code: "12",
+        tags: ["Codex", "邀请"],
+        category: "tools"
     },
 
-    // ===== 金融类 =====
+    // ===== 金融 / 数据 =====
     {
-        name: "黄金价格检测系统",
-        desc: "金价变化放进看板，波动更早被看见。",
+        name: "黄金量化监控",
+        desc: "Vue3 + AI 的金价看板与信号。",
         url: "https://gold.chuankangkk.top/",
-        code: "12",
+        code: "13",
         tags: ["金融", "AI", "量化"],
         category: "finance",
         featured: true
     },
     {
-        name: "海外基金估值",
-        desc: "海外基金盘中动向集中到一屏，打开就能判断。",
-        url: "https://fund.chuankangkk.top/",
-        code: "13",
-        tags: ["基金", "估值"],
-        category: "finance"
-    },
-    {
-        name: "中国基金数据",
-        desc: "自选、涨跌、数据入口放在一起，少来回翻。",
+        name: "中国基金实时行情",
+        desc: "盘中估值 · 涨跌榜 · 自选管理。",
         url: "https://fund-cn.chuankangkk.top/",
         code: "14",
-        tags: ["基金", "数据分析"],
+        tags: ["基金", "Workers"],
         category: "finance",
         featured: true
     },
-
-    // ===== AI智能类 =====
     {
-        name: "CET6听力预测",
-        desc: "把听力趋势做成预测入口，考前少盲猜。",
-        url: "https://cet6.chuankangkk.top/",
+        name: "全球基金估值",
+        desc: "中外基金双源融合，中英双语。",
+        url: "https://fund.chuankangkk.top/",
         code: "15",
-        tags: ["六级", "AI预测"],
-        category: "ai"
+        tags: ["基金", "估值"],
+        category: "finance"
     },
+
+    // ===== AI =====
     {
-        name: "CK Diviner 占卜师",
-        desc: "丢进一个问题，让算法给出有趣的回声。",
-        url: "https://diviner.chuankangkk.top/",
+        name: "谁是 AI 大嘉豪",
+        desc: "硬核 AI 能力测评 · 四段位抽题。",
+        url: "https://ai-jiahao.chuankangkk.top/",
         code: "16",
-        tags: ["AI", "占卜", "预测"],
-        category: "ai"
-    },
-    {
-        name: "Trump-X 情绪分析",
-        desc: "一句动态拆成情绪和波动，放进图里看。",
-        url: "https://trump-x.chuankangkk.top/",
-        code: "17",
-        tags: ["AI", "情绪分析", "社交"],
+        tags: ["AI", "测评"],
         category: "ai",
         featured: true
+    },
+    {
+        name: "Trump Tracker",
+        desc: "Truth Social 实时动态 · 监控推送。",
+        url: "https://trump-x.chuankangkk.top/",
+        code: "17",
+        tags: ["AI", "监控"],
+        category: "ai",
+        featured: true
+    },
+    {
+        name: "玄机子 Diviner",
+        desc: "AI 命理玄学助手，问题换回声。",
+        url: "https://diviner.chuankangkk.top/",
+        code: "18",
+        tags: ["AI", "趣味"],
+        category: "ai"
     }
 ];
 
-// ===== GitHub 开源精选数据 =====
+// ===== GitHub 开源精选（按 Stars 降序，2026-07 同步） =====
 const openSourceProjects = [
     {
         name: "cloudflare-bypass-2026",
-        desc: "浏览器自动化的硬核样本，流程和实战痕迹都在。",
+        desc: "Cloudflare Turnstile 绕过工具链，跨平台硬核样本。",
         language: "Python",
-        stars: 367,
-        forks: 61,
+        stars: 391,
+        forks: 71,
         repo: "https://github.com/1837620622/cloudflare-bypass-2026",
-        tags: ["自动化", "安全研究", "跨平台"],
+        tags: ["安全研究", "自动化", "跨平台"],
         featured: true
     },
     {
         name: "windsurf-account-manager-releases",
-        desc: "账号切换做成桌面工具，少来回折腾。",
+        desc: "Windsurf 多账号桌面端：切换 · Token · 额度。",
         language: "Desktop",
-        stars: 66,
+        stars: 65,
         forks: 5,
         repo: "https://github.com/1837620622/windsurf-account-manager-releases",
-        tags: ["桌面工具", "账号管理", "效率"],
+        tags: ["桌面工具", "账号管理"],
+        featured: true
+    },
+    {
+        name: "chatgpt-specimen-toolbox",
+        desc: "Session ↔ 9 种认证格式 N×N 互转，本地零上报。",
+        language: "JavaScript",
+        stars: 50,
+        forks: 18,
+        repo: "https://github.com/1837620622/chatgpt-specimen-toolbox",
+        tags: ["扩展", "本地处理"],
         featured: true
     },
     {
         name: "cto-new-openai-proxy",
-        desc: "模型接口、账号池、面板连成网关，适合拆架构。",
+        desc: "OpenAI / Anthropic 兼容反代 · 账号池 · Dashboard。",
         language: "Python",
-        stars: 32,
-        forks: 10,
+        stars: 35,
+        forks: 9,
         repo: "https://github.com/1837620622/cto-new-openai-proxy",
-        tags: ["AI接口", "代理服务", "Dashboard"],
+        tags: ["AI网关", "代理"],
         featured: true
     },
     {
         name: "winsurf-switch",
-        desc: "更轻的切换入口，动手快，逻辑也清楚。",
+        desc: "Windsurf 多账号切换，突破模型等待限制。",
         language: "Python",
-        stars: 32,
+        stars: 33,
         forks: 3,
         repo: "https://github.com/1837620622/winsurf-switch",
-        tags: ["效率工具", "跨平台", "自动化"]
-    },
-    {
-        name: "fund-cn",
-        desc: "基金看板从数据到部署都能拆，适合拿来改。",
-        language: "JavaScript",
-        stars: 21,
-        forks: 6,
-        repo: "https://github.com/1837620622/fund-cn",
-        demo: "https://fund-cn.chuankangkk.top",
-        tags: ["金融数据", "实时行情", "Workers"],
-        featured: true
+        tags: ["效率", "跨平台"]
     },
     {
         name: "wifi-security-toolkit",
-        desc: "无线安全工具箱，偏实战，适合慢慢翻。",
+        desc: "WPA 研究 + hashcat，本地 / 云 GPU 工具链。",
         language: "Shell",
-        stars: 16,
-        forks: 5,
+        stars: 23,
+        forks: 7,
         repo: "https://github.com/1837620622/wifi-security-toolkit",
-        tags: ["网络安全", "审计", "GPU"]
+        tags: ["安全", "GPU"]
+    },
+    {
+        name: "fund-cn",
+        desc: "国内基金实时估值，Cloudflare Workers 部署。",
+        language: "JavaScript",
+        stars: 22,
+        forks: 7,
+        repo: "https://github.com/1837620622/fund-cn",
+        demo: "https://fund-cn.chuankangkk.top",
+        tags: ["金融", "Workers"],
+        featured: true
+    },
+    {
+        name: "free-vps",
+        desc: "25+ 免费 VPS / 容器平台对比与部署笔记。",
+        language: "Docs",
+        stars: 15,
+        forks: 7,
+        repo: "https://github.com/1837620622/free-vps",
+        tags: ["运维", "文档"]
     },
     {
         name: "Gold-Price-Quantitative-Monitoring-System",
-        desc: "黄金行情的开源版本，看板和信号都能追。",
+        desc: "黄金行情 + DeepSeek 量化分析开源版。",
         language: "JavaScript",
-        stars: 8,
+        stars: 12,
         forks: 5,
         repo: "https://github.com/1837620622/Gold-Price-Quantitative-Monitoring-System",
         demo: "https://gold.chuankangkk.top",
-        tags: ["量化分析", "Vue3", "AI"]
+        tags: ["量化", "Vue3"]
     },
     {
-        name: "chatgpt-specimen-toolbox",
-        desc: "敏感文本留在本地，转换动作在浏览器里完成。",
-        language: "JavaScript",
-        stars: 5,
-        forks: 2,
-        repo: "https://github.com/1837620622/chatgpt-specimen-toolbox",
-        tags: ["浏览器扩展", "本地处理", "工具箱"]
+        name: "codex-red-team-prompt",
+        desc: "Codex 系统提示注入研究工具，红队向。",
+        language: "Python",
+        stars: 8,
+        forks: 1,
+        repo: "https://github.com/1837620622/codex-red-team-prompt",
+        tags: ["安全研究", "Codex"]
+    },
+    {
+        name: "codex-inviter",
+        desc: "一键发送 ChatGPT Codex 邀请页。",
+        language: "HTML",
+        stars: 6,
+        forks: 3,
+        repo: "https://github.com/1837620622/codex-inviter",
+        demo: "https://codex-inviter.vercel.app/",
+        tags: ["工具", "Vercel"]
     },
     {
         name: "proxypool",
-        desc: "采集、清洗、接口输出都在，代理池骨架完整。",
+        desc: "多协议代理池：采集 · 检测 · REST API。",
         language: "JavaScript",
         stars: 5,
-        forks: 1,
+        forks: 2,
         repo: "https://github.com/1837620622/proxypool",
-        demo: "https://proxy.chuankangkk.top/",
-        tags: ["代理池", "REST API", "Web界面"]
+        tags: ["代理池", "API"]
     }
 ];
 
@@ -295,11 +335,31 @@ function renderTags(tags) {
     return tags.map(tag => `<span>${escapeHtml(tag)}</span>`).join('');
 }
 
+// ===== 同步页眉数字（以数据数组为准） =====
+function syncVaultMetrics() {
+    const live = projects.length;
+    const openRepos = openSourceProjects.length;
+    const totalStars = openSourceProjects.reduce((sum, p) => sum + (Number(p.stars) || 0), 0);
+
+    const worksCount = document.getElementById('worksCount');
+    if (worksCount) worksCount.textContent = `(${live})`;
+
+    const sourceCount = document.getElementById('sourceCount');
+    if (sourceCount) sourceCount.textContent = `(${openRepos} · ${totalStars}+ ⭐)`;
+
+    document.querySelectorAll('.hero-stats .stat-num').forEach((el, idx) => {
+        if (idx === 0) el.setAttribute('data-count', String(live));
+        if (idx === 1) el.setAttribute('data-count', '67');
+        if (idx === 2) el.setAttribute('data-count', String(Math.max(totalStars, 600)));
+    });
+}
+
 // ===== 渲染项目卡片（支持分类） =====
 function renderProjects() {
     const gridContainer = document.getElementById('projectGrid');
     if (!gridContainer) return;
     gridContainer.innerHTML = '';
+    syncVaultMetrics();
 
     // 按分类分组项目
     const groupedProjects = {};
@@ -776,6 +836,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initVisibilityChange();
 
     console.log('%c\n  ██████╗██╗  ██╗\n ██╔════╝██║ ██╔╝\n ██║     █████╔╝ \n ██║     ██╔═██╗ \n  ██████╗██║  ██╗\n  ══════╝══╝  ══╝\n', 'color: #fff; font-size: 10px;');
-    console.log('%cCK Studio ready.', 'color: #fff; font-size: 14px; font-weight: bold;');
-    console.log('%cGitHub: github.com/1837620622 | Email: 2040168455@qq.com', 'color: #888;');
+    console.log('%cCK Studio ready · vault 2026-07', 'color: #58a6ff; font-size: 14px; font-weight: bold;');
+    console.log('%cGitHub: github.com/1837620622 | Email: 2040168455@qq.com | WeChat: 1837620622', 'color: #888;');
 });
