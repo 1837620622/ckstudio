@@ -1,11 +1,13 @@
 /* ===================================================================
-   CKSTUDIO · 交互脚本
+   CKSTUDIO · 页面脚本
    =================================================================== */
 'use strict';
 
 document.documentElement.classList.add('js');
 
 const PAGE_TITLE = document.title;
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const finePointer = window.matchMedia('(pointer: fine)').matches;
 
 // ===== 分类与图标（统一 24 网格 · 1.6 描边 · 圆端点） =====
 const projectCategories = {
@@ -56,7 +58,7 @@ function renderTags(tags) {
     return tags.map(tag => `<span>${escapeHtml(tag)}</span>`).join('');
 }
 
-// ===== 在线作品（已部署，可直接打开） =====
+// ===== 案例：已上线的自研产品 =====
 const projects = [
     { name: "中国基金实时行情", desc: "国内基金实时估值、涨跌排行和自选列表。", url: "https://fund-cn.chuankangkk.top/", code: "01", tags: ["基金", "Workers"], category: "finance", featured: true },
     { name: "全球基金估值", desc: "海外基金估值，双数据源，支持中英文切换。", url: "https://fund.chuankangkk.top/", code: "02", tags: ["基金", "估值"], category: "finance" },
@@ -80,11 +82,6 @@ const openSourceProjects = [
 /* ===================================================================
    渲染
    =================================================================== */
-const metrics = {
-    live: projects.length,
-    repos: openSourceProjects.length
-};
-
 function renderProjects() {
     const grid = document.getElementById('projectGrid');
     if (!grid) return;
@@ -107,7 +104,7 @@ function renderProjects() {
 
         items.forEach(p => {
             html.push(`
-                <a class="card spot reveal${p.featured ? ' card-featured' : ''}" href="${safeExternalUrl(p.url)}" target="_blank" rel="noopener noreferrer" aria-label="打开：${escapeHtml(p.name)}">
+                <a class="panel card spot tilt reveal${p.featured ? ' card-featured' : ''}" href="${safeExternalUrl(p.url)}" target="_blank" rel="noopener noreferrer" aria-label="打开：${escapeHtml(p.name)}">
                     <div class="card-top">
                         <span class="card-icon">${svgIcon(cat.icon)}</span>
                         <span class="card-meta">
@@ -133,8 +130,7 @@ function renderOpenSource() {
     if (!grid) return;
 
     grid.innerHTML = openSourceProjects.map(p => {
-        const hasStars = typeof p.stars === 'number';
-        const metricsHtml = hasStars
+        const metricsHtml = typeof p.stars === 'number'
             ? `<span class="repo-metrics">
                         <span><b>${escapeHtml(p.stars)}</b>stars</span>
                         <span><b>${escapeHtml(p.forks)}</b>forks</span>
@@ -144,7 +140,7 @@ function renderOpenSource() {
             ? `<a class="btn btn-ghost" href="${safeExternalUrl(p.demo)}" target="_blank" rel="noopener noreferrer">在线版本 ${ICON.arrow}</a>`
             : '';
         return `
-            <article class="repo-card spot reveal${p.featured ? ' repo-card-featured' : ''}">
+            <article class="panel repo-card spot tilt reveal${p.featured ? ' repo-card-featured' : ''}">
                 <header class="repo-head">
                     <span class="repo-lang">${escapeHtml(p.language)}</span>
                     ${metricsHtml}
@@ -164,14 +160,10 @@ function renderOpenSource() {
 
 function syncHeadlines() {
     const worksCount = document.getElementById('worksCount');
-    if (worksCount) worksCount.textContent = String(metrics.live);
+    if (worksCount) worksCount.textContent = String(projects.length);
 
     const sourceCount = document.getElementById('sourceCount');
-    if (sourceCount) sourceCount.textContent = `${metrics.repos} 个精选仓库`;
-
-    document.querySelectorAll('[data-metric]').forEach(el => {
-        el.dataset.count = metrics[el.dataset.metric];
-    });
+    if (sourceCount) sourceCount.textContent = `${openSourceProjects.length} 个精选仓库`;
 }
 
 /* ===================================================================
@@ -185,8 +177,6 @@ function finishLoading() {
         loader.classList.add('is-done');
         setTimeout(() => { loader.hidden = true; }, 1200);
     }
-
-    document.querySelectorAll('.hero [data-metric]').forEach(countUp);
 }
 
 function initLoader() {
@@ -199,8 +189,7 @@ function initLoader() {
         return;
     }
 
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const duration = reduceMotion ? 300 : 2100;
+    const duration = reduceMotion ? 300 : 2000;
     const start = performance.now();
 
     const tick = now => {
@@ -260,7 +249,7 @@ function initNav() {
 
     // 当前所在区块对应的导航项高亮
     if (!('IntersectionObserver' in window)) return;
-    const links = Array.from(nav.querySelectorAll('.menu a[href^="#"]'));
+    const links = Array.from(nav.querySelectorAll('.menu a:not(.btn)[href^="#"]'));
     const byId = new Map(links.map(a => [a.getAttribute('href').slice(1), a]));
 
     const spy = new IntersectionObserver(entries => {
@@ -278,7 +267,7 @@ function initNav() {
         });
     }, { rootMargin: '-45% 0px -50% 0px' });
 
-    ['works', 'opensource', 'about', 'contact'].forEach(id => {
+    ['home', 'services', 'works', 'opensource', 'partner', 'about', 'contact'].forEach(id => {
         const section = document.getElementById(id);
         if (section) spy.observe(section);
     });
@@ -309,7 +298,7 @@ function initProgress() {
    =================================================================== */
 // 卡片聚光：把指针坐标写进元素的 --mx / --my
 function initSpotlight() {
-    if (!window.matchMedia('(pointer: fine)').matches) return;
+    if (!finePointer) return;
     document.addEventListener('pointermove', event => {
         const el = event.target.closest ? event.target.closest('.spot') : null;
         if (!el) return;
@@ -319,11 +308,32 @@ function initSpotlight() {
     }, { passive: true });
 }
 
+// 卡片倾斜：指针位置决定转角，离开时缓慢回正
+function initTilt() {
+    if (!finePointer || reduceMotion) return;
+    const MAX = 6;
+
+    document.querySelectorAll('.tilt').forEach(el => {
+        el.addEventListener('pointermove', event => {
+            const rect = el.getBoundingClientRect();
+            const px = (event.clientX - rect.left) / rect.width - 0.5;
+            const py = (event.clientY - rect.top) / rect.height - 0.5;
+            el.classList.add('is-tilting');
+            el.style.setProperty('--ry', `${(px * MAX).toFixed(2)}deg`);
+            el.style.setProperty('--rx', `${(-py * MAX).toFixed(2)}deg`);
+        });
+        el.addEventListener('pointerleave', () => {
+            el.classList.remove('is-tilting');
+            el.style.setProperty('--rx', '0deg');
+            el.style.setProperty('--ry', '0deg');
+        });
+    });
+}
+
 // 鼠标光晕：缓动跟随
 function initCursorGlow() {
     const glow = document.getElementById('cursorGlow');
-    if (!glow || !window.matchMedia('(pointer: fine)').matches) return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (!glow || !finePointer || reduceMotion) return;
 
     let x = window.innerWidth / 2;
     let y = window.innerHeight / 2;
@@ -349,8 +359,7 @@ function initCursorGlow() {
 
 // 按钮磁吸：靠近时轻微跟随
 function initMagnetic() {
-    if (!window.matchMedia('(pointer: fine)').matches) return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (!finePointer || reduceMotion) return;
 
     document.querySelectorAll('.magnetic').forEach(el => {
         el.addEventListener('pointermove', event => {
@@ -368,11 +377,17 @@ function initMagnetic() {
 }
 
 /* ===================================================================
-   滚动入场与数字
+   滚动入场
    =================================================================== */
 function initReveal() {
     const items = Array.from(document.querySelectorAll('.reveal'));
-    items.forEach((el, i) => el.style.setProperty('--d', `${(i % 3) * 90}ms`));
+
+    // 同一容器内的相邻元素依次错开出现
+    items.forEach(el => {
+        const siblings = Array.from(el.parentElement.children).filter(c => c.classList.contains('reveal'));
+        const index = siblings.indexOf(el);
+        el.style.setProperty('--d', `${(index % 4) * 90}ms`);
+    });
 
     if (!('IntersectionObserver' in window)) {
         items.forEach(el => el.classList.add('is-in'));
@@ -388,48 +403,6 @@ function initReveal() {
     }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
 
     items.forEach(el => io.observe(el));
-}
-
-function countUp(el) {
-    const target = Number(el.dataset.count) || 0;
-    const suffix = el.dataset.suffix || '';
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    if (reduceMotion) {
-        el.textContent = `${target}${suffix}`;
-        return;
-    }
-
-    const duration = 1600;
-    const begin = performance.now();
-    const step = now => {
-        const p = Math.min(1, (now - begin) / duration);
-        const value = Math.round(target * (1 - Math.pow(1 - p, 3)));
-        el.textContent = `${value}${suffix}`;
-        if (p < 1) requestAnimationFrame(step);
-    };
-    el.textContent = `0${suffix}`;
-    requestAnimationFrame(step);
-}
-
-function initCounters() {
-    const els = Array.from(document.querySelectorAll('[data-metric]')).filter(el => !el.closest('.hero'));
-    if (!els.length) return;
-
-    if (!('IntersectionObserver' in window)) {
-        els.forEach(countUp);
-        return;
-    }
-
-    const io = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-            if (!entry.isIntersecting) return;
-            countUp(entry.target);
-            io.unobserve(entry.target);
-        });
-    }, { threshold: 0.6 });
-
-    els.forEach(el => io.observe(el));
 }
 
 /* ===================================================================
@@ -507,15 +480,15 @@ document.addEventListener('DOMContentLoaded', () => {
     initProgress();
 
     initSpotlight();
+    initTilt();
     initCursorGlow();
     initMagnetic();
     initCopy();
     initAvatar();
 
     initReveal();
-    initCounters();
     initVisibility();
 
-    console.log('%cCKSTUDIO · 传康Kk', 'color: #f2f3f5; font-size: 13px; font-weight: 600;');
-    console.log('%cgithub.com/1837620622', 'color: #888;');
+    console.log('%cCKSTUDIO · 传康Kk 技术工作室', 'color: #f2f3f5; font-size: 13px; font-weight: 600;');
+    console.log('%c合作联系：2040168455@qq.com', 'color: #888;');
 });

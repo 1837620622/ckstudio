@@ -17,3 +17,6 @@
 
 /script.js
   Cache-Control: public, max-age=31536000, immutable
+
+/js/vendor/*
+  Cache-Control: public, max-age=31536000, immutable
