@@ -1,24 +1,67 @@
-/* ===== 传康KK Studio 脚本 ===== */
+/* ===================================================================
+   CK Studio · 交互脚本
+   数据区（作品 / 开源仓库）在下方原样保留；渲染与交互在数据之后
+   =================================================================== */
+'use strict';
 
-// ===== 项目分类数据 =====
+document.documentElement.classList.add('js');
+
+const PUBLIC_REPOS = 67; // GitHub 公开仓库数，手动同步
+const PAGE_TITLE = document.title;
+
+// ===== 分类与图标（统一 24 网格 · 1.6 描边 · 圆端点） =====
 const projectCategories = {
     entertainment: {
         name: "娱乐",
-        icon: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10.5h10l2.3 5.4c.5 1.2-.4 2.6-1.7 2.6-.6 0-1.1-.3-1.5-.7l-1.6-1.8h-5l-1.6 1.8c-.4.5-.9.7-1.5.7-1.3 0-2.2-1.4-1.7-2.6L7 10.5Z"/><path d="M9 13v3M7.5 14.5h3M15.5 14h.01M17.2 15.7h.01"/></svg>'
+        icon: '<rect x="3.5" y="6" width="17" height="12" rx="3.5"/><path d="M10.5 9.6v4.8l4-2.4-4-2.4Z"/>'
     },
     tools: {
         name: "工具",
-        icon: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.7 6.3a4.5 4.5 0 0 0-5.6 5.6l-4.8 4.8a2 2 0 0 0 2.8 2.8l4.8-4.8a4.5 4.5 0 0 0 5.6-5.6l-3 3-3-3 3.2-2.8Z"/></svg>'
+        icon: '<path d="M4 7h8M16 7h4M4 17h3M11 17h9"/><circle cx="14" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>'
     },
     finance: {
         name: "行情",
-        icon: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18h16M6 18V9M12 18V6M18 18v-5"/><path d="M4 9l8-5 8 5"/></svg>'
+        icon: '<path d="M4 17.5 9.2 12.3l3.6 3.6L20 8.6"/><path d="M15.4 8.6H20v4.6"/>'
     },
     ai: {
         name: "AI",
-        icon: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="3"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/><path d="M10 11.5h.01M14 11.5h.01M10 15h4"/></svg>'
+        icon: '<path d="M12 4.2 13.7 9.3 18.8 11 13.7 12.7 12 17.8l-1.7-5.1L5.2 11l5.1-1.7L12 4.2Z"/><path d="M18.5 16.8v3.4M16.8 18.5h3.4"/>'
     }
 };
+
+function svgIcon(paths) {
+    return `<svg class="ico" viewBox="0 0 24 24" aria-hidden="true">${paths}</svg>`;
+}
+
+const ICON = {
+    arrow: svgIcon('<path d="M7 17 17 7M9 7h8v8"/>'),
+    arrowRight: svgIcon('<path d="M5 12h14M13.5 6.5 19 12l-5.5 5.5"/>')
+};
+
+function escapeHtml(value) {
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function safeExternalUrl(value) {
+    try {
+        const url = new URL(String(value), window.location.href);
+        if (url.protocol === 'http:' || url.protocol === 'https:' || url.protocol === 'mailto:') {
+            return url.href;
+        }
+    } catch (error) {
+        return '#';
+    }
+    return '#';
+}
+
+function renderTags(tags) {
+    return tags.map(tag => `<span>${escapeHtml(tag)}</span>`).join('');
+}
 
 // ===== 在线作品（仅收录 2026-07 实测 HTTP 2xx 的自有站点） =====
 // 已剔除失效：api.chuankangkk.top / proxy.chuankangkk.top / cet6 railway / sport.chuankangkk.top
@@ -79,429 +122,223 @@ const openSourceProjects = [
     { name: "sport-xiaomi", desc: "小米运动刷步 Web 工具源码。", language: "JavaScript", stars: 0, forks: 0, repo: "https://github.com/1837620622/sport-xiaomi", demo: "https://sport-xiaomi.vercel.app", tags: ["工具", "Vercel"] }
 ];
 
-// ===== SVG 图标片段 =====
-const iconExternal = '<svg class="inline-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17L17 7M10 7h7v7"/></svg>';
-const iconArrowRight = '<svg class="inline-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
 
-function escapeHtml(value) {
-    return String(value)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-}
+/* ===================================================================
+   渲染
+   =================================================================== */
+const totalStars = openSourceProjects.reduce((sum, p) => sum + (Number(p.stars) || 0), 0);
+const metrics = {
+    live: projects.length,
+    repos: PUBLIC_REPOS,
+    stars: totalStars
+};
 
-function safeExternalUrl(value) {
-    try {
-        const url = new URL(String(value), window.location.href);
-        if (url.protocol === 'http:' || url.protocol === 'https:' || url.protocol === 'mailto:') {
-            return url.href;
-        }
-    } catch (error) {
-        return '#';
-    }
-    return '#';
-}
-
-function renderTags(tags) {
-    return tags.map(tag => `<span>${escapeHtml(tag)}</span>`).join('');
-}
-
-// ===== 同步页眉数字（以数据数组为准） =====
-function syncVaultMetrics() {
-    const live = projects.length;
-    const openRepos = openSourceProjects.length;
-    const totalStars = openSourceProjects.reduce((sum, p) => sum + (Number(p.stars) || 0), 0);
-
-    const worksCount = document.getElementById('worksCount');
-    if (worksCount) worksCount.textContent = String(live);
-
-    const sourceCount = document.getElementById('sourceCount');
-    if (sourceCount) sourceCount.textContent = `${openRepos} 仓 · ${totalStars}+ stars`;
-
-    document.querySelectorAll('.hero-stats .stat-num').forEach((el, idx) => {
-        if (idx === 0) el.setAttribute('data-count', String(live));
-        if (idx === 1) el.setAttribute('data-count', '67');
-        if (idx === 2) el.setAttribute('data-count', String(Math.max(totalStars, 600)));
-    });
-}
-
-// ===== 渲染项目卡片（支持分类） =====
 function renderProjects() {
-    const gridContainer = document.getElementById('projectGrid');
-    if (!gridContainer) return;
-    gridContainer.innerHTML = '';
-    syncVaultMetrics();
+    const grid = document.getElementById('projectGrid');
+    if (!grid) return;
 
-    // 按分类分组项目
-    const groupedProjects = {};
-    projects.forEach(proj => {
-        const cat = proj.category || 'other';
-        if (!groupedProjects[cat]) {
-            groupedProjects[cat] = [];
-        }
-        groupedProjects[cat].push(proj);
-    });
+    const order = ['entertainment', 'tools', 'finance', 'ai'];
+    const html = [];
 
-    // 分类渲染顺序
-    const categoryOrder = ['entertainment', 'tools', 'finance', 'ai'];
+    order.forEach(key => {
+        const items = projects.filter(p => p.category === key);
+        if (!items.length) return;
+        const cat = projectCategories[key];
 
-    categoryOrder.forEach(catKey => {
-        const catProjects = groupedProjects[catKey];
-        if (!catProjects || catProjects.length === 0) return;
+        html.push(`
+            <div class="category-head reveal">
+                <span class="category-icon">${svgIcon(cat.icon)}</span>
+                <h3 class="category-name">${escapeHtml(cat.name)}</h3>
+                <span class="category-count">${String(items.length).padStart(2, '0')}</span>
+                <span class="category-line"></span>
+            </div>`);
 
-        const catInfo = projectCategories[catKey];
-
-        // 创建分类标题
-        const categoryHeader = document.createElement('div');
-        categoryHeader.className = 'category-header';
-        categoryHeader.innerHTML = `
-            <span class="category-icon">${catInfo.icon}</span>
-            <span class="category-name">${escapeHtml(catInfo.name)}</span>
-            <span class="category-count">(${escapeHtml(catProjects.length)})</span>
-        `;
-        gridContainer.appendChild(categoryHeader);
-
-        // 渲染该分类下的项目
-        catProjects.forEach(proj => {
-            const card = document.createElement('a');
-            card.href = safeExternalUrl(proj.url);
-            card.className = 'card' + (proj.featured ? ' card-featured' : '');
-            card.target = '_blank';
-            card.rel = 'noopener noreferrer';
-            card.setAttribute('aria-label', `打开项目：${proj.name}`);
-
-            const tagsHtml = renderTags(proj.tags);
-
-            card.innerHTML = `
-                <div class="card-top">
-                    <div class="card-number">${escapeHtml(proj.code)}</div>
-                    <div class="card-title">${escapeHtml(proj.name)}</div>
-                    <div class="card-desc">${escapeHtml(proj.desc)}</div>
-                    <div class="card-tags">${tagsHtml}</div>
-                </div>
-                <div class="card-bottom">
-                    ${proj.featured ? '<span class="card-badge">精选</span>' : '<span></span>'}
-                    <span class="card-arrow">${iconExternal}</span>
-                </div>
-            `;
-
-            gridContainer.appendChild(card);
+        items.forEach(p => {
+            html.push(`
+                <a class="card spot reveal${p.featured ? ' card-featured' : ''}" href="${safeExternalUrl(p.url)}" target="_blank" rel="noopener noreferrer" aria-label="打开项目：${escapeHtml(p.name)}">
+                    <div class="card-top">
+                        <span class="card-icon">${svgIcon(cat.icon)}</span>
+                        <span class="card-meta">
+                            ${p.featured ? '<em class="badge">精选</em>' : ''}
+                            <span class="card-code">${escapeHtml(p.code)}</span>
+                        </span>
+                    </div>
+                    <h4 class="card-title">${escapeHtml(p.name)}</h4>
+                    <p class="card-desc">${escapeHtml(p.desc)}</p>
+                    <div class="card-foot">
+                        <div class="card-tags">${renderTags(p.tags)}</div>
+                        <span class="card-go">${ICON.arrow}</span>
+                    </div>
+                </a>`);
         });
     });
+
+    grid.innerHTML = html.join('');
 }
 
-// ===== 渲染开源项目卡片 =====
-function renderOpenSourceProjects() {
-    const gridContainer = document.getElementById('openSourceGrid');
-    if (!gridContainer) return;
-    gridContainer.innerHTML = '';
+function renderOpenSource() {
+    const grid = document.getElementById('openSourceGrid');
+    if (!grid) return;
 
-    openSourceProjects.forEach((project, index) => {
-        const card = document.createElement('article');
-        card.className = 'repo-card' + (project.featured ? ' repo-card-featured' : '');
-        card.style.setProperty('--repo-delay', `${index * 0.05}s`);
-
-        const tagsHtml = renderTags(project.tags);
-        const demoLink = project.demo ? `<a href="${safeExternalUrl(project.demo)}" target="_blank" rel="noopener noreferrer" class="repo-action repo-demo">在线预览 ${iconExternal}</a>` : '';
-
-        card.innerHTML = `
-            <div class="repo-card-top">
-                <div class="repo-meta">
-                    <span class="repo-language">${escapeHtml(project.language)}</span>
-                    <span class="repo-stars"><span class="repo-metric-num">${escapeHtml(project.stars)}</span> stars</span>
-                    <span class="repo-forks"><span class="repo-metric-num">${escapeHtml(project.forks)}</span> forks</span>
+    grid.innerHTML = openSourceProjects.map(p => {
+        const demo = p.demo
+            ? `<a class="btn btn-ghost" href="${safeExternalUrl(p.demo)}" target="_blank" rel="noopener noreferrer">在线预览 ${ICON.arrow}</a>`
+            : '';
+        return `
+            <article class="repo-card spot reveal${p.featured ? ' repo-card-featured' : ''}">
+                <header class="repo-head">
+                    <span class="repo-lang">${escapeHtml(p.language)}</span>
+                    <span class="repo-metrics">
+                        <span><b>${escapeHtml(p.stars)}</b>stars</span>
+                        <span><b>${escapeHtml(p.forks)}</b>forks</span>
+                    </span>
+                </header>
+                <h4 class="repo-name">${escapeHtml(p.name)}</h4>
+                <p class="repo-desc">${escapeHtml(p.desc)}</p>
+                <div class="repo-foot">
+                    <div class="card-tags">${renderTags(p.tags)}</div>
+                    <div class="repo-actions">
+                        <a class="btn btn-ghost" href="${safeExternalUrl(p.repo)}" target="_blank" rel="noopener noreferrer">仓库 ${ICON.arrow}</a>
+                        ${demo}
+                    </div>
                 </div>
-                <h3>${escapeHtml(project.name)}</h3>
-                <p>${escapeHtml(project.desc)}</p>
-            </div>
-            <div class="repo-tags">${tagsHtml}</div>
-            <div class="repo-actions">
-                <a href="${safeExternalUrl(project.repo)}" target="_blank" rel="noopener noreferrer" class="repo-action repo-source">仓库 ${iconExternal}</a>
-                ${demoLink}
-            </div>
-        `;
+            </article>`;
+    }).join('');
+}
 
-        gridContainer.appendChild(card);
+function syncHeadlines() {
+    const worksCount = document.getElementById('worksCount');
+    if (worksCount) worksCount.textContent = String(metrics.live);
+
+    const sourceCount = document.getElementById('sourceCount');
+    if (sourceCount) sourceCount.textContent = `${openSourceProjects.length} 仓 · ${metrics.stars}+ stars`;
+
+    document.querySelectorAll('[data-metric]').forEach(el => {
+        el.dataset.count = metrics[el.dataset.metric];
     });
 }
 
-let scrollRevealStarted = false;
+/* ===================================================================
+   加载页
+   =================================================================== */
+function finishLoading() {
+    document.documentElement.classList.add('is-ready');
 
-function startScrollRevealOnce() {
-    // 已迁移至 initReveal（基于 reveal class）
+    const loader = document.getElementById('loader');
+    if (loader) {
+        loader.classList.add('is-done');
+        setTimeout(() => { loader.hidden = true; }, 1200);
+    }
+
+    document.querySelectorAll('.hero [data-metric]').forEach(countUp);
 }
 
-// ===== 加载动画控制（自主创新版） =====
 function initLoader() {
     const loader = document.getElementById('loader');
-    const numEl = loader ? loader.querySelector('.loader-num') : null;
-    const fillEl = loader ? loader.querySelector('.progress-fill') : null;
-    const dots = loader ? Array.from(loader.querySelectorAll('.loader-dots span')) : [];
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const startTime = performance.now();
-    const minDuration = reduceMotion ? 1200 : 3200;
-    let completed = false;
-    let windowLoaded = document.readyState === 'complete';
-
-    window.addEventListener('load', () => {
-        windowLoaded = true;
-    }, { once: true });
-
-    const finishLoading = () => {
-        if (completed) return;
-        completed = true;
-        if (loader) loader.classList.add('hidden');
-        document.body.classList.remove('is-loading');
-        animateHero();
-        animateNumbers();
-        startScrollRevealOnce();
-    };
-
-    const requestFinish = () => {
-        const elapsed = performance.now() - startTime;
-        const remaining = Math.max(0, minDuration - elapsed);
-        const waitForWindow = windowLoaded ? 0 : 320;
-        window.setTimeout(finishLoading, Math.max(remaining, waitForWindow));
-    };
+    const numEl = document.getElementById('loaderNum');
+    const barEl = document.getElementById('loaderBar');
 
     if (!loader) {
         finishLoading();
         return;
     }
 
-    // 进度驱动：RAF 平滑递进
-    const totalSteps = Math.max(1, Math.floor(minDuration / 16));
-    let stepIndex = 0;
-    const tick = () => {
-        if (completed) return;
-        stepIndex++;
-        const p = Math.min(stepIndex / totalSteps, 1);
-        // 缓动（先快后慢）
-        const eased = 1 - Math.pow(1 - p, 2.4);
-        const value = Math.floor(eased * 100);
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const duration = reduceMotion ? 300 : 2100;
+    const start = performance.now();
 
-        if (numEl) numEl.textContent = value;
-        if (fillEl) fillEl.style.width = `${value}%`;
-
-        // 顶部点阵：根据进度点亮对应数量
-        const activeCount = Math.floor((value / 100) * dots.length);
-        dots.forEach((dot, i) => {
-            dot.classList.toggle('is-on', i < activeCount);
-        });
-
-        if (p < 1) {
-            requestAnimationFrame(tick);
-        } else {
-            // 收尾：让最后一个点短暂亮起再结束
-            dots.forEach(d => d.classList.add('is-on'));
-            requestFinish();
-        }
+    const tick = now => {
+        const p = Math.min(1, (now - start) / duration);
+        const eased = 1 - Math.pow(1 - p, 3);
+        if (numEl) numEl.textContent = String(Math.round(eased * 100)).padStart(3, '0');
+        if (barEl) barEl.style.transform = `scaleX(${eased})`;
+        if (p < 1) requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
-}
 
-// ===== 数字递增动画 =====
-function animateNumbers() {
-    document.querySelectorAll('.stat-num[data-count]').forEach(el => {
-        const target = parseInt(el.getAttribute('data-count'));
-        const duration = 900;
-        const step = target / (duration / 16);
-        let current = 0;
-
-        const update = () => {
-            current += step;
-            if (current < target) {
-                el.textContent = Math.floor(current);
-                requestAnimationFrame(update);
-            } else {
-                el.textContent = target + (target === 271 ? '+' : '');
-            }
-        };
-        update();
+    const minTime = new Promise(resolve => setTimeout(resolve, duration));
+    const pageLoaded = new Promise(resolve => {
+        if (document.readyState === 'complete') resolve();
+        else window.addEventListener('load', resolve, { once: true });
     });
+    const cap = new Promise(resolve => setTimeout(resolve, 4000));
+
+    Promise.all([minTime, Promise.race([pageLoaded, cap])]).then(finishLoading);
 }
 
-// ===== Hero 入场动画 =====
-function animateHero() {
-    const lines = document.querySelectorAll('h1 .line');
-    const heroDesc = document.querySelector('.hero-desc');
-    const heroStats = document.querySelector('.hero-stats');
-    const heroTag = document.querySelector('.hero-tag');
-    const heroBadge = document.querySelector('.hero-badge');
-    const heroButtons = document.querySelector('.hero-buttons');
-    const visualItems = document.querySelectorAll('.code-block, .repo-panel, .orbit-map');
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    if (window.gsap && !reduceMotion) {
-        const tl = gsap.timeline({ defaults: { duration: 0.44, ease: 'power3.out' } });
-        tl.from([heroBadge, heroTag], { autoAlpha: 0, y: 18, stagger: 0.08 })
-            .from(lines, { autoAlpha: 0, y: 34, stagger: 0.07 }, '-=0.18')
-            .from(heroDesc, { autoAlpha: 0, y: 12 }, '-=0.18')
-            .from(heroButtons, { autoAlpha: 0, y: 12 }, '-=0.24')
-            .from(heroStats, { autoAlpha: 0, y: 16 }, '-=0.24')
-            .from(visualItems, { autoAlpha: 0, scale: 0.94, y: 16, stagger: 0.08 }, '-=0.58');
-        return;
-    }
-
-    [heroBadge, heroTag, heroDesc, heroButtons, heroStats, ...visualItems].forEach(el => {
-        if (!el) return;
-        el.style.opacity = '1';
-        el.style.transform = 'none';
-    });
-    lines.forEach(line => {
-        line.style.opacity = '1';
-        line.style.transform = 'none';
-    });
-}
-
-// ===== 装饰动效（已迁移至 three-scene.js） =====
-function initGsapMotion() {
-    // 原 GSAP 装饰动效已由 WebGL 3D 场景接管，此函数保留为空占位
-}
-
-// ===== 移动端菜单 =====
+/* ===================================================================
+   导航
+   =================================================================== */
 function initMobileMenu() {
-    const menuToggle = document.getElementById('menuToggle');
-    const mobileMenu = document.getElementById('mobileMenu');
+    const toggle = document.getElementById('menuToggle');
+    const menu = document.getElementById('mobileMenu');
+    if (!toggle || !menu) return;
 
-    if (menuToggle && mobileMenu) {
-        const setMenuOpen = isOpen => {
-            mobileMenu.classList.toggle('active', isOpen);
-            menuToggle.classList.toggle('active', isOpen);
-            menuToggle.setAttribute('aria-expanded', String(isOpen));
-            menuToggle.setAttribute('aria-label', isOpen ? '关闭菜单' : '打开菜单');
-            mobileMenu.setAttribute('aria-hidden', String(!isOpen));
-        };
+    const setOpen = open => {
+        menu.classList.toggle('active', open);
+        toggle.classList.toggle('active', open);
+        toggle.setAttribute('aria-expanded', String(open));
+        toggle.setAttribute('aria-label', open ? '关闭菜单' : '打开菜单');
+        menu.setAttribute('aria-hidden', String(!open));
+        document.body.style.overflow = open ? 'hidden' : '';
+    };
 
-        menuToggle.addEventListener('click', () => {
-            setMenuOpen(!mobileMenu.classList.contains('active'));
-        });
+    toggle.addEventListener('click', () => setOpen(!menu.classList.contains('active')));
+    menu.querySelectorAll('a').forEach(link => link.addEventListener('click', () => setOpen(false)));
 
-        // 点击链接关闭菜单
-        mobileMenu.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', () => {
-                setMenuOpen(false);
-            });
-        });
-
-        document.addEventListener('keydown', event => {
-            if (event.key === 'Escape' && mobileMenu.classList.contains('active')) {
-                setMenuOpen(false);
-                menuToggle.focus();
-            }
-        });
-    }
-}
-
-function initExternalLinks() {
-    document.querySelectorAll('a[target="_blank"]').forEach(link => {
-        link.rel = 'noopener noreferrer';
-    });
-}
-
-function initAvatarFallback() {
-    document.querySelectorAll('img[data-fallback]').forEach(img => {
-        img.addEventListener('error', () => {
-            img.classList.add('avatar-hidden');
-            const fallback = document.getElementById(img.dataset.fallback);
-            if (fallback) fallback.classList.add('visible');
-        }, { once: true });
-    });
-}
-
-// ===== 复制联系方式 =====
-function initCopyContact() {
-    document.querySelectorAll('.contact-card[data-copy]').forEach(card => {
-        card.addEventListener('click', function() {
-            const text = this.getAttribute('data-copy');
-            const hint = this.querySelector('.contact-hint');
-
-            navigator.clipboard.writeText(text).then(() => {
-                if (hint) {
-                    const original = hint.textContent;
-                    hint.textContent = '已复制';
-                    hint.style.opacity = '1';
-                    hint.style.color = '#ffffff';
-
-                    setTimeout(() => {
-                        hint.textContent = original;
-                        hint.style.color = '';
-                    }, 1500);
-                }
-            });
-        });
-    });
-}
-
-// ===== 鼠标跟随 =====
-function initCursor() {
-    // 已移除自定义光标（Active Theory 风格不需要）
-}
-
-// ===== 平滑滚动 =====
-function initSmoothScroll() {
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
-            const href = this.getAttribute('href');
-            if (href === '#') return;
-
-            e.preventDefault();
-            const target = document.querySelector(href);
-
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
-        });
-    });
-}
-
-// ===== 滚动显示动画 =====
-function initScrollReveal() {
-    // 已迁移至 initReveal（基于 reveal class）
-}
-
-// ===== 页面可见性 =====
-function initVisibilityChange() {
-    document.addEventListener('visibilitychange', () => {
-        if (document.hidden) {
-            document.title = 'CK Studio | Paused';
-        } else {
-            document.title = 'CK Studio | Motion Web Lab';
+    document.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && menu.classList.contains('active')) {
+            setOpen(false);
+            toggle.focus();
         }
     });
 }
 
-// =====================================================================
-// Active Theory 风格新增功能
-// =====================================================================
+function initNav() {
+    const nav = document.getElementById('nav');
+    if (!nav) return;
 
-// ===== Three.js 3D 场景初始化 =====
-function initThreeScene() {
-    if (window.CKScene && typeof window.CKScene.init === 'function') {
-        window.CKScene.init();
-    }
+    const onScroll = () => nav.classList.toggle('is-stuck', window.scrollY > 40);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    // 滚动监听：当前所在区块对应的导航项高亮
+    if (!('IntersectionObserver' in window)) return;
+    const links = Array.from(nav.querySelectorAll('.menu a[href^="#"]'));
+    const byId = new Map(links.map(a => [a.getAttribute('href').slice(1), a]));
+
+    const spy = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            links.forEach(a => {
+                a.classList.remove('is-active');
+                a.removeAttribute('aria-current');
+            });
+            const active = byId.get(entry.target.id);
+            if (active) {
+                active.classList.add('is-active');
+                active.setAttribute('aria-current', 'true');
+            }
+        });
+    }, { rootMargin: '-45% 0px -50% 0px' });
+
+    ['works', 'opensource', 'about', 'contact'].forEach(id => {
+        const section = document.getElementById(id);
+        if (section) spy.observe(section);
+    });
 }
 
-// ===== 滚动时导航栏变实底 =====
-function initScrollNav() {
-    const nav = document.querySelector('nav');
-    if (!nav) return;
+function initProgress() {
+    const bar = document.getElementById('progress');
+    if (!bar) return;
 
     let ticking = false;
     const update = () => {
-        if (window.scrollY > 60) {
-            nav.classList.add('is-stuck');
-        } else {
-            nav.classList.remove('is-stuck');
-        }
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        const p = max > 0 ? window.scrollY / max : 0;
+        bar.style.transform = `scaleX(${p})`;
         ticking = false;
     };
-
     window.addEventListener('scroll', () => {
         if (!ticking) {
             requestAnimationFrame(update);
@@ -511,104 +348,218 @@ function initScrollNav() {
     update();
 }
 
-// ===== 滚动入场动画（IntersectionObserver） =====
-function initReveal() {
-    if (!('IntersectionObserver' in window)) return;
-
-    const targets = document.querySelectorAll(
-        '.section-header, .works-intro, .opensource-intro, .work-card, ' +
-        '.repo-row, .about-content, .about-card, .about-right, ' +
-        '.contact-hero, .contact-grid, .contact-cta'
-    );
-    if (targets.length === 0) return;
-
-    targets.forEach((el, i) => {
-        el.classList.add('reveal');
-        el.style.transitionDelay = `${Math.min(i % 6, 5) * 60}ms`;
-    });
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('is-visible');
-                observer.unobserve(entry.target);
-            }
-        });
-    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
-
-    targets.forEach(el => observer.observe(el));
+/* ===================================================================
+   指针效果
+   =================================================================== */
+// 卡片聚光：把指针坐标写进元素的 --mx / --my
+function initSpotlight() {
+    if (!window.matchMedia('(pointer: fine)').matches) return;
+    document.addEventListener('pointermove', event => {
+        const el = event.target.closest ? event.target.closest('.spot') : null;
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        el.style.setProperty('--mx', `${event.clientX - rect.left}px`);
+        el.style.setProperty('--my', `${event.clientY - rect.top}px`);
+    }, { passive: true });
 }
 
-// ===== 数字滚动计数（用于卡片统计） =====
-function initCountUp() {
-    const nums = document.querySelectorAll('[data-count]');
-    if (nums.length === 0) return;
+// 鼠标光晕：缓动跟随
+function initCursorGlow() {
+    const glow = document.getElementById('cursorGlow');
+    if (!glow || !window.matchMedia('(pointer: fine)').matches) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-    const animateNum = (el) => {
-        const target = parseFloat(el.getAttribute('data-count')) || 0;
-        const duration = 1400;
-        const start = performance.now();
-        const isFloat = target % 1 !== 0;
+    let x = window.innerWidth / 2;
+    let y = window.innerHeight / 2;
+    let tx = x;
+    let ty = y;
+    let frame = 0;
 
-        const tick = (now) => {
-            const t = Math.min((now - start) / duration, 1);
-            const eased = 1 - Math.pow(1 - t, 3);
-            const value = target * eased;
-            el.textContent = isFloat ? value.toFixed(1) : Math.floor(value);
-            if (t < 1) requestAnimationFrame(tick);
-            else el.textContent = isFloat ? target.toFixed(1) : target;
-        };
-        requestAnimationFrame(tick);
+    const loop = () => {
+        x += (tx - x) * 0.16;
+        y += (ty - y) * 0.16;
+        glow.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+        const settled = Math.abs(tx - x) < 0.3 && Math.abs(ty - y) < 0.3;
+        frame = settled ? 0 : requestAnimationFrame(loop);
     };
 
+    window.addEventListener('pointermove', event => {
+        tx = event.clientX;
+        ty = event.clientY;
+        glow.classList.add('is-on');
+        if (!frame) frame = requestAnimationFrame(loop);
+    }, { passive: true });
+}
+
+// 按钮磁吸：靠近时轻微跟随
+function initMagnetic() {
+    if (!window.matchMedia('(pointer: fine)').matches) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    document.querySelectorAll('.magnetic').forEach(el => {
+        el.addEventListener('pointermove', event => {
+            const rect = el.getBoundingClientRect();
+            const dx = (event.clientX - (rect.left + rect.width / 2)) * 0.2;
+            const dy = (event.clientY - (rect.top + rect.height / 2)) * 0.28;
+            el.style.setProperty('--tx', `${dx.toFixed(1)}px`);
+            el.style.setProperty('--ty', `${dy.toFixed(1)}px`);
+        });
+        el.addEventListener('pointerleave', () => {
+            el.style.setProperty('--tx', '0px');
+            el.style.setProperty('--ty', '0px');
+        });
+    });
+}
+
+/* ===================================================================
+   滚动入场与数字
+   =================================================================== */
+function initReveal() {
+    const items = Array.from(document.querySelectorAll('.reveal'));
+    items.forEach((el, i) => el.style.setProperty('--d', `${(i % 3) * 90}ms`));
+
     if (!('IntersectionObserver' in window)) {
-        nums.forEach(animateNum);
+        items.forEach(el => el.classList.add('is-in'));
         return;
     }
 
-    const observer = new IntersectionObserver((entries) => {
+    const io = new IntersectionObserver(entries => {
         entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                animateNum(entry.target);
-                observer.unobserve(entry.target);
-            }
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add('is-in');
+            io.unobserve(entry.target);
         });
-    }, { threshold: 0.5 });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
 
-    nums.forEach(n => observer.observe(n));
+    items.forEach(el => io.observe(el));
 }
 
-// ===== 页面可见性 =====
-function initVisibilityChange() {
-    document.addEventListener('visibilitychange', () => {
-        if (document.hidden) {
-            document.title = 'CK Studio | Paused';
-        } else {
-            document.title = 'CK Studio | Motion Web Lab';
-        }
+function countUp(el) {
+    const target = Number(el.dataset.count) || 0;
+    const suffix = el.dataset.suffix || '';
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (reduceMotion) {
+        el.textContent = `${target}${suffix}`;
+        return;
+    }
+
+    const duration = 1600;
+    const begin = performance.now();
+    const step = now => {
+        const p = Math.min(1, (now - begin) / duration);
+        const value = Math.round(target * (1 - Math.pow(1 - p, 3)));
+        el.textContent = `${value}${suffix}`;
+        if (p < 1) requestAnimationFrame(step);
+    };
+    el.textContent = `0${suffix}`;
+    requestAnimationFrame(step);
+}
+
+function initCounters() {
+    const els = Array.from(document.querySelectorAll('[data-metric]:not(.hero [data-metric])'));
+    if (!els.length) return;
+
+    if (!('IntersectionObserver' in window)) {
+        els.forEach(countUp);
+        return;
+    }
+
+    const io = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            countUp(entry.target);
+            io.unobserve(entry.target);
+        });
+    }, { threshold: 0.6 });
+
+    els.forEach(el => io.observe(el));
+}
+
+/* ===================================================================
+   其它交互
+   =================================================================== */
+function initCopy() {
+    const toast = document.getElementById('toast');
+    let timer = 0;
+
+    const show = message => {
+        if (!toast) return;
+        toast.textContent = message;
+        toast.classList.add('is-on');
+        clearTimeout(timer);
+        timer = setTimeout(() => toast.classList.remove('is-on'), 1800);
+    };
+
+    const fallbackCopy = text => {
+        const area = document.createElement('textarea');
+        area.value = text;
+        area.setAttribute('readonly', '');
+        area.style.position = 'fixed';
+        area.style.opacity = '0';
+        document.body.appendChild(area);
+        area.select();
+        const ok = document.execCommand('copy');
+        area.remove();
+        return ok;
+    };
+
+    document.querySelectorAll('[data-copy]').forEach(button => {
+        button.addEventListener('click', () => {
+            const text = button.dataset.copy;
+            const done = () => show(`已复制：${text}`);
+            const failed = () => show('复制失败，请手动复制');
+
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(done, () => (fallbackCopy(text) ? done() : failed()));
+            } else {
+                (fallbackCopy(text) ? done : failed)();
+            }
+        });
     });
 }
 
-// ===== 初始化 =====
+function initAvatar() {
+    document.querySelectorAll('img[data-fallback]').forEach(img => {
+        const fallback = document.getElementById(img.dataset.fallback);
+        const fail = () => {
+            img.hidden = true;
+            if (fallback) fallback.classList.add('visible');
+        };
+        img.addEventListener('error', fail, { once: true });
+        if (img.complete && img.naturalWidth === 0) fail();
+    });
+}
+
+function initVisibility() {
+    document.addEventListener('visibilitychange', () => {
+        document.title = document.hidden ? 'CK Studio | Paused' : PAGE_TITLE;
+    });
+}
+
+/* ===================================================================
+   启动
+   =================================================================== */
 document.addEventListener('DOMContentLoaded', () => {
     renderProjects();
-    renderOpenSourceProjects();
-    initExternalLinks();
-    initAvatarFallback();
+    renderOpenSource();
+    syncHeadlines();
+
     initLoader();
+    initNav();
     initMobileMenu();
-    initCopyContact();
-    initSmoothScroll();
+    initProgress();
 
-    // Active Theory 风格新增
-    initThreeScene();
-    initScrollNav();
+    initSpotlight();
+    initCursorGlow();
+    initMagnetic();
+    initCopy();
+    initAvatar();
+
     initReveal();
-    initCountUp();
+    initCounters();
+    initVisibility();
 
-    initVisibilityChange();
-
-    console.log('%c\n  ██████╗██╗  ██╗\n ██╔════╝██║ ██╔╝\n ██║     █████╔╝ \n ██║     ██╔═██╗ \n  ██████╗██║  ██╗\n  ══════╝══╝  ══╝\n', 'color: #fff; font-size: 10px;');
-    console.log('%cCK Studio', 'color: #c8ccd2; font-size: 12px;');
-    console.log('%cGitHub: github.com/1837620622 | Email: 2040168455@qq.com | WeChat: 1837620622', 'color: #888;');
+    console.log('%cCK Studio', 'color: #f2f3f5; font-size: 13px; font-weight: 600;');
+    console.log('%cGitHub: github.com/1837620622', 'color: #888;');
 });
