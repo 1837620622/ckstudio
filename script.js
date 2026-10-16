@@ -1,5 +1,6 @@
 /* ===================================================================
-   CKSTUDIO · 页面脚本
+   CKSTUDIO · 传康Kk 个人工作站 · 页面脚本
+   数据（案例 / 开源仓库）在前，渲染与交互在后
    =================================================================== */
 'use strict';
 
@@ -9,29 +10,7 @@ const PAGE_TITLE = document.title;
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const finePointer = window.matchMedia('(pointer: fine)').matches;
 
-// ===== 分类与图标（统一 24 网格 · 1.6 描边 · 圆端点） =====
-const projectCategories = {
-    finance: {
-        name: "行情与数据",
-        icon: '<path d="M4 17.5 9.2 12.3l3.6 3.6L20 8.6"/><path d="M15.4 8.6H20v4.6"/>'
-    },
-    creative: {
-        name: "前端与交互",
-        icon: '<path d="M12 4.2 13.7 9.3 18.8 11 13.7 12.7 12 17.8l-1.7-5.1L5.2 11l5.1-1.7L12 4.2Z"/><path d="M18.5 16.8v3.4M16.8 18.5h3.4"/>'
-    },
-    tools: {
-        name: "工具",
-        icon: '<path d="M4 7h8M16 7h4M4 17h3M11 17h9"/><circle cx="14" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>'
-    }
-};
-
-function svgIcon(paths) {
-    return `<svg class="ico" viewBox="0 0 24 24" aria-hidden="true">${paths}</svg>`;
-}
-
-const ICON = {
-    arrow: svgIcon('<path d="M7 17 17 7M9 7h8v8"/>')
-};
+const ICON_ARROW = '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>';
 
 function escapeHtml(value) {
     return String(value)
@@ -54,28 +33,27 @@ function safeExternalUrl(value) {
     return '#';
 }
 
-function renderTags(tags) {
-    return tags.map(tag => `<span>${escapeHtml(tag)}</span>`).join('');
-}
+const pad2 = n => String(n).padStart(2, '0');
+const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
 
-// ===== 案例：已上线的自研产品 =====
+// ===== 案例：已上线的自研项目（封面为示意插图） =====
 const projects = [
-    { name: "中国基金实时行情", desc: "国内基金实时估值、涨跌排行和自选列表。", url: "https://fund-cn.chuankangkk.top/", code: "01", tags: ["基金", "Workers"], category: "finance", featured: true },
-    { name: "全球基金估值", desc: "海外基金估值，双数据源，支持中英文切换。", url: "https://fund.chuankangkk.top/", code: "02", tags: ["基金", "估值"], category: "finance" },
-    { name: "黄金量化监控", desc: "黄金行情看板，接入 AI 做简单的行情分析。", url: "https://gold.chuankangkk.top/", code: "03", tags: ["金融", "AI", "量化"], category: "finance", featured: true },
-    { name: "传康烟花秀", desc: "Canvas 烟花动效，点击画面即可触发。", url: "https://yanhua.chuankangkk.top/", code: "04", tags: ["Canvas", "动效"], category: "creative" },
-    { name: "CK 3D", desc: "可拖拽的三维页面。", url: "https://3d.chuankangkk.top/", code: "05", tags: ["3D", "交互"], category: "creative", featured: true },
-    { name: "睡眠助手", desc: "白噪音页面，适合睡前或专注时播放。", url: "https://sleep-3s3.pages.dev/", code: "06", tags: ["白噪音", "工具"], category: "tools" }
+    { name: "中国基金实时行情", desc: "国内基金实时估值、涨跌排行和自选列表，部署在 Cloudflare Workers 上。", url: "https://fund-cn.chuankangkk.top/", image: "assets/works/fund-cn.webp", category: "行情与数据", tags: ["基金", "Workers", "实时数据"] },
+    { name: "黄金量化监控", desc: "黄金行情看板，均线与指标监控，接入 AI 生成简要的行情分析。", url: "https://gold.chuankangkk.top/", image: "assets/works/gold.webp", category: "量化", tags: ["量化", "AI 分析", "Vue3"] },
+    { name: "全球基金估值", desc: "海外基金估值，双数据源交叉校验，支持中英文切换。", url: "https://fund.chuankangkk.top/", image: "assets/works/fund-global.webp", category: "行情与数据", tags: ["估值", "双数据源", "i18n"] },
+    { name: "CK 3D", desc: "可拖拽、可旋转的三维交互页面，WebGL 实时渲染。", url: "https://3d.chuankangkk.top/", image: "assets/works/ck-3d.webp", category: "前端交互", tags: ["WebGL", "3D", "交互"] },
+    { name: "传康烟花秀", desc: "Canvas 粒子烟花动效，点击画面即可触发。", url: "https://yanhua.chuankangkk.top/", image: "assets/works/fireworks.webp", category: "前端交互", tags: ["Canvas", "粒子", "动效"] },
+    { name: "睡眠助手", desc: "白噪音页面，多种环境声，睡前或专注时播放。", url: "https://sleep-3s3.pages.dev/", image: "assets/works/sleep.webp", category: "工具", tags: ["白噪音", "音频", "工具"] }
 ];
 
 // ===== 精选开源仓库（Star 数截至 2026-07 同步；没有数据的不显示数字） =====
 const openSourceProjects = [
-    { name: "vensim-system-dynamics-skill", desc: "Vensim 系统动力学工具，读写 .mdl 模型，从 JSON 生成存量流量图并整理布局。", language: "Python", stars: null, forks: null, repo: "https://github.com/1837620622/vensim-system-dynamics-skill", tags: ["系统动力学", "AI Agent"], featured: true },
-    { name: "Super-Agent-Skills", desc: "面向 AI 编程助手的技能库，覆盖 Cloudflare、AWS、文档处理等场景。", language: "Skills", stars: null, forks: null, repo: "https://github.com/1837620622/Super-Agent-Skills", tags: ["Agent", "技能库"] },
-    { name: "fund-cn", desc: "国内基金实时估值，跑在 Cloudflare Workers 上。", language: "JavaScript", stars: 22, forks: 7, repo: "https://github.com/1837620622/fund-cn", demo: "https://fund-cn.chuankangkk.top", tags: ["金融", "Workers"], featured: true },
-    { name: "Gold-Price-Quantitative-Monitoring-System", desc: "黄金行情监控面板，接入 DeepSeek 做简单分析。", language: "JavaScript", stars: 12, forks: 5, repo: "https://github.com/1837620622/Gold-Price-Quantitative-Monitoring-System", demo: "https://gold.chuankangkk.top", tags: ["量化", "Vue3"] },
-    { name: "travel-diary-app", desc: "Android 旅行日记，支持账号、日记本、分类筛选和搜索。", language: "Android", stars: null, forks: null, repo: "https://github.com/1837620622/travel-diary-app", tags: ["Android", "应用"] },
-    { name: "cloudflare-free-services-guide", desc: "Cloudflare 免费服务的使用说明：Workers、Pages、D1、R2。", language: "Docs", stars: 6, forks: 1, repo: "https://github.com/1837620622/cloudflare-free-services-guide", tags: ["Cloudflare", "教程"] }
+    { name: "vensim-system-dynamics-skill", desc: "Vensim 系统动力学工具：读写 .mdl 模型，从 JSON 生成存量流量图并自动整理布局。", language: "Python", stars: null, repo: "https://github.com/1837620622/vensim-system-dynamics-skill" },
+    { name: "Super-Agent-Skills", desc: "面向 AI 编程助手的技能库，覆盖 Cloudflare、AWS、文档处理等常见场景。", language: "Skills", stars: null, repo: "https://github.com/1837620622/Super-Agent-Skills" },
+    { name: "fund-cn", desc: "国内基金实时估值，运行在 Cloudflare Workers 上。", language: "JavaScript", stars: 22, repo: "https://github.com/1837620622/fund-cn", demo: "https://fund-cn.chuankangkk.top" },
+    { name: "Gold-Price-Quantitative-Monitoring-System", desc: "黄金行情监控面板，接入 DeepSeek 做行情分析。", language: "JavaScript", stars: 12, repo: "https://github.com/1837620622/Gold-Price-Quantitative-Monitoring-System", demo: "https://gold.chuankangkk.top" },
+    { name: "travel-diary-app", desc: "Android 旅行日记：账号体系、日记本、分类筛选与全文搜索。", language: "Android", stars: null, repo: "https://github.com/1837620622/travel-diary-app" },
+    { name: "cloudflare-free-services-guide", desc: "Cloudflare 免费服务实践指南：Workers、Pages、D1、R2。", language: "Docs", stars: 6, repo: "https://github.com/1837620622/cloudflare-free-services-guide" }
 ];
 
 
@@ -86,84 +64,78 @@ function renderProjects() {
     const grid = document.getElementById('projectGrid');
     if (!grid) return;
 
-    const order = ['finance', 'creative', 'tools'];
-    const html = [];
-
-    order.forEach(key => {
-        const items = projects.filter(p => p.category === key);
-        if (!items.length) return;
-        const cat = projectCategories[key];
-
-        html.push(`
-            <div class="category-head reveal">
-                <span class="category-icon">${svgIcon(cat.icon)}</span>
-                <h3 class="category-name">${escapeHtml(cat.name)}</h3>
-                <span class="category-count">${String(items.length).padStart(2, '0')}</span>
-                <span class="category-line"></span>
-            </div>`);
-
-        items.forEach(p => {
-            html.push(`
-                <a class="panel card spot tilt reveal${p.featured ? ' card-featured' : ''}" href="${safeExternalUrl(p.url)}" target="_blank" rel="noopener noreferrer" aria-label="打开：${escapeHtml(p.name)}">
-                    <div class="card-top">
-                        <span class="card-icon">${svgIcon(cat.icon)}</span>
-                        <span class="card-meta">
-                            ${p.featured ? '<em class="badge">精选</em>' : ''}
-                            <span class="card-code">${escapeHtml(p.code)}</span>
-                        </span>
-                    </div>
-                    <h4 class="card-title">${escapeHtml(p.name)}</h4>
-                    <p class="card-desc">${escapeHtml(p.desc)}</p>
-                    <div class="card-foot">
-                        <div class="card-tags">${renderTags(p.tags)}</div>
-                        <span class="card-go">${ICON.arrow}</span>
-                    </div>
-                </a>`);
-        });
-    });
-
-    grid.innerHTML = html.join('');
+    grid.innerHTML = projects.map((p, i) => `
+        <a class="work reveal" href="${safeExternalUrl(p.url)}" target="_blank" rel="noopener noreferrer" data-cursor="查看">
+            <div class="work-media">
+                <img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)} 封面示意图" loading="lazy" decoding="async" width="1200" height="800">
+            </div>
+            <div class="work-info">
+                <span class="work-num">${pad2(i + 1)}</span>
+                <h3 class="work-title">${escapeHtml(p.name)}</h3>
+                <span class="work-cat">${escapeHtml(p.category)}</span>
+            </div>
+            <p class="work-desc">${escapeHtml(p.desc)}</p>
+            <p class="work-tags">${p.tags.map(escapeHtml).join(' · ')}</p>
+        </a>`).join('');
 }
 
 function renderOpenSource() {
-    const grid = document.getElementById('openSourceGrid');
-    if (!grid) return;
+    const list = document.getElementById('openSourceGrid');
+    if (!list) return;
 
-    grid.innerHTML = openSourceProjects.map(p => {
-        const metricsHtml = typeof p.stars === 'number'
-            ? `<span class="repo-metrics">
-                        <span><b>${escapeHtml(p.stars)}</b>stars</span>
-                        <span><b>${escapeHtml(p.forks)}</b>forks</span>
-                    </span>`
-            : '';
+    list.innerHTML = openSourceProjects.map(p => {
         const demo = p.demo
-            ? `<a class="btn btn-ghost" href="${safeExternalUrl(p.demo)}" target="_blank" rel="noopener noreferrer">在线版本 ${ICON.arrow}</a>`
+            ? ` <a class="repo-demo" href="${safeExternalUrl(p.demo)}" target="_blank" rel="noopener noreferrer">在线版本</a>`
             : '';
+        const stars = typeof p.stars === 'number' ? `★ ${escapeHtml(p.stars)}` : '';
         return `
-            <article class="panel repo-card spot tilt reveal${p.featured ? ' repo-card-featured' : ''}">
-                <header class="repo-head">
-                    <span class="repo-lang">${escapeHtml(p.language)}</span>
-                    ${metricsHtml}
-                </header>
-                <h4 class="repo-name">${escapeHtml(p.name)}</h4>
-                <p class="repo-desc">${escapeHtml(p.desc)}</p>
-                <div class="repo-foot">
-                    <div class="card-tags">${renderTags(p.tags)}</div>
-                    <div class="repo-actions">
-                        <a class="btn btn-ghost" href="${safeExternalUrl(p.repo)}" target="_blank" rel="noopener noreferrer">仓库 ${ICON.arrow}</a>
-                        ${demo}
-                    </div>
-                </div>
-            </article>`;
+            <li class="repo reveal">
+                <a class="repo-name" href="${safeExternalUrl(p.repo)}" target="_blank" rel="noopener noreferrer">${escapeHtml(p.name)}</a>
+                <p class="repo-desc">${escapeHtml(p.desc)}${demo}</p>
+                <span class="repo-lang">${escapeHtml(p.language)}</span>
+                <span class="repo-stars">${stars}</span>
+                ${ICON_ARROW}
+            </li>`;
     }).join('');
 }
 
-function syncHeadlines() {
-    const worksCount = document.getElementById('worksCount');
-    if (worksCount) worksCount.textContent = String(projects.length);
+// 标题拆成单字，用于逐字上升
+function splitTitles() {
+    document.querySelectorAll('.split').forEach(el => {
+        const text = el.textContent.trim();
+        el.setAttribute('aria-label', text);
+        el.innerHTML = Array.from(text)
+            .map((c, i) => `<span class="ch" aria-hidden="true" style="--i: ${i}">${escapeHtml(c)}</span>`)
+            .join('');
+    });
+}
 
-    const sourceCount = document.getElementById('sourceCount');
-    if (sourceCount) sourceCount.textContent = `${openSourceProjects.length} 个精选仓库`;
+/* ===================================================================
+   平滑滚动（Lenis）与锚点
+   =================================================================== */
+let lenis = null;
+
+function initSmoothScroll() {
+    if (!reduceMotion && typeof window.Lenis === 'function') {
+        lenis = new window.Lenis({
+            duration: 1.2,
+            easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            smoothWheel: true
+        });
+    }
+
+    document.addEventListener('click', event => {
+        const link = event.target.closest ? event.target.closest('a[href^="#"]') : null;
+        if (!link) return;
+        const id = link.getAttribute('href');
+        if (id.length < 2) return;
+        const target = document.querySelector(id);
+        if (!target) return;
+
+        event.preventDefault();
+        if (lenis) lenis.scrollTo(target, { duration: 1.6 });
+        else target.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
+    });
 }
 
 /* ===================================================================
@@ -171,11 +143,10 @@ function syncHeadlines() {
    =================================================================== */
 function finishLoading() {
     document.documentElement.classList.add('is-ready');
-
     const loader = document.getElementById('loader');
     if (loader) {
         loader.classList.add('is-done');
-        setTimeout(() => { loader.hidden = true; }, 1200);
+        setTimeout(() => { loader.hidden = true; }, 1400);
     }
 }
 
@@ -183,7 +154,6 @@ function initLoader() {
     const loader = document.getElementById('loader');
     const numEl = document.getElementById('loaderNum');
     const barEl = document.getElementById('loaderBar');
-
     if (!loader) {
         finishLoading();
         return;
@@ -191,7 +161,6 @@ function initLoader() {
 
     const duration = reduceMotion ? 300 : 2000;
     const start = performance.now();
-
     const tick = now => {
         const p = Math.min(1, (now - start) / duration);
         const eased = 1 - Math.pow(1 - p, 3);
@@ -207,7 +176,6 @@ function initLoader() {
         else window.addEventListener('load', resolve, { once: true });
     });
     const cap = new Promise(resolve => setTimeout(resolve, 4000));
-
     Promise.all([minTime, Promise.race([pageLoaded, cap])]).then(finishLoading);
 }
 
@@ -225,12 +193,16 @@ function initMobileMenu() {
         toggle.setAttribute('aria-expanded', String(open));
         toggle.setAttribute('aria-label', open ? '关闭菜单' : '打开菜单');
         menu.setAttribute('aria-hidden', String(!open));
-        document.body.style.overflow = open ? 'hidden' : '';
+        if (lenis) {
+            if (open) lenis.stop();
+            else lenis.start();
+        } else {
+            document.body.style.overflow = open ? 'hidden' : '';
+        }
     };
 
     toggle.addEventListener('click', () => setOpen(!menu.classList.contains('active')));
     menu.querySelectorAll('a').forEach(link => link.addEventListener('click', () => setOpen(false)));
-
     document.addEventListener('keydown', event => {
         if (event.key === 'Escape' && menu.classList.contains('active')) {
             setOpen(false);
@@ -239,17 +211,9 @@ function initMobileMenu() {
     });
 }
 
-function initNav() {
-    const nav = document.getElementById('nav');
-    if (!nav) return;
-
-    const onScroll = () => nav.classList.toggle('is-stuck', window.scrollY > 40);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
-
-    // 当前所在区块对应的导航项高亮
+function initScrollSpy() {
     if (!('IntersectionObserver' in window)) return;
-    const links = Array.from(nav.querySelectorAll('.menu a:not(.btn)[href^="#"]'));
+    const links = Array.from(document.querySelectorAll('.menu-link'));
     const byId = new Map(links.map(a => [a.getAttribute('href').slice(1), a]));
 
     const spy = new IntersectionObserver(entries => {
@@ -267,126 +231,19 @@ function initNav() {
         });
     }, { rootMargin: '-45% 0px -50% 0px' });
 
-    ['home', 'services', 'works', 'opensource', 'partner', 'about', 'contact'].forEach(id => {
-        const section = document.getElementById(id);
-        if (section) spy.observe(section);
-    });
-}
-
-function initProgress() {
-    const bar = document.getElementById('progress');
-    if (!bar) return;
-
-    let ticking = false;
-    const update = () => {
-        const max = document.documentElement.scrollHeight - window.innerHeight;
-        const p = max > 0 ? window.scrollY / max : 0;
-        bar.style.transform = `scaleX(${p})`;
-        ticking = false;
-    };
-    window.addEventListener('scroll', () => {
-        if (!ticking) {
-            requestAnimationFrame(update);
-            ticking = true;
-        }
-    }, { passive: true });
-    update();
+    document.querySelectorAll('main > header, main > section').forEach(s => spy.observe(s));
 }
 
 /* ===================================================================
-   指针效果
-   =================================================================== */
-// 卡片聚光：把指针坐标写进元素的 --mx / --my
-function initSpotlight() {
-    if (!finePointer) return;
-    document.addEventListener('pointermove', event => {
-        const el = event.target.closest ? event.target.closest('.spot') : null;
-        if (!el) return;
-        const rect = el.getBoundingClientRect();
-        el.style.setProperty('--mx', `${event.clientX - rect.left}px`);
-        el.style.setProperty('--my', `${event.clientY - rect.top}px`);
-    }, { passive: true });
-}
-
-// 卡片倾斜：指针位置决定转角，离开时缓慢回正
-function initTilt() {
-    if (!finePointer || reduceMotion) return;
-    const MAX = 6;
-
-    document.querySelectorAll('.tilt').forEach(el => {
-        el.addEventListener('pointermove', event => {
-            const rect = el.getBoundingClientRect();
-            const px = (event.clientX - rect.left) / rect.width - 0.5;
-            const py = (event.clientY - rect.top) / rect.height - 0.5;
-            el.classList.add('is-tilting');
-            el.style.setProperty('--ry', `${(px * MAX).toFixed(2)}deg`);
-            el.style.setProperty('--rx', `${(-py * MAX).toFixed(2)}deg`);
-        });
-        el.addEventListener('pointerleave', () => {
-            el.classList.remove('is-tilting');
-            el.style.setProperty('--rx', '0deg');
-            el.style.setProperty('--ry', '0deg');
-        });
-    });
-}
-
-// 鼠标光晕：缓动跟随
-function initCursorGlow() {
-    const glow = document.getElementById('cursorGlow');
-    if (!glow || !finePointer || reduceMotion) return;
-
-    let x = window.innerWidth / 2;
-    let y = window.innerHeight / 2;
-    let tx = x;
-    let ty = y;
-    let frame = 0;
-
-    const loop = () => {
-        x += (tx - x) * 0.16;
-        y += (ty - y) * 0.16;
-        glow.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-        const settled = Math.abs(tx - x) < 0.3 && Math.abs(ty - y) < 0.3;
-        frame = settled ? 0 : requestAnimationFrame(loop);
-    };
-
-    window.addEventListener('pointermove', event => {
-        tx = event.clientX;
-        ty = event.clientY;
-        glow.classList.add('is-on');
-        if (!frame) frame = requestAnimationFrame(loop);
-    }, { passive: true });
-}
-
-// 按钮磁吸：靠近时轻微跟随
-function initMagnetic() {
-    if (!finePointer || reduceMotion) return;
-
-    document.querySelectorAll('.magnetic').forEach(el => {
-        el.addEventListener('pointermove', event => {
-            const rect = el.getBoundingClientRect();
-            const dx = (event.clientX - (rect.left + rect.width / 2)) * 0.2;
-            const dy = (event.clientY - (rect.top + rect.height / 2)) * 0.28;
-            el.style.setProperty('--tx', `${dx.toFixed(1)}px`);
-            el.style.setProperty('--ty', `${dy.toFixed(1)}px`);
-        });
-        el.addEventListener('pointerleave', () => {
-            el.style.setProperty('--tx', '0px');
-            el.style.setProperty('--ty', '0px');
-        });
-    });
-}
-
-/* ===================================================================
-   滚动入场
+   渐入与渐出：进入视口出现，离开视口淡出
    =================================================================== */
 function initReveal() {
     const items = Array.from(document.querySelectorAll('.reveal'));
 
-    // 同一容器内的相邻元素依次错开出现
+    // 同一容器内的相邻元素依次错开
     items.forEach(el => {
         const siblings = Array.from(el.parentElement.children).filter(c => c.classList.contains('reveal'));
-        const index = siblings.indexOf(el);
-        el.style.setProperty('--d', `${(index % 4) * 90}ms`);
+        el.style.setProperty('--d', `${(siblings.indexOf(el) % 4) * 90}ms`);
     });
 
     if (!('IntersectionObserver' in window)) {
@@ -395,19 +252,149 @@ function initReveal() {
     }
 
     const io = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-            if (!entry.isIntersecting) return;
-            entry.target.classList.add('is-in');
-            io.unobserve(entry.target);
-        });
-    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+        entries.forEach(entry => entry.target.classList.toggle('is-in', entry.isIntersecting));
+    }, { rootMargin: '-6% 0px -6% 0px', threshold: 0 });
 
     items.forEach(el => io.observe(el));
 }
 
 /* ===================================================================
-   其它交互
+   指针：磁吸与案例跟随标签
    =================================================================== */
+function initMagnetic() {
+    if (!finePointer || reduceMotion) return;
+
+    document.querySelectorAll('.magnetic').forEach(el => {
+        const strength = el.classList.contains('btn') ? 0.3 : 0.18;
+        el.addEventListener('pointermove', event => {
+            const rect = el.getBoundingClientRect();
+            const dx = (event.clientX - (rect.left + rect.width / 2)) * strength;
+            const dy = (event.clientY - (rect.top + rect.height / 2)) * strength;
+            el.style.setProperty('--mx', `${dx.toFixed(1)}px`);
+            el.style.setProperty('--my', `${dy.toFixed(1)}px`);
+        });
+        el.addEventListener('pointerleave', () => {
+            el.style.setProperty('--mx', '0px');
+            el.style.setProperty('--my', '0px');
+        });
+    });
+}
+
+const cursor = { x: -200, y: -200, tx: -200, ty: -200, on: false, el: null };
+
+function initCursorLabel() {
+    const el = document.getElementById('cursorLabel');
+    if (!el || !finePointer || reduceMotion) return;
+    cursor.el = el;
+    const text = el.querySelector('span');
+
+    window.addEventListener('pointermove', event => {
+        cursor.tx = event.clientX;
+        cursor.ty = event.clientY;
+        if (cursor.x < -100) {
+            cursor.x = cursor.tx;
+            cursor.y = cursor.ty;
+        }
+    }, { passive: true });
+
+    document.addEventListener('pointerover', event => {
+        const target = event.target.closest ? event.target.closest('[data-cursor]') : null;
+        cursor.on = Boolean(target);
+        if (target && text) text.textContent = target.dataset.cursor;
+    });
+}
+
+/* ===================================================================
+   滚动驱动：首屏淡出、进度线、导航隐藏、跑马灯
+   =================================================================== */
+function initScrollEffects() {
+    const heroInner = document.getElementById('heroInner');
+    const progress = document.getElementById('progress');
+    const nav = document.getElementById('nav');
+    const menu = document.getElementById('mobileMenu');
+    const track = document.getElementById('marqueeTrack');
+
+    let lastY = window.scrollY;
+    let lastT = performance.now();
+    let vel = 0;
+    let marqueeX = 0;
+    let direction = 1;
+
+    const loop = now => {
+        if (lenis) lenis.raf(now);
+
+        const dt = Math.min(0.05, (now - lastT) / 1000);
+        lastT = now;
+        const y = window.scrollY;
+        const dy = y - lastY;
+        lastY = y;
+        vel += ((dy / Math.max(dt, 1 / 240)) - vel) * 0.12;
+
+        // 首屏随滚动淡出、上移
+        if (heroInner && !reduceMotion) {
+            const vh = window.innerHeight;
+            if (y < vh * 1.2) {
+                const p = clamp(y / (vh * 0.85), 0, 1);
+                heroInner.style.opacity = String(clamp(1 - p * 1.15, 0, 1));
+                heroInner.style.transform = `translate3d(0, ${(-p * 90).toFixed(1)}px, 0)`;
+            }
+        }
+
+        // 顶部进度线
+        if (progress) {
+            const max = document.documentElement.scrollHeight - window.innerHeight;
+            progress.style.transform = `scaleX(${max > 0 ? y / max : 0})`;
+        }
+
+        // 导航：向下滚动时收起，向上时出现
+        if (nav) {
+            nav.classList.toggle('is-stuck', y > 40);
+            const menuOpen = menu && menu.classList.contains('active');
+            if (menuOpen || y < 200) nav.classList.remove('is-hidden');
+            else if (dy > 4) nav.classList.add('is-hidden');
+            else if (dy < -4) nav.classList.remove('is-hidden');
+        }
+
+        // 跑马灯：滚动越快走得越快，方向跟随滚动方向
+        if (track && !reduceMotion) {
+            if (dy > 0.5) direction = 1;
+            else if (dy < -0.5) direction = -1;
+            const speed = 46 + Math.min(900, Math.abs(vel) * 0.35);
+            const groupW = track.scrollWidth / 2;
+            marqueeX -= speed * dt * direction;
+            if (groupW > 0) {
+                if (marqueeX <= -groupW) marqueeX += groupW;
+                if (marqueeX > 0) marqueeX -= groupW;
+            }
+            track.style.transform = `translate3d(${marqueeX.toFixed(1)}px, 0, 0)`;
+        }
+
+        // 案例跟随标签
+        if (cursor.el) {
+            cursor.x += (cursor.tx - cursor.x) * 0.18;
+            cursor.y += (cursor.ty - cursor.y) * 0.18;
+            cursor.el.style.setProperty('--x', `${cursor.x.toFixed(1)}px`);
+            cursor.el.style.setProperty('--y', `${cursor.y.toFixed(1)}px`);
+            cursor.el.style.setProperty('--s', cursor.on ? '1' : '0');
+        }
+
+        requestAnimationFrame(loop);
+    };
+    requestAnimationFrame(loop);
+}
+
+/* ===================================================================
+   其它
+   =================================================================== */
+function initClock() {
+    const el = document.getElementById('clock');
+    if (!el || typeof Intl === 'undefined') return;
+    const fmt = new Intl.DateTimeFormat('zh-CN', { timeZone: 'Asia/Shanghai', hour: '2-digit', minute: '2-digit', hour12: false });
+    const update = () => { el.textContent = fmt.format(new Date()); };
+    update();
+    setInterval(update, 15000);
+}
+
 function initCopy() {
     const toast = document.getElementById('toast');
     let timer = 0;
@@ -438,7 +425,6 @@ function initCopy() {
             const text = button.dataset.copy;
             const done = () => show(`已复制：${text}`);
             const failed = () => show('复制失败，请手动复制');
-
             if (navigator.clipboard && window.isSecureContext) {
                 navigator.clipboard.writeText(text).then(done, () => (fallbackCopy(text) ? done() : failed()));
             } else {
@@ -472,23 +458,23 @@ function initVisibility() {
 document.addEventListener('DOMContentLoaded', () => {
     renderProjects();
     renderOpenSource();
-    syncHeadlines();
+    splitTitles();
 
+    initSmoothScroll();
     initLoader();
-    initNav();
     initMobileMenu();
-    initProgress();
+    initScrollSpy();
+    initReveal();
 
-    initSpotlight();
-    initTilt();
-    initCursorGlow();
     initMagnetic();
+    initCursorLabel();
+    initScrollEffects();
+
+    initClock();
     initCopy();
     initAvatar();
-
-    initReveal();
     initVisibility();
 
-    console.log('%cCKSTUDIO · 传康Kk 技术工作室', 'color: #f2f3f5; font-size: 13px; font-weight: 600;');
+    console.log('%cCKSTUDIO · 传康Kk 个人工作站', 'color: #ecebe8; font-size: 13px; font-weight: 600;');
     console.log('%c合作联系：2040168455@qq.com', 'color: #888;');
 });

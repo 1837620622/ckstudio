@@ -1,18 +1,18 @@
 /* ===================================================================
    CKSTUDIO · 背景三维字标
-   几何绘制的 CK，沿中线分为上下两半，中间是一道光缝
-   · 材质：烟熏铬正面 + 亮银倒角，PMREM 环境反射，泛光（bloom）
-   · 入场：光缝从中心拉开，上下两半沿光缝合拢，灯光亮起
-   · 待机：缓慢摆动，光带周期性扫过金属表面
-   · 交互：指针用弹簧阻尼带动倾斜；滚动越快，两半分得越开
-   · 滚动：在各区块的姿态之间连续插值
-   无 WebGL 或模块加载失败时，页面照常显示，只是没有背景
+   字形取自 Bodoni Moda Black（高反差 Didone），挤出为抛光铬金属
+   · 入场：在黑暗中缓慢亮起，镜头推近，K 滑入与 C 并拢，一道扫光掠过
+   · 待机：极慢的摆动与浮动，扫光间隔出现；指针用阻尼弹簧带动倾斜
+   · 滚动：首屏之后退向深处并渐暗，中段完全隐去，到联系区重新浮现
+   · 完全隐去时停止渲染，节省 GPU
+   无 WebGL 或模块加载失败时，页面照常显示
    =================================================================== */
 import * as THREE from './vendor/three-0.160.0/three.module.min.js';
 import { EffectComposer } from './vendor/three-0.160.0/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from './vendor/three-0.160.0/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from './vendor/three-0.160.0/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from './vendor/three-0.160.0/addons/postprocessing/OutputPass.js';
+import { GLYPH_C, GLYPH_K, MONO_WIDTH } from './ck-glyphs.js';
 
 const canvas = document.getElementById('scene-canvas');
 const root = document.documentElement;
@@ -20,44 +20,34 @@ const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').match
 const coarse = window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 768;
 const forceHigh = new URLSearchParams(window.location.search).get('quality') === 'high';
 
-const SECTION_IDS = ['home', 'services', 'works', 'opensource', 'partner', 'about', 'contact'];
+const SECTION_IDS = ['home', 'why', 'services', 'works', 'opensource', 'partner', 'about', 'contact'];
 
-// 各区块的字标姿态。x / y 为位置，s 缩放，ry / rx 转角，dim 亮度，split 分离量
+// 各区块的姿态：x / y / z 位置，s 缩放，ry / rx 转角，dim 亮度（0 即完全隐去）
 const KEYS_WIDE = [
-    { x:  2.10, y:  0.02, s: 0.86, ry: -0.36, rx:  0.06, dim: 1.00, split: 0.00 },
-    { x:  3.45, y:  0.10, s: 0.62, ry: -0.95, rx:  0.14, dim: 0.24, split: 0.12 },
-    { x:  3.45, y: -0.05, s: 0.62, ry: -0.55, rx: -0.08, dim: 0.20, split: 0.04 },
-    { x:  3.45, y:  0.10, s: 0.62, ry: -1.10, rx:  0.12, dim: 0.20, split: 0.14 },
-    { x:  3.45, y: -0.05, s: 0.62, ry: -0.70, rx:  0.02, dim: 0.22, split: 0.06 },
-    { x:  3.45, y:  0.10, s: 0.62, ry: -0.90, rx:  0.10, dim: 0.20, split: 0.10 },
-    { x:  2.25, y:  0.45, s: 0.60, ry: -0.32, rx:  0.04, dim: 0.80, split: 0.00 }
+    { x: 1.80, y: -0.02, z:  0.0, s: 1.00, ry: -0.40, rx:  0.04, dim: 1.00 },
+    { x: 3.00, y:  0.70, z: -1.8, s: 0.80, ry: -1.10, rx:  0.12, dim: 0.14 },
+    { x: 2.80, y:  0.55, z: -3.0, s: 0.80, ry: -1.35, rx:  0.18, dim: 0.00 },
+    { x: 2.80, y:  0.55, z: -3.0, s: 0.80, ry: -1.35, rx:  0.18, dim: 0.00 },
+    { x: 2.80, y:  0.55, z: -3.0, s: 0.80, ry: -1.35, rx:  0.18, dim: 0.00 },
+    { x: 2.80, y:  0.55, z: -3.0, s: 0.80, ry: -1.35, rx:  0.18, dim: 0.00 },
+    { x: 2.60, y:  0.40, z: -2.2, s: 0.80, ry: -0.90, rx:  0.10, dim: 0.00 },
+    { x: 2.05, y:  0.20, z:  0.0, s: 0.78, ry: -0.34, rx:  0.04, dim: 0.95 }
 ];
 
-// 竖屏：首屏字标在上方，正文在下方；其余区块退到背景
+// 竖屏：首屏字标在上方，正文在下方；之后隐去
 const KEYS_TALL = [
-    { x: 0, y:  1.22, s: 0.58, ry: -0.30, rx: 0.08, dim: 1.00, split: 0.00 },
-    { x: 0, y:  0.50, s: 0.50, ry: -0.80, rx: 0.14, dim: 0.14, split: 0.10 },
-    { x: 0, y:  0.50, s: 0.50, ry:  0.70, rx: 0.10, dim: 0.12, split: 0.05 },
-    { x: 0, y:  0.50, s: 0.50, ry: -0.60, rx: 0.12, dim: 0.12, split: 0.12 },
-    { x: 0, y:  0.50, s: 0.50, ry:  0.60, rx: 0.06, dim: 0.12, split: 0.06 },
-    { x: 0, y:  0.50, s: 0.50, ry: -0.50, rx: 0.10, dim: 0.12, split: 0.10 },
-    { x: 0, y:  1.30, s: 0.50, ry: -0.20, rx: 0.06, dim: 0.40, split: 0.00 }
+    { x: 0, y: 0.88, z:  0.0, s: 0.70, ry: -0.30, rx: 0.06, dim: 1.00 },
+    { x: 0, y: 1.80, z: -1.5, s: 0.55, ry: -0.90, rx: 0.14, dim: 0.00 },
+    { x: 0, y: 2.20, z: -3.0, s: 0.50, ry: -1.20, rx: 0.18, dim: 0.00 },
+    { x: 0, y: 2.20, z: -3.0, s: 0.50, ry: -1.20, rx: 0.18, dim: 0.00 },
+    { x: 0, y: 2.20, z: -3.0, s: 0.50, ry: -1.20, rx: 0.18, dim: 0.00 },
+    { x: 0, y: 2.20, z: -3.0, s: 0.50, ry: -1.20, rx: 0.18, dim: 0.00 },
+    { x: 0, y: 2.20, z: -3.0, s: 0.50, ry: -1.20, rx: 0.18, dim: 0.00 },
+    { x: 0, y: 2.20, z: -3.0, s: 0.50, ry: -1.20, rx: 0.18, dim: 0.00 }
 ];
 const KEY_NAMES = Object.keys(KEYS_WIDE[0]);
 
-// 字形（字高 2，以 C 的圆心为原点）
-const STROKE = 0.32;
-const DEPTH = 0.34;
-const C_OUT = 1;
-const C_IN = C_OUT - STROKE;
-const C_TERM = 0.5;          // C 开口处的水平切口高度
-const SEAM = 0.07;           // 中缝宽度
-const HALF = SEAM / 2;
-const K_X = 0.98;            // K 竖干左缘
-const K_ARM = 0.38;          // K 斜干水平宽度
-const K_R = K_X + 1.12;      // K 右缘
-const K_FOOT = K_X + 0.1;    // 斜干在中线处的起点
-const MONO_CENTER = (-C_OUT + K_R) / 2;
+const DEPTH = 0.42;
 
 const clamp01 = v => Math.min(1, Math.max(0, v));
 const easeOutQuart = p => 1 - Math.pow(1 - p, 4);
@@ -65,107 +55,43 @@ const easeOutExpo = p => (p >= 1 ? 1 : 1 - Math.pow(2, -10 * p));
 const easeInOutCubic = p => (p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2);
 
 // ---------------------------------------------------------------
-// 形状
+// 字形 → 形状 → 挤出
 // ---------------------------------------------------------------
-function cHalf(sign) {
-    const aOutT = Math.asin(C_TERM / C_OUT);
-    const aInT = Math.asin(C_TERM / C_IN);
-    const aOutS = Math.PI - Math.asin(HALF / C_OUT);
-    const aInS = Math.PI - Math.asin(HALF / C_IN);
-    const s = new THREE.Shape();
-
-    if (sign > 0) {
-        s.moveTo(C_OUT * Math.cos(aOutT), C_OUT * Math.sin(aOutT));
-        s.absarc(0, 0, C_OUT, aOutT, aOutS, false);
-        s.lineTo(C_IN * Math.cos(aInS), C_IN * Math.sin(aInS));
-        s.absarc(0, 0, C_IN, aInS, aInT, true);
-    } else {
-        s.moveTo(C_OUT * Math.cos(-aOutT), C_OUT * Math.sin(-aOutT));
-        s.absarc(0, 0, C_OUT, -aOutT, -aOutS, true);
-        s.lineTo(C_IN * Math.cos(-aInS), C_IN * Math.sin(-aInS));
-        s.absarc(0, 0, C_IN, -aInS, -aInT, false);
+function glyphShapes(data) {
+    const path = new THREE.ShapePath();
+    const t = data.split(' ');
+    let i = 0;
+    const n = () => parseFloat(t[i++]);
+    while (i < t.length) {
+        const op = t[i++];
+        if (op === 'M') path.moveTo(n(), n());
+        else if (op === 'L') path.lineTo(n(), n());
+        else if (op === 'Q') path.quadraticCurveTo(n(), n(), n(), n());
+        else if (op === 'C') path.bezierCurveTo(n(), n(), n(), n(), n(), n());
     }
-    s.closePath();
-    return s;
+    return path.toShapes(true);
 }
 
-// K 的半边：竖干与斜干合成一个多边形，交接处倒角干净
-function kHalf(sign) {
-    const slopeL = (K_R - K_ARM - K_FOOT);          // 斜干左缘每单位 y 的 x 增量
-    const slopeR = (K_R - (K_FOOT + K_ARM));
-    const yJoin = (K_X + STROKE - K_FOOT) / slopeL;  // 斜干左缘与竖干右缘的交点
-    const xSeamR = K_FOOT + K_ARM + slopeR * HALF;
-
-    const pts = [
-        [K_X, HALF],
-        [K_X, 1],
-        [K_X + STROKE, 1],
-        [K_X + STROKE, yJoin],
-        [K_R - K_ARM, 1],
-        [K_R, 1],
-        [xSeamR, HALF]
-    ];
-    const s = new THREE.Shape();
-    pts.forEach(([x, y], i) => {
-        if (i === 0) s.moveTo(x, y * sign);
-        else s.lineTo(x, y * sign);
-    });
-    s.closePath();
-    return s;
-}
-
-function extrude(shape) {
-    const geo = new THREE.ExtrudeGeometry(shape, {
+function extrude(shapes) {
+    const geo = new THREE.ExtrudeGeometry(shapes, {
         depth: DEPTH,
         bevelEnabled: true,
-        bevelThickness: 0.045,
-        bevelSize: 0.032,
+        bevelThickness: 0.03,
+        bevelSize: 0.012,
         bevelSegments: coarse ? 3 : 6,
-        curveSegments: coarse ? 40 : 96
+        curveSegments: coarse ? 18 : 40
     });
     geo.translate(0, 0, -DEPTH / 2);
+    geo.computeVertexNormals();
     return geo;
 }
 
 // ---------------------------------------------------------------
-// 贴图：水平渐隐的光缝、柔光、圆点
-// ---------------------------------------------------------------
-function canvasTexture(w, h, paint) {
-    const c = document.createElement('canvas');
-    c.width = w;
-    c.height = h;
-    paint(c.getContext('2d'), w, h);
-    const tex = new THREE.CanvasTexture(c);
-    tex.colorSpace = THREE.SRGBColorSpace;
-    return tex;
-}
-
-const seamTexture = () => canvasTexture(512, 4, (g, w, h) => {
-    const grad = g.createLinearGradient(0, 0, w, 0);
-    grad.addColorStop(0, 'rgba(255,255,255,0)');
-    grad.addColorStop(0.18, 'rgba(255,255,255,0.55)');
-    grad.addColorStop(0.5, 'rgba(255,255,255,1)');
-    grad.addColorStop(0.82, 'rgba(255,255,255,0.55)');
-    grad.addColorStop(1, 'rgba(255,255,255,0)');
-    g.fillStyle = grad;
-    g.fillRect(0, 0, w, h);
-});
-
-const glowTexture = () => canvasTexture(256, 256, (g, w, h) => {
-    const grad = g.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, w / 2);
-    grad.addColorStop(0, 'rgba(255,255,255,1)');
-    grad.addColorStop(0.35, 'rgba(255,255,255,0.35)');
-    grad.addColorStop(1, 'rgba(255,255,255,0)');
-    g.fillStyle = grad;
-    g.fillRect(0, 0, w, h);
-});
-
-// ---------------------------------------------------------------
-// 环境：黑色空间里几条软箱，金属上会出现清晰的条状高光
+// 环境：黑色摄影棚里的几条柔光灯条，铬面上形成干净的条状反射
 // ---------------------------------------------------------------
 function buildEnvironment(renderer) {
     const env = new THREE.Scene();
-    env.background = new THREE.Color(0x030304);
+    env.background = new THREE.Color(0x000000);
 
     const box = (w, h, x, y, z, intensity) => {
         const mesh = new THREE.Mesh(
@@ -177,12 +103,12 @@ function buildEnvironment(renderer) {
         env.add(mesh);
     };
 
-    box(16, 2.4, 0, 9, 3, 5.5);    // 顶灯条
-    box(1.8, 14, -10, 1, 4, 4.5);  // 左侧竖条
-    box(1.2, 11, 10, 2, -3, 6);    // 右后轮廓光
-    box(1.4, 10, 6, 2, 8, 2.4);    // 右前竖向灯条
-    box(12, 0.7, 0, -4.5, 8, 1.6); // 底部细条
-    box(22, 9, 0, 4, 15, 0.32);    // 镜头后方的大面柔光，让正面有一层渐变光泽
+    box(18, 2.2, 0, 9, 2, 5.0);       // 顶灯条
+    box(1.6, 14, -10, 1, 4, 3.6);     // 左侧竖条
+    box(1.1, 12, 10, 1, -4, 5.2);     // 右后轮廓光
+    box(1.3, 10, 6.5, 2, 8, 2.2);     // 右前竖向灯条
+    box(14, 0.6, 0, -4.8, 8, 1.4);    // 底部细条
+    box(24, 10, 0, 3, 15, 0.26);      // 镜头后方大面柔光：正面的渐变光泽
 
     const pmrem = new THREE.PMREMGenerator(renderer);
     const texture = pmrem.fromScene(env, 0.02).texture;
@@ -199,24 +125,19 @@ function buildEnvironment(renderer) {
 // ---------------------------------------------------------------
 let renderer;
 let composer;
-let bloom;
 let useComposer = false;
 let scene;
 let camera;
 let clock;
 
-let ck;          // 位置与缩放
-let tilt;        // 姿态
-let topHalf;
-let bottomHalf;
-let seam;
-let seamGlow;
-let backGlow;
-let dust;
+let rig;        // 位置与缩放
+let tilt;       // 姿态
+let letterC;
+let letterK;
 let keyLight;
 let sweepLight;
-const faceMats = [];
-const edgeMats = [];
+const capMats = [];
+const sideMats = [];
 
 const state = {};
 const goal = {};
@@ -231,115 +152,34 @@ let centers = [];
 let introStart = -1;
 let running = false;
 let rafId = 0;
+let blankFrames = 0;
 
-// 自适应画质：入场后统计帧时间，太慢就关掉泛光并降低分辨率
 const perf = { frames: 0, total: 0, decided: forceHigh || coarse };
 
 function buildMonogram() {
-    const face = new THREE.MeshPhysicalMaterial({
-        color: 0x7d838d,
+    // 正面：抛光铬；侧壁：略暗的拉丝金属，转动时能读出厚度
+    const cap = new THREE.MeshPhysicalMaterial({
+        color: 0xf4f5f7,
         metalness: 1,
-        roughness: 0.26,
-        clearcoat: 1,
-        clearcoatRoughness: 0.2
+        roughness: 0.1,
+        clearcoat: 0.5,
+        clearcoatRoughness: 0.12
     });
-    const edge = new THREE.MeshPhysicalMaterial({
-        color: 0xffffff,
+    const side = new THREE.MeshPhysicalMaterial({
+        color: 0xb7bbc2,
         metalness: 1,
-        roughness: 0.1
+        roughness: 0.32
     });
-    faceMats.push(face);
-    edgeMats.push(edge);
+    capMats.push(cap);
+    sideMats.push(side);
 
-    // ExtrudeGeometry：组 0 是正反面，组 1 是侧壁与倒角
-    const half = sign => {
-        const g = new THREE.Group();
-        g.add(new THREE.Mesh(extrude(cHalf(sign)), [face, edge]));
-        g.add(new THREE.Mesh(extrude(kHalf(sign)), [face, edge]));
-        return g;
-    };
+    letterC = new THREE.Mesh(extrude(glyphShapes(GLYPH_C)), [cap, side]);
+    letterK = new THREE.Mesh(extrude(glyphShapes(GLYPH_K)), [cap, side]);
 
     const mono = new THREE.Group();
-    mono.position.x = -MONO_CENTER;
-    topHalf = half(1);
-    bottomHalf = half(-1);
-    mono.add(topHalf, bottomHalf);
+    mono.scale.setScalar(2 / MONO_WIDTH * 1.22);
+    mono.add(letterC, letterK);
     tilt.add(mono);
-
-    // 光缝：一条细亮线 + 一层柔光
-    const seamTex = seamTexture();
-    seam = new THREE.Mesh(
-        new THREE.PlaneGeometry(4.8, 0.014),
-        new THREE.MeshBasicMaterial({
-            map: seamTex,
-            color: new THREE.Color().setScalar(1.7),
-            transparent: true,
-            blending: THREE.AdditiveBlending,
-            depthWrite: false,
-            toneMapped: false
-        })
-    );
-    seamGlow = new THREE.Mesh(
-        new THREE.PlaneGeometry(4.8, 0.42),
-        new THREE.MeshBasicMaterial({
-            map: glowTexture(),
-            color: 0xffffff,
-            transparent: true,
-            opacity: 0.0,
-            blending: THREE.AdditiveBlending,
-            depthWrite: false
-        })
-    );
-    seamGlow.scale.y = 1;
-    tilt.add(seam, seamGlow);
-
-    // 字标背后的一团极淡的光，拉开前后层次
-    backGlow = new THREE.Mesh(
-        new THREE.PlaneGeometry(7, 7),
-        new THREE.MeshBasicMaterial({
-            map: glowTexture(),
-            color: 0xffffff,
-            transparent: true,
-            opacity: 0,
-            blending: THREE.AdditiveBlending,
-            depthWrite: false
-        })
-    );
-    backGlow.position.z = -2.4;
-    ck.add(backGlow);
-}
-
-function buildDust() {
-    const count = coarse ? 260 : 900;
-    const pos = new Float32Array(count * 3);
-    const col = new Float32Array(count * 3);
-    for (let i = 0; i < count; i++) {
-        const r = 8 + Math.random() * 8;
-        const u = Math.random() * 2 - 1;
-        const th = Math.random() * Math.PI * 2;
-        const s = Math.sqrt(1 - u * u);
-        pos[i * 3] = r * s * Math.cos(th) * 1.3;
-        pos[i * 3 + 1] = r * u * 0.8;
-        pos[i * 3 + 2] = r * s * Math.sin(th) - 2;
-        const b = 0.12 + Math.pow(Math.random(), 2.6) * 0.7;
-        col[i * 3] = b;
-        col[i * 3 + 1] = b;
-        col[i * 3 + 2] = b;
-    }
-    const geo = new THREE.BufferGeometry();
-    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-    geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
-    dust = new THREE.Points(geo, new THREE.PointsMaterial({
-        size: coarse ? 0.06 : 0.045,
-        map: glowTexture(),
-        vertexColors: true,
-        transparent: true,
-        opacity: 0,
-        depthWrite: false,
-        blending: THREE.AdditiveBlending,
-        sizeAttenuation: true
-    }));
-    scene.add(dust);
 }
 
 // ---------------------------------------------------------------
@@ -396,6 +236,7 @@ function resize() {
     }
     keys = camera.aspect < 0.8 ? KEYS_TALL : KEYS_WIDE;
     measure();
+    blankFrames = 0;
 }
 
 // 阻尼弹簧：略带回弹，让指针带来的倾斜有重量感
@@ -419,95 +260,85 @@ function frame() {
     if (introStart < 0 && root.classList.contains('is-ready')) introStart = t;
     const it = reduceMotion ? 99 : (introStart < 0 ? -1 : t - introStart);
 
-    const seamIn = it < 0 ? 0 : easeOutExpo(clamp01((it - 0.05) / 1.2));
-    const topIn = it < 0 ? 0 : easeOutQuart(clamp01((it - 0.35) / 1.9));
-    const botIn = it < 0 ? 0 : easeOutQuart(clamp01((it - 0.5) / 1.9));
-    const lightIn = it < 0 ? 0 : easeInOutCubic(clamp01((it - 0.3) / 2.2));
-    const swingIn = it < 0 ? 0 : easeOutQuart(clamp01((it - 0.2) / 2.8));
+    const lightIn = it < 0 ? 0 : easeInOutCubic(clamp01((it - 0.1) / 2.6));
+    const swingIn = it < 0 ? 0 : easeOutQuart(clamp01(it / 3.4));
+    const dollyIn = it < 0 ? 0 : easeOutExpo(clamp01(it / 3.0));
+    const kIn = it < 0 ? 0 : easeOutQuart(clamp01((it - 0.35) / 2.4));
 
-    // 区块姿态
     computeGoal();
-    const k = 1 - Math.exp(-dt * 3.4);
+    const k = 1 - Math.exp(-dt * 3.0);
     KEY_NAMES.forEach(name => {
         state[name] += (goal[name] - state[name]) * k;
     });
 
-    // 滚动速度 → 两半分离、轻微侧倾
+    // 滚动速度 → 轻微侧倾与 K 的前后错位
     const sy = window.scrollY;
     const raw = (sy - lastScrollY) / Math.max(dt, 1 / 240);
     lastScrollY = sy;
-    scrollVel += (raw - scrollVel) * (1 - Math.exp(-dt * 6));
-    const velSplit = Math.min(0.22, Math.abs(scrollVel) / 7000) * motion;
-    const velRoll = Math.max(-0.07, Math.min(0.07, scrollVel / 14000)) * motion;
+    scrollVel += (raw - scrollVel) * (1 - Math.exp(-dt * 5));
+    const vel = Math.max(-1, Math.min(1, scrollVel / 5000)) * motion;
 
-    // 指针
-    spring(springX, pointer.x, dt, 30, 7.5);
-    spring(springY, pointer.y, dt, 30, 7.5);
+    spring(springX, pointer.x, dt, 26, 7);
+    spring(springY, pointer.y, dt, 26, 7);
 
-    // 位置与缩放
+    // 金属反射的是很亮的灯条，线性压暗在色调映射后不明显，所以按 1.6 次方压暗
+    const dim = Math.pow(Math.max(0, state.dim), 1.6) * lightIn;
+
+    // 完全隐去时不再渲染（先补几帧黑场，确保画面清空）
+    if (dim < 0.002 && it > 3.5) {
+        if (blankFrames > 2) return;
+        blankFrames += 1;
+    } else {
+        blankFrames = 0;
+    }
+
     const aspect = camera.aspect;
     const tall = aspect < 0.8;
     const fit = tall ? 1 : Math.min(1, aspect / 1.6);
-    ck.position.set(
+
+    rig.position.set(
         state.x * fit,
-        state.y + Math.sin(t * 0.6) * 0.035 * motion,
-        0
+        state.y + Math.sin(t * 0.55) * 0.03 * motion,
+        state.z + (1 - dollyIn) * -1.6
     );
-    ck.scale.setScalar(state.s * (tall ? 1 : 0.62 + 0.38 * fit));
+    rig.scale.setScalar(state.s * (tall ? 1 : 0.62 + 0.38 * fit));
 
     tilt.rotation.set(
-        state.rx - springY.p * 0.12 + Math.sin(t * 0.43) * 0.02 * motion,
-        state.ry + springX.p * 0.2 + Math.sin(t * 0.29) * 0.08 * motion + (1 - swingIn) * -1.1,
-        velRoll
+        state.rx - springY.p * 0.1 + (1 - swingIn) * 0.22 + Math.sin(t * 0.37) * 0.018 * motion,
+        state.ry + springX.p * 0.18 + (1 - swingIn) * -0.95 + Math.sin(t * 0.23) * 0.07 * motion,
+        vel * -0.05
     );
 
-    // 上下两半：入场合拢 + 区块分离 + 速度分离
-    const split = (state.split + velSplit) / 2;
-    topHalf.position.set(0, split + (1 - topIn) * 0.95, (1 - topIn) * -1.4);
-    topHalf.rotation.x = (1 - topIn) * -0.7;
-    bottomHalf.position.set(0, -split - (1 - botIn) * 0.95, (1 - botIn) * -1.4);
-    bottomHalf.rotation.x = (1 - botIn) * 0.7;
+    // K 从右后方滑入，与 C 并拢；滚动时前后轻微错位
+    letterK.position.set((1 - kIn) * 0.9, 0, (1 - kIn) * -0.9 + vel * 0.12);
+    letterC.position.z = vel * -0.06;
 
-    // 亮度
-    // 金属反射的是很亮的灯条，线性压暗在色调映射后不明显，所以按 1.6 次方压暗
-    const dim = Math.pow(state.dim, 1.6) * lightIn;
-    faceMats.forEach(m => { m.envMapIntensity = 1.05 * dim; });
-    edgeMats.forEach(m => { m.envMapIntensity = 1.15 * dim; });
-    keyLight.intensity = 1.5 * dim;
-
-    const pulse = 0.88 + Math.sin(t * 1.3) * 0.12 * motion;
-    seam.scale.x = Math.max(0.0001, seamIn);
-    seam.material.opacity = state.dim * pulse * (it < 0 ? 0 : 1);
-    seamGlow.scale.x = Math.max(0.0001, seamIn);
-    seamGlow.material.opacity = 0.14 * state.dim * pulse * seamIn;
-    backGlow.material.opacity = 0.02 * dim;
+    capMats.forEach(m => { m.envMapIntensity = 1.0 * dim; });
+    sideMats.forEach(m => { m.envMapIntensity = 0.9 * dim; });
+    keyLight.intensity = 1.0 * dim;
 
     // 主光缓慢绕行
-    const a = t * 0.22 * motion;
+    const a = t * 0.2 * motion;
     keyLight.position.set(Math.cos(a) * 5, 3.5 + Math.sin(a * 0.7) * 1.2, 4 + Math.sin(a) * 2);
 
-    // 扫光：入场 1.7 秒时第一次，之后每 9 秒一次
-    if (it > 1.7 && motion) {
-        const cycle = (it - 1.7) % 9;
-        const p = clamp01(cycle / 1.9);
+    // 扫光：入场 1.4 秒时第一次，之后每 8 秒一次
+    if (it > 1.4 && motion) {
+        const cycle = (it - 1.4) % 8;
+        const p = clamp01(cycle / 2.0);
         const e = easeInOutCubic(p);
-        sweepLight.position.set(-4.2 + e * 8.4, 0.6 - e * 0.4, 2.1);
-        sweepLight.intensity = Math.sin(Math.PI * p) * 34 * dim;
+        sweepLight.position.set(rig.position.x - 3.6 + e * 7.2, rig.position.y + 0.8 - e * 0.6, rig.position.z + 2.2);
+        sweepLight.intensity = Math.sin(Math.PI * p) * 18 * dim;
     } else {
         sweepLight.intensity = 0;
     }
 
-    dust.rotation.y = t * 0.01 * motion;
-    dust.material.opacity = 0.85 * Math.max(0.4, state.dim) * lightIn;
-
-    // 相机视差
-    camera.position.set(springX.p * 0.25, springY.p * 0.18, 7);
+    camera.position.set(springX.p * 0.22, springY.p * 0.16, 7);
     camera.lookAt(0, 0, 0);
 
     if (useComposer) composer.render();
     else renderer.render(scene, camera);
 
-    // 自适应画质
+    // 自适应画质：入场后统计帧时间，太慢就关掉泛光并降低分辨率
     if (!perf.decided && it > 3) {
         perf.frames += 1;
         perf.total += dt;
@@ -545,43 +376,40 @@ function init() {
     });
     // 清屏用纯黑：后期管线里非零的清屏色会被色调映射抬成灰色
     renderer.setClearColor(0x000000, 1);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, coarse ? 1.25 : 1.75));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, coarse ? 1.5 : 1.75));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.15;
+    renderer.toneMappingExposure = 1.1;
 
     scene = new THREE.Scene();
     scene.environment = buildEnvironment(renderer);
 
-    camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 120);
+    camera = new THREE.PerspectiveCamera(36, window.innerWidth / window.innerHeight, 0.1, 120);
     camera.position.set(0, 0, 7);
 
-    ck = new THREE.Group();
+    rig = new THREE.Group();
     tilt = new THREE.Group();
-    ck.add(tilt);
-    scene.add(ck);
-
+    rig.add(tilt);
+    scene.add(rig);
     buildMonogram();
-    buildDust();
 
     keyLight = new THREE.DirectionalLight(0xffffff, 0);
     sweepLight = new THREE.PointLight(0xffffff, 0, 7, 1.6);
     scene.add(keyLight, sweepLight);
 
-    // 泛光：触屏设备默认关闭
+    // 泛光只保留金属上的高光闪点；触屏设备默认关闭
     if (!coarse) {
         const target = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: 4 });
         composer = new EffectComposer(renderer, target);
         composer.addPass(new RenderPass(scene, camera));
-        bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), 0.36, 0.42, 0.9);
-        composer.addPass(bloom);
+        composer.addPass(new UnrealBloomPass(new THREE.Vector2(256, 256), 0.22, 0.0, 0.92));
         composer.addPass(new OutputPass());
         useComposer = true;
     }
 
-    const start0 = (camera.aspect < 0.8 ? KEYS_TALL : KEYS_WIDE)[0];
+    const first = (camera.aspect < 0.8 ? KEYS_TALL : KEYS_WIDE)[0];
     KEY_NAMES.forEach(name => {
-        state[name] = start0[name];
-        goal[name] = start0[name];
+        state[name] = first[name];
+        goal[name] = first[name];
     });
 
     clock = new THREE.Clock();
