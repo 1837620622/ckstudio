@@ -3,20 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="CK Studio · 传康KK 个人作品集：在线作品、开源仓库与联系方式。">
+    <meta name="description" content="传康Kk 的个人主页，整理在线项目、开源仓库和联系方式。">
     <meta name="theme-color" content="#030304">
-    <title>CK Studio | 传康KK</title>
+    <title>CKSTUDIO | 传康Kk</title>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop stop-color='%23ffffff'/%3E%3Cstop offset='.48' stop-color='%238f949d'/%3E%3Cstop offset='1' stop-color='%23ffffff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect x='4' y='4' width='56' height='56' rx='16' fill='%23010205' stroke='url(%23g)' stroke-width='2'/%3E%3Cpath d='M12 18H52M12 46H52M18 12V52M46 12V52' stroke='%23ffffff' stroke-opacity='.16'/%3E%3Ctext x='50%25' y='57%25' text-anchor='middle' font-family='Arial' font-size='27' font-weight='800' fill='%23ffffff'%3ECK%3C/text%3E%3C/svg%3E">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=20261016">
+    <link rel="stylesheet" href="style.css?v=20261016b">
     <script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js" defer></script>
 </head>
 <body>
 
-    <!-- ===== 加载页：品牌标描边绘制 + 数字计数 + 顶部帘幕上提 ===== -->
+    <!-- 加载页 -->
     <div class="loader" id="loader" aria-hidden="true">
         <div class="loader-inner">
             <svg class="brand-mark loader-mark" viewBox="0 0 64 64">
@@ -26,16 +26,15 @@
             </svg>
             <div class="loader-num" id="loaderNum">000</div>
             <div class="loader-bar"><i id="loaderBar"></i></div>
-            <div class="loader-label">加载中 · CK STUDIO</div>
+            <div class="loader-label">CKSTUDIO</div>
         </div>
     </div>
 
-    <!-- ===== 顶部进度 / 鼠标光晕 / 3D 背景 ===== -->
     <div class="progress" id="progress" aria-hidden="true"></div>
     <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
     <canvas id="scene-canvas" aria-hidden="true"></canvas>
 
-    <!-- ===== 导航 ===== -->
+    <!-- 导航 -->
     <nav class="nav" id="nav" aria-label="主导航">
         <a class="logo" href="#home" aria-label="回到顶部">
             <span class="logo-mark" aria-hidden="true">
@@ -46,8 +45,8 @@
                 </svg>
             </span>
             <span class="logo-stack">
-                <span class="logo-cn">传康</span>
-                <span class="logo-text">STUDIO</span>
+                <span class="logo-cn">传康Kk</span>
+                <span class="logo-text">CKSTUDIO</span>
             </span>
         </a>
         <div class="menu">
@@ -71,132 +70,121 @@
         <a href="https://github.com/1837620622" target="_blank" rel="noopener noreferrer">GitHub</a>
     </div>
 
-    <!-- ===== Hero ===== -->
+    <!-- Hero -->
     <header class="hero" id="home">
         <div class="hero-inner">
             <div class="hero-badge hero-anim" style="--d: 0ms">
                 <span class="badge-dot"></span>
-                <span>作品集</span>
+                <span>CKSTUDIO</span>
             </div>
-            <div class="hero-tag hero-anim" style="--d: 120ms">Web · AI · 数据 · 安全 · 开源</div>
-            <h1>
-                <span class="line hero-anim" style="--d: 220ms">这是</span>
-                <span class="line bold hero-anim" style="--d: 320ms"><span class="metal">CK</span> STUDIO</span>
-            </h1>
-            <p class="hero-desc hero-anim" style="--d: 440ms">传康KK 的个人作品集。<br>收录已上线的项目、实用工具和开源仓库——只有能打开的才放上来。</p>
+            <div class="hero-tag hero-anim" style="--d: 120ms">Full Stack · AI · Security</div>
+            <h1 class="hero-anim" style="--d: 240ms">传康Kk</h1>
+            <p class="hero-desc hero-anim" style="--d: 380ms">独立开发者，做 Web 应用、数据看板、AI 工具和自动化流程。<br>做完的项目会部署上线，能用的代码整理后开源。</p>
 
-            <div class="hero-buttons hero-anim" style="--d: 540ms">
-                <a href="#works" class="btn btn-primary btn-lg magnetic">浏览作品 <span class="btn-icon"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13.5 6.5 19 12l-5.5 5.5"/></svg></span></a>
+            <div class="hero-buttons hero-anim" style="--d: 500ms">
+                <a href="#works" class="btn btn-primary btn-lg magnetic">查看作品 <span class="btn-icon"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13.5 6.5 19 12l-5.5 5.5"/></svg></span></a>
                 <a href="https://github.com/1837620622" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-lg magnetic">GitHub <span class="btn-icon"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span></a>
             </div>
 
-            <div class="hero-stats hero-anim" style="--d: 680ms">
+            <div class="hero-stats hero-anim" style="--d: 640ms">
                 <div class="stat">
-                    <span class="stat-num" data-metric="live">19</span>
+                    <span class="stat-num" data-metric="live">6</span>
                     <span class="stat-label">在线项目</span>
                 </div>
                 <div class="stat">
-                    <span class="stat-num" data-metric="repos">67</span>
-                    <span class="stat-label">公开仓库</span>
-                </div>
-                <div class="stat">
-                    <span class="stat-num" data-metric="stars" data-suffix="+">689+</span>
-                    <span class="stat-label">GitHub Stars</span>
+                    <span class="stat-num" data-metric="repos">6</span>
+                    <span class="stat-label">精选仓库</span>
                 </div>
             </div>
         </div>
 
         <div class="scroll-hint hero-anim" style="--d: 900ms" aria-hidden="true">
-            <span>向下滚动</span>
+            <span>向下</span>
             <i></i>
         </div>
     </header>
 
-    <!-- ===== 跑马灯 ===== -->
+    <!-- 跑马灯 -->
     <div class="marquee" aria-hidden="true">
         <div class="marquee-track">
             <div class="marquee-group">
-                <span>Web</span><span>AI</span><span>数据</span><span>安全</span><span>开源</span><span>Cloudflare</span><span>Python</span><span>TypeScript</span><span>Workers</span>
+                <span>Web</span><span>AI</span><span>Data</span><span>Security</span><span>Open Source</span><span>Cloudflare</span><span>Python</span><span>TypeScript</span>
             </div>
             <div class="marquee-group">
-                <span>Web</span><span>AI</span><span>数据</span><span>安全</span><span>开源</span><span>Cloudflare</span><span>Python</span><span>TypeScript</span><span>Workers</span>
+                <span>Web</span><span>AI</span><span>Data</span><span>Security</span><span>Open Source</span><span>Cloudflare</span><span>Python</span><span>TypeScript</span>
             </div>
         </div>
     </div>
 
-    <!-- ===== 作品 ===== -->
+    <!-- 作品 -->
     <section class="section" id="works">
         <div class="wrap">
             <div class="sec-head reveal">
-                <span class="sec-index">02</span>
-                <h2 class="sec-title">在线作品</h2>
-                <p class="sec-meta"><span id="worksCount">19</span> 个在线项目</p>
+                <span class="sec-index">01</span>
+                <h2 class="sec-title">作品</h2>
+                <p class="sec-meta"><span id="worksCount">6</span> 个在线项目</p>
             </div>
 
             <div class="sec-intro reveal">
-                <p>已部署、可直接访问的站点：播放器、小工具、行情看板，以及几个 AI 应用。</p>
-                <p>点击卡片进入；失效链接已移除。</p>
+                <p>以下项目都已部署，可以直接打开。</p>
+                <p>包括行情数据看板、前端交互页面和一个小工具。</p>
             </div>
 
             <div class="works-grid" id="projectGrid"></div>
 
             <div class="works-more reveal">
                 <a class="btn btn-ghost btn-lg magnetic" href="https://github.com/1837620622" target="_blank" rel="noopener noreferrer">
-                    <span>在 GitHub 查看更多</span>
+                    <span>GitHub 上的全部项目</span>
                     <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>
                 </a>
             </div>
         </div>
     </section>
 
-    <!-- ===== 开源 ===== -->
+    <!-- 开源 -->
     <section class="section" id="opensource">
         <div class="wrap">
             <div class="sec-head reveal">
-                <span class="sec-index">03</span>
-                <h2 class="sec-title">开源仓库</h2>
-                <p class="sec-meta" id="sourceCount">精选</p>
+                <span class="sec-index">02</span>
+                <h2 class="sec-title">开源</h2>
+                <p class="sec-meta" id="sourceCount">6 个精选仓库</p>
             </div>
 
             <div class="sec-intro reveal">
-                <p>按 Star 排序的原创仓库，主要是自动化、代理网关、金融面板和安全相关工具。</p>
-                <p>源码在 GitHub，可直接 Fork；有在线演示的会单独标出。</p>
-                <a class="btn btn-ghost magnetic" href="https://github.com/1837620622?tab=repositories" target="_blank" rel="noopener noreferrer">查看全部仓库 <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
+                <p>挑了几个结构完整、可以直接参考的仓库。</p>
+                <p>代码都在 GitHub，欢迎 Fork。有在线版本的会单独标出。</p>
+                <a class="btn btn-ghost magnetic" href="https://github.com/1837620622?tab=repositories" target="_blank" rel="noopener noreferrer">全部仓库 <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
             </div>
 
             <div class="repo-grid" id="openSourceGrid"></div>
         </div>
     </section>
 
-    <!-- ===== 关于 ===== -->
+    <!-- 关于 -->
     <section class="section" id="about">
         <div class="wrap">
             <div class="sec-head reveal">
-                <span class="sec-index">04</span>
-                <h2 class="sec-title">关于我</h2>
+                <span class="sec-index">03</span>
+                <h2 class="sec-title">关于</h2>
             </div>
 
             <div class="about-grid">
                 <aside class="profile spot reveal">
                     <div class="profile-avatar">
-                        <img src="https://avatars.githubusercontent.com/u/35034498?v=4" alt="传康KK" loading="lazy" referrerpolicy="no-referrer" data-fallback="avatarFallback">
+                        <img src="https://avatars.githubusercontent.com/u/35034498?v=4" alt="传康Kk" loading="lazy" referrerpolicy="no-referrer" data-fallback="avatarFallback">
                         <span class="avatar-fallback" id="avatarFallback" aria-hidden="true">CK</span>
                     </div>
-                    <div class="profile-name">传康KK</div>
-                    <div class="profile-role">全栈 · AI · 安全</div>
+                    <div class="profile-name">传康Kk</div>
+                    <div class="profile-role">独立开发者</div>
 
                     <div class="profile-stats">
                         <div class="profile-stat">
-                            <span class="num" data-metric="live">19</span>
-                            <span class="label">在线</span>
+                            <span class="num" data-metric="live">6</span>
+                            <span class="label">在线项目</span>
                         </div>
                         <div class="profile-stat">
-                            <span class="num" data-metric="repos">67</span>
-                            <span class="label">仓库</span>
-                        </div>
-                        <div class="profile-stat">
-                            <span class="num" data-metric="stars" data-suffix="+">689+</span>
-                            <span class="label">Stars</span>
+                            <span class="num" data-metric="repos">6</span>
+                            <span class="label">精选仓库</span>
                         </div>
                     </div>
 
@@ -209,28 +197,28 @@
                 <div class="about-body">
                     <div class="reveal">
                         <h3 class="about-h">简介</h3>
-                        <p class="about-lead">独立开发者。习惯把东西做完、部署上线，再开源出去——能给别人用，才算真正做完。</p>
-                        <p class="about-text">不太在意文档里写得多漂亮，更在意页面能不能打开、代码能不能跑。</p>
+                        <p class="about-lead">独立开发者。习惯先把东西做出来、跑起来，再慢慢打磨。</p>
+                        <p class="about-text">比起文档写得多漂亮，我更在意页面能不能打开、接口能不能调通、数据能不能对上。</p>
                     </div>
 
                     <div class="reveal">
                         <h3 class="about-h">方向</h3>
-                        <p class="about-text">网站与工具、API / 网关、AI 脚本、自动化流程、行情与数据看板。</p>
-                        <p class="about-text">能跑通就先上线，再边用边改；同时维护几个有实际用户的开源项目。</p>
+                        <p class="about-text">Web 应用与工具、API 与网关、数据看板、自动化流程，以及 AI 相关的应用。</p>
+                        <p class="about-text">上线之后会持续维护，有人在用就继续改。</p>
                     </div>
 
                     <div class="reveal">
                         <h3 class="about-h">技术栈</h3>
                         <div class="skills">
                             <span class="skill-tag">全栈</span>
-                            <span class="skill-tag">AI 工具</span>
-                            <span class="skill-tag">安全研究</span>
+                            <span class="skill-tag">AI 应用</span>
+                            <span class="skill-tag">网络安全</span>
                             <span class="skill-tag">Cloudflare</span>
                             <span class="skill-tag">Python</span>
                             <span class="skill-tag">TypeScript</span>
                             <span class="skill-tag">React / Vue</span>
                             <span class="skill-tag">自动化</span>
-                            <span class="skill-tag">数据看板</span>
+                            <span class="skill-tag">数据可视化</span>
                         </div>
                     </div>
                 </div>
@@ -238,18 +226,18 @@
         </div>
     </section>
 
-    <!-- ===== 联系 ===== -->
+    <!-- 联系 -->
     <section class="section" id="contact">
         <div class="wrap">
             <div class="sec-head reveal">
-                <span class="sec-index">05</span>
+                <span class="sec-index">04</span>
                 <h2 class="sec-title">联系</h2>
             </div>
 
             <div class="contact-hero reveal">
-                <h2 class="contact-heading">联系 <span class="metal">合作</span></h2>
-                <p class="contact-desc">项目合作、页面定制、工具开发或技术咨询，都可以联系我。</p>
-                <p class="contact-desc">需求说清楚即可；合适就推进，不合适也会直接说明。</p>
+                <h2 class="contact-heading">合作与<span class="metal">交流</span></h2>
+                <p class="contact-desc">项目合作、页面开发、工具定制或技术问题，都可以联系我。</p>
+                <p class="contact-desc">把需求说清楚即可，我会尽快回复。</p>
             </div>
 
             <div class="contact-grid">
@@ -281,7 +269,7 @@
         </div>
     </section>
 
-    <!-- ===== 页脚 ===== -->
+    <!-- 页脚 -->
     <footer class="footer">
         <div class="wrap footer-top">
             <div>
@@ -294,23 +282,23 @@
                         </svg>
                     </span>
                     <span class="logo-stack">
-                        <span class="logo-cn">传康</span>
-                        <span class="logo-text">STUDIO</span>
+                        <span class="logo-cn">传康Kk</span>
+                        <span class="logo-text">CKSTUDIO</span>
                     </span>
                 </a>
-                <p class="footer-tagline">上线能用，才算做完</p>
+                <p class="footer-tagline">独立开发 · 长期维护</p>
             </div>
 
             <div class="footer-links">
                 <div>
-                    <h4>导航</h4>
+                    <h4>页面</h4>
                     <a href="#works">作品</a>
                     <a href="#opensource">开源</a>
                     <a href="#about">关于</a>
                     <a href="#contact">联系</a>
                 </div>
                 <div>
-                    <h4>联系</h4>
+                    <h4>联系方式</h4>
                     <a href="https://github.com/1837620622" target="_blank" rel="noopener noreferrer">GitHub</a>
                     <a href="mailto:2040168455@qq.com">邮箱</a>
                     <a href="#contact">微信</a>
@@ -319,7 +307,7 @@
         </div>
 
         <div class="wrap footer-bottom">
-            <span>© 传康KK</span>
+            <span>© 2026 传康Kk</span>
             <div class="footer-social">
                 <a href="https://github.com/1837620622" target="_blank" rel="noopener noreferrer" class="social-icon" title="GitHub" aria-label="GitHub"><svg class="ico-brand" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg></a>
                 <a href="mailto:2040168455@qq.com" class="social-icon" title="邮箱" aria-label="邮箱"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7 8 6 8-6"/></svg></a>
@@ -327,12 +315,12 @@
             </div>
         </div>
 
-        <div class="footer-wordmark" aria-hidden="true">CK STUDIO</div>
+        <div class="footer-wordmark" aria-hidden="true">CKSTUDIO</div>
     </footer>
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-    <script src="js/three-scene.js?v=20261016" defer></script>
-    <script src="script.js?v=20261016" defer></script>
+    <script src="js/three-scene.js?v=20261016b" defer></script>
+    <script src="script.js?v=20261016b" defer></script>
 </body>
 </html>
