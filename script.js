@@ -10,8 +10,6 @@ const PAGE_TITLE = document.title;
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const finePointer = window.matchMedia('(pointer: fine)').matches;
 
-const ICON_ARROW = '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>';
-
 function escapeHtml(value) {
     return String(value)
         .replace(/&/g, '&amp;')
@@ -64,18 +62,16 @@ function renderProjects() {
     const grid = document.getElementById('projectGrid');
     if (!grid) return;
 
-    grid.innerHTML = projects.map((p, i) => `
+    grid.innerHTML = projects.map(p => `
         <a class="work reveal" href="${safeExternalUrl(p.url)}" target="_blank" rel="noopener noreferrer" data-cursor="查看">
             <div class="work-media">
                 <img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)} 封面示意图" loading="lazy" decoding="async" width="1200" height="800">
             </div>
-            <div class="work-info">
-                <span class="work-num">${pad2(i + 1)}</span>
-                <h3 class="work-title">${escapeHtml(p.name)}</h3>
-                <span class="work-cat">${escapeHtml(p.category)}</span>
+            <div class="work-meta">
+                <h3>${escapeHtml(p.name)}</h3>
+                <span>${escapeHtml(p.category)}</span>
             </div>
             <p class="work-desc">${escapeHtml(p.desc)}</p>
-            <p class="work-tags">${p.tags.map(escapeHtml).join(' · ')}</p>
         </a>`).join('');
 }
 
@@ -85,29 +81,18 @@ function renderOpenSource() {
 
     list.innerHTML = openSourceProjects.map(p => {
         const demo = p.demo
-            ? ` <a class="repo-demo" href="${safeExternalUrl(p.demo)}" target="_blank" rel="noopener noreferrer">在线版本</a>`
+            ? ` <a class="inline-link" href="${safeExternalUrl(p.demo)}" target="_blank" rel="noopener noreferrer">在线版本</a>`
             : '';
-        const stars = typeof p.stars === 'number' ? `★ ${escapeHtml(p.stars)}` : '';
+        const meta = typeof p.stars === 'number'
+            ? `${escapeHtml(p.language)} · ★ ${escapeHtml(p.stars)}`
+            : escapeHtml(p.language);
         return `
             <li class="repo reveal">
                 <a class="repo-name" href="${safeExternalUrl(p.repo)}" target="_blank" rel="noopener noreferrer">${escapeHtml(p.name)}</a>
-                <p class="repo-desc">${escapeHtml(p.desc)}${demo}</p>
-                <span class="repo-lang">${escapeHtml(p.language)}</span>
-                <span class="repo-stars">${stars}</span>
-                ${ICON_ARROW}
+                <p>${escapeHtml(p.desc)}${demo}</p>
+                <span class="repo-meta">${meta}</span>
             </li>`;
     }).join('');
-}
-
-// 标题拆成单字，用于逐字上升
-function splitTitles() {
-    document.querySelectorAll('.split').forEach(el => {
-        const text = el.textContent.trim();
-        el.setAttribute('aria-label', text);
-        el.innerHTML = Array.from(text)
-            .map((c, i) => `<span class="ch" aria-hidden="true" style="--i: ${i}">${escapeHtml(c)}</span>`)
-            .join('');
-    });
 }
 
 /* ===================================================================
@@ -336,7 +321,7 @@ function initScrollEffects() {
             if (y < vh * 1.2) {
                 const p = clamp(y / (vh * 0.85), 0, 1);
                 heroInner.style.opacity = String(clamp(1 - p * 1.15, 0, 1));
-                heroInner.style.transform = `translate3d(0, ${(-p * 90).toFixed(1)}px, 0)`;
+                heroInner.style.transform = `translate3d(0, ${(-p * 70).toFixed(1)}px, 0)`;
             }
         }
 
@@ -458,7 +443,6 @@ function initVisibility() {
 document.addEventListener('DOMContentLoaded', () => {
     renderProjects();
     renderOpenSource();
-    splitTitles();
 
     initSmoothScroll();
     initLoader();
