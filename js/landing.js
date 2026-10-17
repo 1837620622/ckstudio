@@ -61,8 +61,10 @@ function hashIndex() {
 // 每一屏对应的粒子形态：A 球体 / B 键盘 / C <CK>；首屏不显示粒子
 const FORMS = [null, 'A', 'B', 'C', 'A', 'B', 'C'];
 // 粒子层在各屏的不透明度：内容较多的后三屏压暗，让文字更好读
-const STAGE_OP = [1, 1, 1, 1, 0.32, 0.3, 0.2];
+const STAGE_OP = [1, 1, 1, 1, 0.45, 0.14, 0.12];
 const LEAVE_MS = 900;
+// 竖排布局里能力屏的卡片压在球体上，粒子再暗一些
+const stageOp = i => (i === 4 && (W <= 900 || H < 560) ? 0.2 : STAGE_OP[i]);
 
 let W = window.innerWidth;
 let H = window.innerHeight;
@@ -374,7 +376,7 @@ function drawNums() {
         for (let c = 0; c < cols; c++) {
             if (hash(c, r) < 0.12) continue;
             const v = clamp(Math.round(50 + 49 * Math.sin(c * 0.19 + r * 0.075 + numT * 0.22) * Math.cos(r * 0.14 - numT * 0.09 + c * 0.03)), 0, 99);
-            nctx.fillStyle = `rgba(255,255,255,${(0.17 + 0.33 * hash(r, c)).toFixed(3)})`;
+            nctx.fillStyle = `rgba(255,255,255,${(0.12 + 0.24 * hash(r, c)).toFixed(3)})`;
             nctx.fillText(String(v), c * COL + 10, r * ROW + 7);
         }
     }
@@ -1190,7 +1192,7 @@ function initStage() {
         };
         let top = header.offsetHeight + 8;
         let bottom = H - 8;
-        $$(upperSel, sec).forEach(el => { const r = rel(el); if (r.h > 0) top = Math.max(top, r.bottom + 10); });
+        if (upperSel) $$(upperSel, sec).forEach(el => { const r = rel(el); if (r.h > 0) top = Math.max(top, r.bottom + 10); });
         $$(lowerSel, sec).forEach(el => { const r = rel(el); if (r.h > 0) bottom = Math.min(bottom, r.top - 10); });
         if (bottom - top < 70) {
             const mid = (top + bottom) / 2;
@@ -1204,8 +1206,13 @@ function initStage() {
         let s = film() ? 1 : Math.min(1, W / 1100, H / 780);
         let oy = 0;
         if (stacked()) {
-            const b = band('s2', 'h2', '.facts, .note');
+            const b = band('s2', 'h2', '.stats, .note');
             s = Math.min(1, W / 860, (b.h / 2) * 0.84 / R);
+            oy = H / 2 - b.cy;
+        } else {
+            // 桌面：球体可以压在标题后面，但不压住底部的数字
+            const b = band('s2', null, '.stats');
+            s = Math.min(s, (b.h / 2) / (R * 1.04));
             oy = H / 2 - b.cy;
         }
         for (let i = 0; i < PN; i++) {
@@ -1229,7 +1236,7 @@ function initStage() {
         let srcW;
         let cy;
         if (stacked()) {
-            const b = band('s3', 'h2, .kbd', '.note, .chips');
+            const b = band('s3', 'h2', '.kbd, .s3-foot');
             srcW = Math.min(W * 0.96, 1300);
             // 透视会让近处一排略放大，按 1.12 倍留余量
             if (srcW * aspect * ct * 1.12 > b.h * 0.9) srcW = b.h * 0.9 / (aspect * ct * 1.12);
@@ -1490,7 +1497,7 @@ function stateAt(y) {
     } else {
         w[to] = 1;
     }
-    return { w, sq, op: lerp(STAGE_OP[i], STAGE_OP[i + 1], smooth(t)) };
+    return { w, sq, op: lerp(stageOp(i), stageOp(i + 1), smooth(t)) };
 }
 const dominant = s => (s.w.A >= s.w.B && s.w.A >= s.w.C ? 'A' : (s.w.B >= s.w.C ? 'B' : 'C'));
 
@@ -1771,7 +1778,7 @@ const KBD_SEC = sections.findIndex(s => s.id === 's3');
 const kbdText = $('#kbdText');
 const kbdTip = $('#kbdTip');
 const kbdSoundBtn = $('#kbdSound');
-const TIP_DEFAULT = mouseUI.matches ? '敲几个字母试试，或者直接点这把粒子键盘。' : '点按下面这把粒子键盘试试。';
+const TIP_DEFAULT = mouseUI.matches ? '敲几个字母，或直接点上方的键盘。' : '点按上方的粒子键盘试试。';
 let typed = '';
 let tipTimer = 0;
 let soundOn = fx.sound;

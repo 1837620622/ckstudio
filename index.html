@@ -46,11 +46,11 @@
   --nav-h: 98px;
   --fs-hero: clamp(42px, 7.05vw, 112px);
   --fs-h2: clamp(38px, 6.17vw, 104px);
-  --fs-note: clamp(13px, 1.04vw, 18px);
+  --fs-note: clamp(15px, 1.12vw, 19px);
   --fs-nav: clamp(12px, 1.05vw, 17px);
   --fs-logo: clamp(19px, 2.18vw, 36px);
   --fs-btn: clamp(12px, 1.13vw, 19px);
-  --fs-small: clamp(12.5px, .9vw, 15px);
+  --fs-small: clamp(13px, .95vw, 15px);
   --ls-disp: -.038em;
   --btn-h: 47px;
   --header-h: var(--nav-h);
@@ -523,15 +523,6 @@ main > section.out-down { transform: translateY(100%); }
   overflow-wrap: anywhere;
 }
 #heroAside .btnpair { pointer-events: auto; }
-.hero-tag, .drag-hint {
-  height: 30px;
-  padding: 0 12px;
-  border-radius: 999px;
-  background: rgba(16, 40, 58, .38);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .12);
-}
 .hero-tag {
   position: absolute;
   left: var(--pl);
@@ -539,7 +530,14 @@ main > section.out-down { transform: translateY(100%); }
   display: inline-flex;
   align-items: center;
   gap: 9px;
-  font-size: var(--fs-small);
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(16, 40, 58, .38);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .12);
+  font-size: 13px;
   font-weight: 500;
   color: rgba(255, 255, 255, .92);
   pointer-events: none;
@@ -555,17 +553,6 @@ main > section.out-down { transform: translateY(100%); }
   animation: pulse 2.4s ease-in-out infinite;
 }
 @keyframes pulse { 50% { box-shadow: 0 0 0 6px rgba(159, 227, 176, 0); } }
-.drag-hint {
-  position: absolute;
-  right: var(--pr);
-  top: calc(var(--header-h) + 4px);
-  display: inline-flex;
-  align-items: center;
-  font-size: var(--fs-small);
-  color: rgba(255, 255, 255, .82);
-  pointer-events: none;
-}
-@media (any-pointer: coarse) { .drag-hint { display: none; } }
 
 /* ---------- 大标题与逐字显现 ---------- */
 .disp {
@@ -604,7 +591,7 @@ main > section.out-down { transform: translateY(100%); }
 }
 .fade.in { opacity: 1; transform: none; }
 
-/* ---------- 第 2–4 屏（粒子在后面） ---------- */
+/* ---------- 内容屏通用：标题、导语、标签 ---------- */
 .panel:not(.flow) h2 {
   position: absolute;
   font-size: var(--fs-h2);
@@ -616,71 +603,117 @@ main > section.out-down { transform: translateY(100%); }
 .note {
   font-size: var(--fs-note);
   font-weight: 500;
-  line-height: 1.55;
-  letter-spacing: -.01em;
-  color: rgba(255, 255, 255, .95);
+  line-height: 1.62;
+  letter-spacing: -.005em;
+  color: rgba(255, 255, 255, .86);
   overflow-wrap: anywhere;
 }
-.note a { border-bottom: 1px solid rgba(255, 255, 255, .5); }
-.panel > .note { position: absolute; bottom: calc(3.71vh + var(--sb)); z-index: 6; }
-#s2 > .note { right: var(--pr); width: 22.3vw; min-width: 230px; }
-#s3 > .note { left: var(--pl); width: 21.2vw; min-width: 220px; }
-#s4 > .note { right: var(--pr); top: var(--top); bottom: auto; width: 22.3vw; min-width: 230px; color: rgba(255, 255, 255, .78); }
-.kicker {
+.note a { color: #fff; border-bottom: 1px solid rgba(255, 255, 255, .45); }
+.label {
   display: block;
-  font-size: var(--fs-small);
+  font-size: 12px;
   font-weight: 500;
-  color: rgba(255, 255, 255, .5);
-  margin-bottom: 10px;
-  letter-spacing: 0;
+  letter-spacing: .08em;
+  color: rgba(255, 255, 255, .45);
 }
-.facts {
+
+/* ---------- 第 2 屏：关键数字 ---------- */
+#s2 > .note {
+  position: absolute;
+  right: var(--pr);
+  bottom: calc(3.71vh + var(--sb));
+  width: min(24vw, 380px);
+  min-width: 240px;
+  z-index: 6;
+}
+.stats {
   position: absolute;
   left: 13.6vw;
   bottom: calc(3.71vh + var(--sb));
-  width: min(46vw, 700px);
+  width: min(52vw, 860px);
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   z-index: 6;
 }
-.facts li {
-  padding: 14px 18px 0 0;
-  border-top: 1px solid var(--hair);
+.stats li { padding: 18px 18px 0 0; border-top: 1px solid var(--hair); }
+.stats li + li { padding-left: 18px; box-shadow: inset 1px 0 0 var(--hair); }
+.stats b {
+  display: block;
+  font-size: clamp(40px, 4.4vw, 76px);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -.045em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
-.facts li + li { padding-left: 16px; border-left: 1px solid var(--hair); }
-.facts b { display: block; font-size: clamp(17px, 1.46vw, 24px); font-weight: 700; letter-spacing: -.02em; margin-bottom: 8px; }
-.facts span { display: block; font-size: var(--fs-small); line-height: 1.5; color: rgba(255, 255, 255, .7); font-weight: 500; }
-.kbd {
+.stats b i {
+  font-style: normal;
+  font-size: .46em;
+  letter-spacing: 0;
+  margin: 0 .08em;
+  vertical-align: .5em;
+  color: rgba(255, 255, 255, .7);
+}
+.stats span {
+  display: block;
+  margin-top: 12px;
+  font-size: var(--fs-small);
+  line-height: 1.5;
+  color: rgba(255, 255, 255, .62);
+}
+
+/* ---------- 第 3 屏：说明与可按键盘的输入行 ---------- */
+.s3-foot {
   position: absolute;
   left: var(--pl);
-  top: var(--top);
-  width: min(30vw, 380px);
+  bottom: calc(3.71vh + var(--sb));
+  width: min(34vw, 520px);
+  min-width: 260px;
   z-index: 6;
-  padding: 14px 16px 12px;
-  border-radius: 14px;
-  background: rgba(10, 10, 10, .55);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .12);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
 }
-.kbd-tip { font-size: var(--fs-small); line-height: 1.5; color: rgba(255, 255, 255, .62); font-weight: 500; }
+.chips { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px; }
+.chips li {
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 13px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, .4);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .22);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.kbd {
+  position: absolute;
+  right: var(--pr);
+  bottom: calc(3.71vh + var(--sb));
+  width: min(26vw, 360px);
+  min-width: 250px;
+  z-index: 6;
+  padding-top: 14px;
+  border-top: 1px solid var(--hair);
+}
+.kbd-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.kbd-tip { font-size: 13px; line-height: 1.5; color: rgba(255, 255, 255, .58); }
 .kbd-line {
   display: flex;
   align-items: center;
   gap: 8px;
-  min-height: 34px;
-  margin-top: 8px;
+  min-height: 38px;
+  margin-top: 6px;
   font-family: ui-monospace, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
-  font-size: 16px;
+  font-size: 19px;
   letter-spacing: 0;
   white-space: pre;
   overflow: hidden;
 }
-.kbd-pr { color: rgba(255, 255, 255, .45); }
-.kbd-caret { width: 9px; height: 18px; background: #fff; animation: caret 1.05s steps(1) infinite; flex: 0 0 auto; }
+.kbd-pr { color: rgba(255, 255, 255, .4); }
+.kbd-caret { width: 10px; height: 20px; background: #fff; animation: caret 1.05s steps(1) infinite; flex: 0 0 auto; }
 @keyframes caret { 50% { opacity: 0; } }
 .kbd-sound {
-  margin-top: 8px;
+  flex: 0 0 auto;
+  margin-left: auto;
   height: 28px;
   padding: 0 11px;
   border-radius: 999px;
@@ -691,31 +724,17 @@ main > section.out-down { transform: translateY(100%); }
   transition: background-color .3s, color .3s;
 }
 .kbd-sound[aria-pressed="true"] { background: #fff; color: #000; }
-.chips {
+
+/* ---------- 第 4 屏：流程卡片 ---------- */
+#s4 > .note {
   position: absolute;
   right: var(--pr);
-  bottom: calc(3.71vh + var(--sb));
-  max-width: 40vw;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 8px;
+  top: var(--top);
+  width: min(24vw, 380px);
+  min-width: 240px;
+  color: rgba(255, 255, 255, .78);
   z-index: 6;
 }
-.chips li {
-  height: 34px;
-  display: inline-flex;
-  align-items: center;
-  padding: 0 14px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, .22);
-  background: rgba(0, 0, 0, .35);
-  font-size: var(--fs-small);
-  font-weight: 500;
-  white-space: nowrap;
-}
-
-/* 合作流程卡片 */
 #steps {
   position: absolute;
   left: 0;
@@ -727,6 +746,8 @@ main > section.out-down { transform: translateY(100%); }
   grid-template-columns: repeat(5, minmax(0, 1fr));
   touch-action: pan-x;
 }
+
+/* 卡片：流程与能力共用一套样式 */
 .step, .cap {
   position: relative;
   display: flex;
@@ -736,10 +757,10 @@ main > section.out-down { transform: translateY(100%); }
   scrollbar-width: none;
   isolation: isolate;
   overscroll-behavior: contain;
+  border-top: 1px solid var(--hair);
 }
-.step { padding: 17px 15px 33px; height: clamp(168px, 23.9vh, 250px); border-top: 1px solid var(--hair); }
 .step::-webkit-scrollbar, .cap::-webkit-scrollbar { display: none; }
-.step + .step, .cap { box-shadow: inset 1px 0 0 var(--hair); }
+.step + .step, .cap + .cap { box-shadow: inset 1px 0 0 var(--hair); }
 .step::before, .cap::before {
   content: '';
   position: absolute;
@@ -749,6 +770,7 @@ main > section.out-down { transform: translateY(100%); }
   transform: translateY(101%);
   transition: transform .55s var(--ease);
 }
+.step { padding: 17px 16px 30px; height: clamp(168px, 23.9vh, 250px); cursor: pointer; }
 .step::after {
   content: '';
   position: absolute;
@@ -764,7 +786,7 @@ main > section.out-down { transform: translateY(100%); }
 @keyframes stepfill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 .st-n, .cap-n {
   align-self: flex-end;
-  font-size: var(--fs-small);
+  font-size: 12px;
   font-weight: 500;
   color: rgba(255, 255, 255, .36);
   font-variant-numeric: tabular-nums;
@@ -774,26 +796,25 @@ main > section.out-down { transform: translateY(100%); }
 .st-n b, .cap-n b { color: #fff; font-weight: 500; transition: color .3s; }
 .st-t {
   margin-top: auto;
-  font-size: clamp(16px, 1.46vw, 24px);
+  font-size: clamp(17px, 1.46vw, 24px);
   font-weight: 700;
   letter-spacing: -.02em;
   transition: color .3s;
 }
 .st-b {
-  margin-top: 14px;
-  font-size: var(--fs-small);
+  margin-top: 12px;
+  min-height: 3.1em;
+  font-size: clamp(13.5px, .95vw, 15.5px);
   font-weight: 500;
-  line-height: 1.5;
-  letter-spacing: -.01em;
-  color: rgba(255, 255, 255, .82);
-  min-height: 4.5em;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, .8);
   transition: color .3s;
 }
-@media (max-width: 1240px) { .st-b { min-height: 6em; } }
+@media (max-width: 1240px) { .st-b { min-height: 4.65em; } }
 @media (hover: hover) and (pointer: fine) {
   .step:hover::before, .cap:hover::before { transform: none; }
   .step:hover .st-t, .step:hover .st-b, .cap:hover h3, .cap:hover p, .cap:hover .cap-tags { color: #000; }
-  .step:hover .st-n, .cap:hover .cap-n { color: rgba(0, 0, 0, .40); }
+  .step:hover .st-n, .cap:hover .cap-n { color: rgba(0, 0, 0, .4); }
   .step:hover .st-n b, .cap:hover .cap-n b { color: #000; }
 }
 
@@ -817,15 +838,10 @@ main > section.out-down { transform: translateY(100%); }
 .flow-in::-webkit-scrollbar { display: none; }
 .flow-in > * { flex-shrink: 0; }
 .flow .disp { position: relative; left: auto; top: auto; font-size: var(--fs-h2); }
-.flow-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  gap: 40px;
-}
-.flow-head .note { width: 24vw; min-width: 240px; color: rgba(255, 255, 255, .8); padding-bottom: .4em; }
+.flow-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 40px; }
+.flow-head .note { width: min(26vw, 400px); min-width: 240px; padding-bottom: .5em; color: rgba(255, 255, 255, .8); }
 
-/* 能力 */
+/* 能力：四个主方向 */
 .caps {
   margin-top: auto;
   padding-top: 28px;
@@ -833,15 +849,44 @@ main > section.out-down { transform: translateY(100%); }
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 .cap {
-  padding: 16px 16px 20px;
-  min-height: clamp(150px, 18.5vh, 200px);
-  border-top: 1px solid var(--hair);
-  background: rgba(0, 0, 0, .28);
+  padding: 18px 18px 22px;
+  min-height: clamp(200px, 26vh, 280px);
+  background: rgba(0, 0, 0, .3);
 }
-.cap:nth-child(4n + 1) { box-shadow: none; }
-.cap h3 { margin-top: 14px; font-size: clamp(16px, 1.3vw, 22px); font-weight: 700; letter-spacing: -.02em; transition: color .3s; }
-.cap p { margin-top: 10px; font-size: var(--fs-small); font-weight: 500; line-height: 1.5; color: rgba(255, 255, 255, .78); transition: color .3s; }
-.cap-tags { margin-top: auto; padding-top: 12px; font-size: 12px; font-weight: 500; letter-spacing: 0; color: rgba(255, 255, 255, .45); transition: color .3s; }
+.cap h3 {
+  margin-top: 18px;
+  font-size: clamp(19px, 1.65vw, 28px);
+  font-weight: 700;
+  letter-spacing: -.02em;
+  transition: color .3s;
+}
+.cap p {
+  margin-top: 12px;
+  font-size: clamp(13.5px, .98vw, 16px);
+  font-weight: 500;
+  line-height: 1.62;
+  color: rgba(255, 255, 255, .78);
+  transition: color .3s;
+}
+.cap-tags {
+  margin-top: auto;
+  padding-top: 16px;
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: rgba(255, 255, 255, .48);
+  transition: color .3s;
+}
+.also {
+  margin-top: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  font-size: var(--fs-small);
+  line-height: 1.6;
+  color: rgba(255, 255, 255, .62);
+}
+.also span { color: rgba(255, 255, 255, .38); }
 
 /* 案例 */
 .cases-wrap { margin-top: auto; padding-top: 26px; }
@@ -871,14 +916,16 @@ main > section.out-down { transform: translateY(100%); }
   background: #0b0b0c;
   box-shadow: 0 0 0 1px rgba(255, 255, 255, .1);
 }
-.case-media img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.1s var(--ease), filter .6s; -webkit-user-drag: none; }
-.case-meta { display: flex; align-items: baseline; gap: 10px; margin-top: 13px; }
+.case-media img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.1s var(--ease); -webkit-user-drag: none; }
+.case-meta { display: flex; align-items: baseline; gap: 10px; margin-top: 14px; }
 .case-n { font-size: 12px; color: rgba(255, 255, 255, .45); font-variant-numeric: tabular-nums; letter-spacing: 0; }
-.case h3 { font-size: clamp(15px, 1.15vw, 19px); font-weight: 700; letter-spacing: -.02em; }
-.case-cat { margin-left: auto; font-size: 12px; color: rgba(255, 255, 255, .55); white-space: nowrap; }
-.case p { margin-top: 7px; font-size: var(--fs-small); line-height: 1.5; color: rgba(255, 255, 255, .72); font-weight: 500; }
+.case h3 { font-size: clamp(15px, 1.2vw, 20px); font-weight: 700; letter-spacing: -.02em; }
+.case-cat { margin-left: auto; font-size: 12px; color: rgba(255, 255, 255, .5); white-space: nowrap; }
+.case p { margin-top: 7px; font-size: var(--fs-small); line-height: 1.55; color: rgba(255, 255, 255, .74); font-weight: 500; }
+.case-url { margin-top: 8px; font-size: 12px; letter-spacing: 0; color: rgba(255, 255, 255, .42); transition: color .3s; }
 @media (hover: hover) and (pointer: fine) {
   .case:hover .case-media img { transform: scale(1.045); }
+  .case:hover .case-url { color: #fff; }
 }
 .cases-ctl {
   display: flex;
@@ -918,11 +965,11 @@ main > section.out-down { transform: translateY(100%); }
 /* 联系与合作 */
 .contact-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
   gap: 5vw;
   align-items: start;
 }
-.contact-main .note { margin-top: 22px; max-width: 30em; color: rgba(255, 255, 255, .8); }
+.contact-main .note { margin-top: 22px; max-width: 26em; color: rgba(255, 255, 255, .8); }
 .mail {
   display: inline-block;
   margin-top: clamp(16px, 3vh, 30px);
@@ -935,7 +982,7 @@ main > section.out-down { transform: translateY(100%); }
   overflow-wrap: anywhere;
 }
 .mail:hover { border-color: #fff; }
-.clist { margin-top: clamp(16px, 3vh, 30px); border-top: 1px solid var(--hair); max-width: 560px; }
+.clist { margin-top: clamp(16px, 3vh, 28px); border-top: 1px solid var(--hair); max-width: 560px; }
 .clist li { border-bottom: 1px solid var(--hair); }
 .clist button, .clist a, .clist div {
   width: 100%;
@@ -951,37 +998,24 @@ main > section.out-down { transform: translateY(100%); }
 .clist b { font-weight: 500; overflow-wrap: anywhere; }
 .clist em { font-style: normal; color: rgba(255, 255, 255, .5); font-size: 12px; transition: color .3s; }
 @media (hover: hover) { .clist button:hover em, .clist a:hover em { color: #fff; } }
-.compose-row {
-  margin-top: clamp(16px, 3vh, 26px);
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  max-width: 560px;
-}
-.compose-row .hint { margin: 0; }
-.hint {
-  margin-top: 18px;
-  max-width: 560px;
-  font-size: var(--fs-small);
-  line-height: 1.6;
-  color: rgba(255, 255, 255, .55);
-}
-.coop { padding-top: .5em; padding-right: 18px; }
-.coop-h { font-size: var(--fs-small); font-weight: 500; color: rgba(255, 255, 255, .5); margin-bottom: 12px; }
-.coop ol { border-top: 1px solid var(--hair); }
-.coop li {
+.compose-row { margin-top: clamp(18px, 3vh, 28px); display: flex; align-items: center; gap: 16px; }
+.coop { padding-top: .4em; }
+.coop .label { margin-bottom: 14px; }
+.coop-grid {
   display: grid;
-  grid-template-columns: 2.6em 6.2em minmax(0, 1fr);
-  gap: 10px;
-  align-items: baseline;
-  padding: clamp(10px, 1.55vh, 15px) 0;
-  border-bottom: 1px solid var(--hair);
-  font-size: var(--fs-small);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px solid var(--hair);
 }
-.coop li > span { font-size: 12px; color: rgba(255, 255, 255, .4); font-variant-numeric: tabular-nums; letter-spacing: 0; }
-.coop li b { font-weight: 700; font-size: clamp(14px, 1.05vw, 17px); }
-.coop li p { color: rgba(255, 255, 255, .72); line-height: 1.5; font-weight: 500; }
-.coop li a { border-bottom: 1px solid rgba(255, 255, 255, .45); color: #fff; }
+.coop-grid li { position: relative; padding: clamp(16px, 2.4vh, 24px) 18px clamp(18px, 2.6vh, 26px) 0; border-bottom: 1px solid var(--hair); }
+.coop-grid li:nth-child(2n) { padding-left: 20px; box-shadow: inset 1px 0 0 var(--hair); }
+.coop-grid b { display: block; font-size: clamp(16px, 1.25vw, 20px); font-weight: 700; letter-spacing: -.01em; }
+.coop-grid span { display: block; margin-top: 7px; font-size: clamp(13px, .92vw, 14.5px); line-height: 1.55; color: rgba(255, 255, 255, .62); }
+.coop-grid a { color: #fff; border-bottom: 1px solid rgba(255, 255, 255, .45); }
+.coop-cta button { display: block; width: 100%; text-align: left; }
+.coop-cta span { color: #fff; transition: transform .45s var(--ease); }
+@media (hover: hover) and (pointer: fine) {
+  .coop-cta button:hover span { transform: translateX(4px); }
+}
 .foot {
   margin-top: auto;
   padding-top: 22px;
@@ -993,11 +1027,9 @@ main > section.out-down { transform: translateY(100%); }
   color: rgba(255, 255, 255, .45);
   letter-spacing: 0;
 }
-.foot-inner { display: contents; }
 .foot a { color: rgba(255, 255, 255, .8); transition: color .3s; }
 .foot a:hover { color: #fff; }
 .foot .push { margin-left: auto; }
-.contact-grid + .foot { border-top: 0; }
 
 .toast {
   position: fixed;
@@ -1096,8 +1128,15 @@ html.has-cursor .cmp input, html.has-cursor .cmp textarea { cursor: text; }
 .foot-btn:hover { color: #fff; border-color: #fff; }
 /* 触屏：文字链接的可点区域扩大到约 44px，视觉间距不变 */
 @media (pointer: coarse) {
-  .tlink, .foot a, .foot-btn, .note a, .coop li a { display: inline-block; padding-block: 12px; margin-block: -12px; }
-  .mail { padding-bottom: 12px; margin-bottom: -8px; }
+  .tlink, .foot a, .foot-btn, .note a, .coop-grid a, .mail { position: relative; }
+  .tlink::after, .foot a::after, .foot-btn::after, .note a::after, .coop-grid a::after, .mail::after {
+    content: '';
+    position: absolute;
+    left: -6px;
+    right: -6px;
+    top: -12px;
+    bottom: -12px;
+  }
 }
 .cmp-act { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-top: 6px; }
 .cmp-copy { height: var(--btn-h); padding: 0 18px; border-radius: 999px; font-size: var(--fs-btn); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .28); transition: background-color .3s, color .3s; }
@@ -1136,21 +1175,22 @@ html.has-cursor .cmp input, html.has-cursor .cmp textarea { cursor: text; }
   }
   .navpill::-webkit-scrollbar { display: none; }
   .navpill a { padding: 0 14px; flex: 1 0 auto; }
-  .caps { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   #rail { right: max(6px, var(--sr)); }
   #railNum { display: none; }
-  .coop { padding-right: 0; }
   .contact-grid { gap: 32px; }
+  .stats { width: min(58vw, 860px); }
 }
 
 @media (max-width: 900px) {
+  :root { --fs-note: 15px; }
+  /* 第 2–4 屏改为纵向排列，粒子形态放进标题与正文之间的空档 */
   #s2, #s3, #s4 {
     display: flex;
     flex-direction: column;
     padding: calc(var(--header-h) + 14px) var(--pr) max(14px, var(--sb)) var(--pl);
     gap: 14px;
   }
-  #s2 h2, #s3 h2, #s4 h2, #s2 > .note, #s3 > .note, #s4 > .note, .facts, .chips {
+  #s2 h2, #s3 h2, #s4 h2, #s2 > .note, #s4 > .note, .stats, .s3-foot, .kbd {
     position: relative;
     left: auto;
     right: auto;
@@ -1161,21 +1201,19 @@ html.has-cursor .cmp input, html.has-cursor .cmp textarea { cursor: text; }
     max-width: 100%;
   }
   #s3 h2 { text-align: right; align-self: flex-end; }
-  .kbd { position: relative; left: auto; top: auto; width: auto; padding: 10px 12px; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: 10px; }
-  .kbd-tip { grid-column: 1 / -1; font-size: 12.5px; }
-  .kbd-line { margin-top: 4px; min-height: 28px; font-size: 15px; }
-  .kbd-sound { margin-top: 4px; }
-  #s2 > .note, #s3 > .note { margin-top: auto; max-height: 36%; overflow: auto; overscroll-behavior: contain; touch-action: pan-y; flex-shrink: 1; }
-  #s2 .facts { margin-top: auto; }
-  #s2 > .note { margin-top: 0; flex-shrink: 1; }
-  #s3 .chips { justify-content: flex-start; max-width: 100%; }
-  #s4 > .note { margin-top: 0; max-height: none; flex-shrink: 0; }
-  .facts li { padding: 10px 10px 0 0; }
-  .facts li + li { padding-left: 10px; }
-  .facts b { font-size: 16px; margin-bottom: 4px; }
-  .facts span { font-size: 12.5px; }
+  .stats { margin-top: auto; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .stats li { padding: 12px 12px 12px 0; }
+  .stats li + li { padding-left: 0; box-shadow: none; }
+  .stats li:nth-child(2n) { padding-left: 14px; box-shadow: inset 1px 0 0 var(--hair); }
+  .stats b { font-size: clamp(34px, 9vw, 52px); }
+  .stats span { margin-top: 6px; font-size: 13px; }
+  #s2 > .note { margin-top: 0; max-height: 30%; overflow: auto; overscroll-behavior: contain; touch-action: pan-y; flex-shrink: 1; }
+  .kbd { margin-top: auto; padding-top: 10px; }
+  .kbd-line { min-height: 30px; margin-top: 4px; font-size: 16px; }
+  .s3-foot .note { max-height: 30vh; overflow: auto; overscroll-behavior: contain; touch-action: pan-y; }
+  .chips { margin-top: 12px; }
+  #s4 > .note { margin-top: 0; }
   #rail { right: max(8px, var(--sr)); height: 120px; margin-top: -60px; }
-  #railNum { display: none; }
   #steps {
     position: relative;
     left: auto;
@@ -1199,22 +1237,22 @@ html.has-cursor .cmp input, html.has-cursor .cmp textarea { cursor: text; }
     scroll-snap-align: start;
     scroll-snap-stop: always;
   }
-  .st-n { font-size: 12px; }
   .st-t { font-size: 18px; }
-  .st-b { font-size: 14px; line-height: 1.5; margin-top: 10px; min-height: 4.5em; }
+  .st-b { font-size: 14px; margin-top: 10px; min-height: 3.1em; }
   .flow-in { padding-top: calc(var(--header-h) + 14px); padding-bottom: max(16px, var(--sb)); }
   .flow-head { display: block; }
   .flow-head .note { width: auto; min-width: 0; margin-top: 12px; padding: 0; }
   .caps { grid-template-columns: repeat(2, minmax(0, 1fr)); padding-top: 20px; }
   .cap { min-height: 0; padding: 14px 14px 16px; background: transparent; }
-  .cap:nth-child(4n + 1) { box-shadow: inset 1px 0 0 var(--hair); }
-  .cap:nth-child(2n + 1) { box-shadow: none; }
-  .cap h3 { margin-top: 12px; }
+  .cap + .cap { box-shadow: none; }
+  .cap:nth-child(2n) { box-shadow: inset 1px 0 0 var(--hair); }
+  .cap:nth-child(2n + 1) { padding-left: 0; }
+  .cap h3 { margin-top: 12px; font-size: 18px; }
+  .cap p { font-size: 13.5px; }
   .cases { --cw: min(76vw, 380px); scroll-snap-type: x mandatory; }
   .case { scroll-snap-align: start; }
   .contact-grid { grid-template-columns: minmax(0, 1fr); gap: 28px; }
   .clist { max-width: none; }
-  .coop li { grid-template-columns: 2.2em 5.6em minmax(0, 1fr); }
   .foot .push { margin-left: 0; }
 }
 
@@ -1242,29 +1280,27 @@ html.has-cursor .cmp input, html.has-cursor .cmp textarea { cursor: text; }
   :root {
     --fs-hero: clamp(28px, 9.2vw, 56px);
     --fs-h2: clamp(26px, 8.4vw, 48px);
-    --fs-note: 14px;
     --fs-logo: clamp(18px, 5.4vw, 28px);
     --fs-btn: 13px;
     --fs-small: 13px;
   }
-  #heroAside p { text-align: left; }
-  .coop li { grid-template-columns: 2em minmax(0, 1fr); row-gap: 4px; }
-  .coop li p { grid-column: 2; }
   .clist button, .clist a, .clist div { grid-template-columns: 5.2em minmax(0, 1fr) auto; }
   .cases-btns { display: none; }
-  .hero-tag, .drag-hint { display: none; }
+  .hero-tag { display: none; }
 }
 
-@media (max-width: 420px) {
+@media (max-width: 400px) {
   .cap { padding: 12px 10px 14px 12px; }
-  .cap:nth-child(2n + 1) { padding-left: 0; }
-  .cap h3 { margin-top: 8px; font-size: 15px; }
-  .cap p { font-size: 12.5px; margin-top: 6px; }
-  .cap-tags { padding-top: 8px; font-size: 11px; }
+  .cap h3 { font-size: 16px; }
+  .cap p { font-size: 13px; }
+  .cap-tags { padding-top: 10px; font-size: 11.5px; }
+  .coop-grid li { padding-right: 10px; }
+  .coop-grid li:nth-child(2n) { padding-left: 12px; }
+  .coop-grid span { font-size: 12.5px; }
 }
 @media (max-width: 339px) {
-  .caps { grid-template-columns: minmax(0, 1fr); }
-  .cap { box-shadow: none !important; padding-left: 0; }
+  .caps, .coop-grid { grid-template-columns: minmax(0, 1fr); }
+  .cap, .coop-grid li:nth-child(2n) { box-shadow: none !important; padding-left: 0; }
 }
 
 @media (max-height: 640px) {
@@ -1275,14 +1311,15 @@ html.has-cursor .cmp input, html.has-cursor .cmp textarea { cursor: text; }
   :root {
     --fs-hero: clamp(22px, min(7.05vw, 7.2vh), 64px);
     --fs-h2: clamp(22px, min(6.17vw, 6.4vh), 56px);
-    --fs-note: 12.5px;
+    --fs-note: 13px;
   }
   #heroAside p { margin-bottom: 8px; }
   .step { padding: 8px 10px 14px; }
   .st-b { margin-top: 8px; min-height: 0; }
-  .hero-tag, .drag-hint { display: none; }
+  .hero-tag, .kbd-tip { display: none; }
   #s4 > .note { display: none; }
   .cases { --cw: calc((100vh - var(--header-h)) * .72); --cw: calc((100dvh - var(--header-h)) * .72); }
+  .stats b { font-size: clamp(28px, 7vh, 44px); }
   .cap { min-height: 0; }
 }
 
@@ -1355,10 +1392,13 @@ html.has-cursor .cmp input, html.has-cursor .cmp textarea { cursor: text; }
   #heroTitle { text-shadow: 0 2px 16px rgba(0, 0, 0, .55); }
   #heroAside p { max-height: 24vh; overflow: auto; text-align: left; }
   #s2, #s3, #s4 { gap: 8px; }
-  .kbd-tip { display: none; }
-  .kbd { padding: 6px 10px; }
-  .facts span { display: none; }
-  .chips li { height: 28px; }
+  #s2 > .note, .chips { display: none; }
+  .stats span { margin-top: 2px; font-size: 12px; }
+  .stats li { padding: 6px 10px 4px 0; }
+}
+@media (max-height: 520px) and (min-width: 600px) {
+  .stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .stats li:nth-child(n + 2) { padding-left: 12px; box-shadow: inset 1px 0 0 var(--hair); }
 }
 
 @media (max-height: 430px) {
@@ -1434,14 +1474,13 @@ main > section { position: relative; min-height: 100vh; opacity: 1; visibility: 
     <div id="heroShade"></div>
     <canvas id="heroGL" aria-hidden="true"></canvas>
     <div id="heroCopy">
-      <p class="hero-tag fade"><i></i>开放合作中 · 项目 / 岗位 / 投资 / 赞助<span class="bj" id="bjTime"></span></p>
-      <p class="drag-hint fade">拖动 &lt;CK&gt; 旋转</p>
+      <p class="hero-tag fade"><i></i>开放合作中<span class="bj" id="bjTime"></span></p>
       <h1 class="disp fit" id="heroTitle">
         <span class="rv">传康Kk 个人工作站</span>
         <span class="rv" data-dot="1" data-d="240">CKSTUDIO</span>
       </h1>
       <div id="heroAside">
-        <p class="fade">AI 应用、量化系统、嵌入式与软件开发。<span class="nw">一对一合作</span>，从需求、设计到<span class="nw">部署上线</span>，由我本人负责到底；也欢迎<span class="nw">岗位邀约</span>、投资与赞助。</p>
+        <p class="fade">AI 应用、量化系统、嵌入式与全栈开发。<span class="nw">一对一合作</span>，从需求到上线，由我本人负责。</p>
         <a class="btnpair fade" href="#contact" data-go="6">
           <span class="arrowbtn"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4.2 11.8 11.8 4.2M11.8 4.2H5.6M11.8 4.2v6.2"/></svg></span>
           <span class="pillbtn">预约沟通</span>
@@ -1450,39 +1489,44 @@ main > section { position: relative; min-height: 100vh; opacity: 1; visibility: 
     </div>
   </section>
 
-  <!-- 02 理念：粒子球 -->
+  <!-- 02 理念：粒子球 + 关键数字 -->
   <section id="s2" tabindex="-1" class="panel" data-hash="about" aria-label="理念">
     <h2 class="disp fit">
       <span class="rv">一个人，</span>
       <span class="rv" data-d="140">就是一个工作室。</span>
     </h2>
-    <ul class="facts fade">
-      <li><b>一对一</b><span>直接对接写代码的人，没有中间转述</span></li>
-      <li><b>全链路</b><span>设计、开发、部署、运维，一人完成</span></li>
-      <li><b>可交接</b><span>源码、文档与使用说明，接手不费力</span></li>
+    <ul class="stats fade" aria-label="关键数字">
+      <li><b>19</b><span>个自研产品上线运行</span></li>
+      <li><b>600<i>+</i></b><span>开源项目累计 Star</span></li>
+      <li><b>8</b><span>个技术方向，一人打通</span></li>
+      <li><b>1<i>对</i>1</b><span>直接对接写代码的人</span></li>
     </ul>
-    <p class="note fade">你直接和写代码的人沟通，需求不会在转述中走样，问题当天回复，决定当场确认。从界面设计、开发测试到部署运维，每个环节都由我亲手完成；交付的代码结构清晰、文档齐全，后续维护和交接都不费力。</p>
+    <p class="note fade">需求不在转述中走样，决定当场确认。从界面、开发到部署运维，每一步都由我亲手完成。</p>
   </section>
 
-  <!-- 03 AI 提效：键盘粒子 -->
+  <!-- 03 AI 提效：可按的粒子键盘 -->
   <section id="s3" tabindex="-1" class="panel" data-hash="ai" aria-label="AI 提效">
     <h2 class="disp fit">
-      <span class="rv" data-dot="1">重复的交给 AI，</span>
-      <span class="rv" data-dot="1" data-d="140">判断留给我。</span>
+      <span class="rv">重复的交给 AI，</span>
+      <span class="rv" data-d="140">判断留给我。</span>
     </h2>
     <div class="kbd fade" id="kbdHud">
-      <p class="kbd-tip" id="kbdTip">敲几个字母试试，这把粒子键盘会跟着按下。</p>
+      <div class="kbd-top">
+        <p class="kbd-tip" id="kbdTip">敲几个字母，或直接点上方的键盘。</p>
+        <button class="kbd-sound" id="kbdSound" type="button" aria-pressed="false">按键音 · 关</button>
+      </div>
       <p class="kbd-line" aria-live="polite"><span class="kbd-pr" aria-hidden="true">&gt;</span><span id="kbdText"></span><i class="kbd-caret" aria-hidden="true"></i></p>
-      <button class="kbd-sound" id="kbdSound" type="button" aria-pressed="false">按键音 · 关</button>
     </div>
-    <p class="note fade">资料检索、样板代码、调试排错和文档整理交给 AI 加速；架构设计、数据准确性、用户体验和最终质量，由我逐项把关。交付因此更快，质量不打折扣。</p>
-    <ul class="chips fade" aria-label="常用 AI 能力">
-      <li>大模型 API</li>
-      <li>RAG 知识库</li>
-      <li>Agent 智能体</li>
-      <li>AI 工作流</li>
-      <li>自动化测试</li>
-    </ul>
+    <div class="s3-foot">
+      <p class="note fade">检索、样板代码、调试与文档交给 AI 加速；架构、数据准确性和最终质量，由我逐项把关。</p>
+      <ul class="chips fade" aria-label="常用 AI 能力">
+        <li>大模型 API</li>
+        <li>RAG 知识库</li>
+        <li>Agent</li>
+        <li>AI 工作流</li>
+        <li>自动化测试</li>
+      </ul>
+    </div>
   </section>
 
   <!-- 04 合作流程：<CK> 粒子 -->
@@ -1491,37 +1535,37 @@ main > section { position: relative; min-height: 100vh; opacity: 1; visibility: 
       <span class="rv">从想法到上线，</span>
       <span class="rv" data-d="140">五步走完。</span>
     </h2>
-    <p class="note fade" id="s4note">每一步都能看到可运行的成果。交付时附完整源码、部署文档与使用说明，上线后提供维护期支持。</p>
+    <p class="note fade" id="s4note">每一步都有可运行的成果。交付附源码、部署文档与使用说明，上线后有维护期。</p>
     <div id="steps" role="list" aria-label="合作的五个步骤">
       <article class="step" role="listitem">
         <span class="st-n"><b>01</b> / 05</span>
         <h3 class="st-t">沟通</h3>
-        <p class="st-b">直接和我聊需求：目标、范围、预算和时间。不确定的地方，我先帮你把问题理清楚。</p>
+        <p class="st-b">聊清目标、范围、预算和时间，不确定的先帮你理清。</p>
       </article>
       <article class="step" role="listitem">
         <span class="st-n"><b>02</b> / 05</span>
         <h3 class="st-t">方案</h3>
-        <p class="st-b">给出技术方案、模块拆分、排期与报价。方案确认后再动工，范围和价格都写清楚。</p>
+        <p class="st-b">技术方案、模块拆分、排期与报价，写清楚再动工。</p>
       </article>
       <article class="step" role="listitem">
         <span class="st-n"><b>03</b> / 05</span>
         <h3 class="st-t">原型</h3>
-        <p class="st-b">先做出可运行的原型，尽早验证关键假设，再投入正式开发，少走弯路。</p>
+        <p class="st-b">先做可运行的原型，尽早验证关键假设。</p>
       </article>
       <article class="step" role="listitem">
         <span class="st-n"><b>04</b> / 05</span>
         <h3 class="st-t">开发</h3>
-        <p class="st-b">分阶段开发与评审，AI 辅助调试和测试，每个阶段都有可演示的版本。</p>
+        <p class="st-b">分阶段开发与评审，每个阶段都有可演示的版本。</p>
       </article>
       <article class="step" role="listitem">
         <span class="st-n"><b>05</b> / 05</span>
         <h3 class="st-t">交付</h3>
-        <p class="st-b">交付源码与文档，协助部署上线，提供维护期支持，后续迭代随时可接。</p>
+        <p class="st-b">交付源码与文档，协助上线，提供维护期支持。</p>
       </article>
     </div>
   </section>
 
-  <!-- 05 能力：粒子球（暗） -->
+  <!-- 05 能力：四个主方向 -->
   <section id="s5" tabindex="-1" class="panel flow" data-hash="services" aria-label="能力">
     <div class="flow-in vscroll">
       <div class="flow-head">
@@ -1529,22 +1573,39 @@ main > section { position: relative; min-height: 100vh; opacity: 1; visibility: 
           <span class="rv">能做的，</span>
           <span class="rv" data-d="140">不止一个方向。</span>
         </h2>
-        <p class="note fade">从一个脚本到一整套系统，这些方向都可以直接找我。跨领域的需求不必分头找人，一个人对接到底。</p>
+        <p class="note fade">跨领域的需求不必分头找人，一个人对接到底。</p>
       </div>
       <ol class="caps">
-        <li class="cap fade"><span class="cap-n"><b>01</b></span><h3>AI 应用开发</h3><p>大模型接入、私有知识库（RAG）、智能体与 AI 工作流，把 AI 用进具体业务。</p><span class="cap-tags">LLM · RAG · Agent</span></li>
-        <li class="cap fade"><span class="cap-n"><b>02</b></span><h3>量化与金融数据</h3><p>行情采集与清洗、策略回测框架、实时监控与风控看板。</p><span class="cap-tags">回测 · 监控 · 数据管道</span></li>
-        <li class="cap fade"><span class="cap-n"><b>03</b></span><h3>嵌入式与物联网</h3><p>单片机与嵌入式 Linux 程序、设备通信协议、数据上云与远程管理。</p><span class="cap-tags">MCU · Linux · MQTT</span></li>
-        <li class="cap fade"><span class="cap-n"><b>04</b></span><h3>Web 与小程序</h3><p>官网、管理后台、SaaS 产品与微信小程序，前后端一体开发。</p><span class="cap-tags">React · Vue · Node.js</span></li>
-        <li class="cap fade"><span class="cap-n"><b>05</b></span><h3>移动与桌面应用</h3><p>Android 与跨平台 App、Electron 桌面工具，从界面到发布。</p><span class="cap-tags">Android · Electron</span></li>
-        <li class="cap fade"><span class="cap-n"><b>06</b></span><h3>自动化与数据处理</h3><p>业务流程自动化、数据采集与清洗、定时任务与报表生成。</p><span class="cap-tags">Python · 定时任务 · 报表</span></li>
-        <li class="cap fade"><span class="cap-n"><b>07</b></span><h3>数据分析与可视化</h3><p>数据建模与分析、交互式看板，以及系统动力学等专题建模。</p><span class="cap-tags">建模 · 看板 · Vensim</span></li>
-        <li class="cap fade"><span class="cap-n"><b>08</b></span><h3>云服务与安全</h3><p>Cloudflare、Serverless 与 Docker 部署，性能优化与安全加固。</p><span class="cap-tags">Workers · Docker · Linux</span></li>
+        <li class="cap fade">
+          <span class="cap-n"><b>01</b> / 04</span>
+          <h3>AI 应用</h3>
+          <p>大模型接入、私有知识库、智能体与 AI 工作流，落到具体业务流程里。</p>
+          <span class="cap-tags">LLM · RAG · Agent · 工作流</span>
+        </li>
+        <li class="cap fade">
+          <span class="cap-n"><b>02</b> / 04</span>
+          <h3>量化与数据</h3>
+          <p>行情采集、策略回测、实时监控与风控看板，数据准确、过程可追溯。</p>
+          <span class="cap-tags">Python · 回测 · 实时监控 · 看板</span>
+        </li>
+        <li class="cap fade">
+          <span class="cap-n"><b>03</b> / 04</span>
+          <h3>嵌入式与物联网</h3>
+          <p>单片机与嵌入式 Linux、设备通信协议、数据上云与远程管理。</p>
+          <span class="cap-tags">C / C++ · MCU · Linux · MQTT</span>
+        </li>
+        <li class="cap fade">
+          <span class="cap-n"><b>04</b> / 04</span>
+          <h3>全栈产品</h3>
+          <p>官网、管理后台、SaaS、小程序与 App，从界面到部署一体完成。</p>
+          <span class="cap-tags">React · Vue · Node.js · Docker</span>
+        </li>
       </ol>
+      <p class="also fade"><span>也做</span>自动化与数据处理 · 数据分析与可视化 · Cloudflare / Serverless 部署 · 性能与安全加固</p>
     </div>
   </section>
 
-  <!-- 06 案例：键盘粒子（暗） -->
+  <!-- 06 案例 -->
   <section id="s6" tabindex="-1" class="panel flow" data-hash="works" aria-label="案例">
     <div class="flow-in vscroll">
       <div class="flow-head">
@@ -1552,39 +1613,45 @@ main > section { position: relative; min-height: 100vh; opacity: 1; visibility: 
           <span class="rv">做过的项目，</span>
           <span class="rv" data-d="140">都在线上运行。</span>
         </h2>
-        <p class="note fade">部分自研并已上线的项目，点击卡片直接访问，封面为示意插图。开源仓库与完整履历见<a href="works.html">作品与履历</a>。</p>
+        <p class="note fade">自研并上线运行的部分项目，点击卡片直接访问。开源仓库与完整履历见<a href="works.html">作品与履历</a>。</p>
       </div>
       <div class="cases-wrap fade">
         <div class="cases hscroll" id="cases">
           <a class="case" href="https://fund-cn.chuankangkk.top/" target="_blank" rel="noopener noreferrer" data-cursor="访问">
             <div class="case-media"><img src="assets/works/fund-cn.webp" alt="中国基金实时行情 封面示意图" width="1200" height="800" decoding="async" draggable="false"></div>
             <div class="case-meta"><span class="case-n">01</span><h3>中国基金实时行情</h3><span class="case-cat">行情与数据</span></div>
-            <p>国内基金实时估值、涨跌排行和自选列表，部署在 Cloudflare Workers 上。</p>
+            <p>基金实时估值、涨跌排行与自选，运行在 Cloudflare Workers。</p>
+            <span class="case-url">fund-cn.chuankangkk.top ↗</span>
           </a>
           <a class="case" href="https://gold.chuankangkk.top/" target="_blank" rel="noopener noreferrer" data-cursor="访问">
             <div class="case-media"><img src="assets/works/gold.webp" alt="黄金量化监控 封面示意图" width="1200" height="800" decoding="async" draggable="false"></div>
             <div class="case-meta"><span class="case-n">02</span><h3>黄金量化监控</h3><span class="case-cat">量化</span></div>
-            <p>黄金行情看板，均线与指标监控，接入 AI 生成简要的行情分析。</p>
+            <p>均线与指标监控，接入 AI 生成简要的行情分析。</p>
+            <span class="case-url">gold.chuankangkk.top ↗</span>
           </a>
           <a class="case" href="https://fund.chuankangkk.top/" target="_blank" rel="noopener noreferrer" data-cursor="访问">
             <div class="case-media"><img src="assets/works/fund-global.webp" alt="全球基金估值 封面示意图" width="1200" height="800" decoding="async" draggable="false"></div>
             <div class="case-meta"><span class="case-n">03</span><h3>全球基金估值</h3><span class="case-cat">行情与数据</span></div>
-            <p>海外基金估值，双数据源交叉校验，支持中英文切换。</p>
+            <p>海外基金估值，双数据源交叉校验，中英文切换。</p>
+            <span class="case-url">fund.chuankangkk.top ↗</span>
           </a>
           <a class="case" href="https://3d.chuankangkk.top/" target="_blank" rel="noopener noreferrer" data-cursor="访问">
             <div class="case-media"><img src="assets/works/ck-3d.webp" alt="CK 3D 封面示意图" width="1200" height="800" decoding="async" draggable="false"></div>
             <div class="case-meta"><span class="case-n">04</span><h3>CK 3D</h3><span class="case-cat">前端交互</span></div>
             <p>可拖拽、可旋转的三维交互页面，WebGL 实时渲染。</p>
+            <span class="case-url">3d.chuankangkk.top ↗</span>
           </a>
           <a class="case" href="https://yanhua.chuankangkk.top/" target="_blank" rel="noopener noreferrer" data-cursor="访问">
             <div class="case-media"><img src="assets/works/fireworks.webp" alt="传康烟花秀 封面示意图" width="1200" height="800" decoding="async" draggable="false"></div>
             <div class="case-meta"><span class="case-n">05</span><h3>传康烟花秀</h3><span class="case-cat">前端交互</span></div>
-            <p>Canvas 粒子烟花动效，点击画面即可触发。</p>
+            <p>Canvas 粒子烟花，点击画面即可触发。</p>
+            <span class="case-url">yanhua.chuankangkk.top ↗</span>
           </a>
           <a class="case" href="https://sleep-3s3.pages.dev/" target="_blank" rel="noopener noreferrer" data-cursor="访问">
             <div class="case-media"><img src="assets/works/sleep.webp" alt="睡眠助手 封面示意图" width="1200" height="800" decoding="async" draggable="false"></div>
             <div class="case-meta"><span class="case-n">06</span><h3>睡眠助手</h3><span class="case-cat">工具</span></div>
-            <p>白噪音页面，多种环境声，睡前或专注时播放。</p>
+            <p>多种环境白噪音，睡前或专注时播放。</p>
+            <span class="case-url">sleep-3s3.pages.dev ↗</span>
           </a>
         </div>
         <div class="cases-ctl">
@@ -1599,7 +1666,7 @@ main > section { position: relative; min-height: 100vh; opacity: 1; visibility: 
     </div>
   </section>
 
-  <!-- 07 联系与合作：<CK> 粒子（暗） -->
+  <!-- 07 联系与合作 -->
   <section id="s7" tabindex="-1" class="panel flow" data-hash="contact" aria-label="联系与合作">
     <div class="flow-in vscroll">
       <div class="contact-grid">
@@ -1608,7 +1675,7 @@ main > section { position: relative; min-height: 100vh; opacity: 1; visibility: 
             <span class="rv">有想法，</span>
             <span class="rv" data-d="140">聊聊吧。</span>
           </h2>
-          <p class="note fade">项目合作、岗位邀约、投资交流或赞助支持，都欢迎联系。说明需求或来意，我会尽快回复。</p>
+          <p class="note fade">项目、岗位、投资或赞助都欢迎。说明来意，我会尽快回复。</p>
           <a class="mail fade" href="mailto:chuankangkk1@gmail.com">chuankangkk1@gmail.com</a>
           <ul class="clist fade">
             <li><button type="button" data-copy="1837620622"><span>微信</span><b>1837620622</b><em>复制</em></button></li>
@@ -1621,20 +1688,20 @@ main > section { position: relative; min-height: 100vh; opacity: 1; visibility: 
               <span class="arrowbtn"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4.2 11.8 11.8 4.2M11.8 4.2H5.6M11.8 4.2v6.2"/></svg></span>
               <span class="pillbtn">在线填写合作需求</span>
             </button>
-            <p class="hint">附上目标、预算范围和期望时间，我能更快给出判断和方案。</p>
           </div>
         </div>
         <div class="coop fade">
-          <h3 class="coop-h">合作方式</h3>
-          <ol>
-            <li><span>01</span><b>项目接单</b><p>网站、App、小程序、AI 工具、量化系统与嵌入式程序，按需求报价，分阶段验收。</p></li>
-            <li><span>02</span><b>长期合作</b><p>作为外部技术伙伴，按月或按迭代参与产品研发与维护。</p></li>
-            <li><span>03</span><b>技术顾问</b><p>架构评审、技术选型、代码审查，性能、稳定性与安全排查。</p></li>
-            <li><span>04</span><b>岗位邀约</b><p>远程兼职、项目制或长期岗位：全栈、AI 工程、量化开发、嵌入式开发。</p></li>
-            <li><span>05</span><b>投资合作</b><p>关注 AI 应用、金融数据与效率工具方向的投资人，欢迎交流产品与合作方式。</p></li>
-            <li><span>06</span><b>赞助支持</b><p>赞助我的开源项目，支持持续维护与更新：<a href="https://github.com/sponsors/1837620622" target="_blank" rel="noopener noreferrer">GitHub Sponsors</a></p></li>
-            <li><span>07</span><b>伙伴招募</b><p>设计、运营、销售与各技术方向的伙伴，可以按项目一起合作。</p></li>
-          </ol>
+          <h3 class="label">合作方式</h3>
+          <ul class="coop-grid">
+            <li><b>项目接单</b><span>网站、App、AI 工具、量化与嵌入式</span></li>
+            <li><b>长期合作</b><span>按月或按迭代的外部技术伙伴</span></li>
+            <li><b>技术顾问</b><span>架构评审、技术选型与代码审查</span></li>
+            <li><b>岗位邀约</b><span>远程、项目制或长期岗位</span></li>
+            <li><b>投资合作</b><span>AI 应用、金融数据与效率工具</span></li>
+            <li><b>赞助支持</b><span>支持开源项目持续维护 · <a href="https://github.com/sponsors/1837620622" target="_blank" rel="noopener noreferrer">Sponsors</a></span></li>
+            <li><b>伙伴招募</b><span>设计、运营与各技术方向</span></li>
+            <li class="coop-cta"><button type="button" data-compose><b>不确定属于哪类？</b><span>直接写下需求 →</span></button></li>
+          </ul>
         </div>
       </div>
       <footer class="foot fade">
@@ -1739,6 +1806,6 @@ main > section { position: relative; min-height: 100vh; opacity: 1; visibility: 
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script type="module" src="js/landing.js?v=20261019"></script>
+<script type="module" src="js/landing.js?v=20261020"></script>
 </body>
 </html>
