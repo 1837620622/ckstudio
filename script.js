@@ -460,5 +460,5 @@ document.addEventListener('DOMContentLoaded', () => {
     initVisibility();
 
     console.log('%cCKSTUDIO · 传康Kk 个人工作站', 'color: #ecebe8; font-size: 13px; font-weight: 600;');
-    console.log('%c合作联系：2040168455@qq.com', 'color: #888;');
+    console.log('%c合作联系：chuankangkk1@gmail.com', 'color: #888;');
 });

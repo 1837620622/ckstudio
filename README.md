@@ -73,7 +73,7 @@ npm run deploy    # wrangler pages deploy
 ## 联系
 
 - 网站：https://www.chuankangkk.top  
-- 邮箱：2040168455@qq.com  
+- 邮箱：chuankangkk1@gmail.com  
 - 微信：1837620622  
 - GitHub：[@1837620622](https://github.com/1837620622)
 

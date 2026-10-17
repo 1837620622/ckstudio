@@ -352,7 +352,7 @@ function drawNums() {
     }
 }
 setInterval(() => {
-    if (view < H && !document.hidden) {
+    if (!reduceMotion && view < H && !document.hidden) {
         numT += 0.08;
         drawNums();
     }
@@ -526,11 +526,15 @@ function initHero() {
         envMapIntensity: 1.45, reflectivity: 0.94
     });
     const matLetter = new THREE.MeshPhysicalMaterial({
-        color: 0x5d768d, metalness: 0.94, roughness: 0.15,
+        color: 0x4f6f8f, metalness: 1.0, roughness: 0.3,
         clearcoat: 1, clearcoatRoughness: 0.09,
-        iridescence: 0.45, iridescenceIOR: 1.28, iridescenceThicknessRange: [160, 470],
-        envMapIntensity: 1.15, reflectivity: 0.86
+        iridescence: 0.65, iridescenceIOR: 1.28, iridescenceThicknessRange: [160, 470],
+        envMapIntensity: 1.55, reflectivity: 0.86
     });
+    // 来自上后方的冷色轮廓光，让每块方格顶部的倒角亮起来
+    const rim = new THREE.DirectionalLight(0xdfeaff, 0.9);
+    rim.position.set(0.6, 2.2, -1.2);
+    scene.add(rim);
 
     const wordmark = buildWordmark(matChev, matLetter);
     const box = new THREE.Box3().setFromObject(wordmark);
@@ -1111,18 +1115,12 @@ function go(n) {
     onLeave(cur);
     old.classList.add(dir > 0 ? 'out-up' : 'out-down');
     startTween(view, n * H);
-    let done = false;
-    const te = e => { if (e.target === old && e.propertyName === 'transform') fin(); };
-    const fin = () => {
-        if (done) return;
-        done = true;
-        old.removeEventListener('transitionend', te);
+    // 旧屏用 0.9 秒的缓出曲线离场，到 0.64 秒时已基本淡出；此时粒子变形也已过半，新屏接着出现，节奏不拖沓
+    setTimeout(() => {
         old.classList.remove('show', 'out-up', 'out-down');
         resetSection(old);
         present(n, dir);
-    };
-    old.addEventListener('transitionend', te);
-    setTimeout(fin, 980);
+    }, reduceMotion ? 200 : 640);
 }
 
 function present(n, dir) {
@@ -1157,7 +1155,7 @@ function present(n, dir) {
         }
     };
     s.addEventListener('transitionend', te);
-    setTimeout(un, 830);
+    setTimeout(un, 600);
 }
 
 function jumpTo(n) {
