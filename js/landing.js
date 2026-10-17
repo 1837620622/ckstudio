@@ -21,6 +21,7 @@ const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').match
 const mouseUI = window.matchMedia('(hover: hover) and (pointer: fine)');
 
 const header = $('#siteHeader');
+const mainEl = $('#main');
 const navToggle = $('#navToggle');
 const stageEl = $('#stage');
 const rail = $('#rail');
@@ -30,6 +31,11 @@ const heroBg = $('#heroBg');
 const sections = $$('#main > section');
 const N = sections.length;
 const HASHES = sections.map(s => s.dataset.hash);
+function hashIndex() {
+    let h = location.hash.slice(1);
+    try { h = decodeURIComponent(h); } catch (err) { /* 残缺的转义序列，按原样比较 */ }
+    return HASHES.indexOf(h);
+}
 
 // 每一屏对应的粒子形态：A 球体 / B 键盘 / C <CK>；首屏不显示粒子
 const FORMS = [null, 'A', 'B', 'C', 'A', 'B', 'C'];
@@ -112,6 +118,7 @@ function finishLoad() {
     loadedDone = true;
     loader.classList.add('done');
     body.classList.remove('loading');
+    if (mouseUI.matches) root.classList.add('has-cursor');
     setTimeout(() => { loader.hidden = true; }, 800);
     W = window.innerWidth;
     H = window.innerHeight;
@@ -119,7 +126,7 @@ function finishLoad() {
     fitHeadings();
     if (hero) hero.fit();
     if (stage) stage.resize();
-    const start = HASHES.indexOf(decodeURIComponent(location.hash.slice(1)));
+    const start = hashIndex();
     if (start > 0) {
         jumpTo(start);
     } else {
@@ -142,7 +149,7 @@ let overLink = false;
 let overHeroGL = false;
 let heroDragging = false;
 
-if (mouseUI.matches) root.classList.add('has-cursor');
+// 系统光标在加载完成后才隐藏（加载页盖在自定义光标上面）
 
 window.addEventListener('pointermove', e => {
     pointerX = e.clientX / W - 0.5;
@@ -171,15 +178,15 @@ function updateCursor() {
     cursorEl.style.transform = `translate3d(${cz.x.toFixed(2)}px, ${cz.y.toFixed(2)}px, 0)`;
     cursorLabel.style.transform = `translate3d(${cz.x.toFixed(2)}px, ${cz.y.toFixed(2)}px, 0) translate(-50%, 25px)`;
     const big = view > H * 0.70;
-    cursorEl.classList.toggle('dot', (overHeroGL || heroDragging) && !overLink);
-    cursorEl.classList.toggle('big', big && !overLink && !overHeroGL);
+    cursorEl.classList.toggle('dot', (overHeroGL || heroDragging || !!overKeyLabel) && !overLink);
+    cursorEl.classList.toggle('big', big && !overLink && !overHeroGL && !overKeyLabel);
     cursorEl.classList.toggle('link', overLink);
-    const want = hoverLabel || LABEL_DEFAULT;
+    const want = hoverLabel || overKeyLabel || LABEL_DEFAULT;
     if (want !== labelText) {
         labelText = want;
         cursorLabel.textContent = want;
     }
-    const on = hoverLabel ? true : (big && !overLink && view < (N - 1 - 0.45) * H);
+    const on = hoverLabel || overKeyLabel ? true : (big && !overLink && view < (N - 1 - 0.45) * H);
     cursorLabel.classList.toggle('on', on);
 }
 
@@ -203,7 +210,7 @@ document.addEventListener('click', e => {
 });
 
 function updateNav(n) {
-    $$('.navpill a[data-go]').forEach(a => {
+    $$('.navpill a[data-go], .rail-hit a[data-go]').forEach(a => {
         if (Number(a.dataset.go) === n) a.setAttribute('aria-current', 'true');
         else a.removeAttribute('aria-current');
     });
@@ -257,7 +264,7 @@ function availFor(h) {
         let room = cs.textAlign === 'right' ? r.right - pl : root.clientWidth - pr - r.left;
         if (h.dataset.avoid) {
             const o = $(h.dataset.avoid);
-            if (o && getComputedStyle(o).position === 'absolute') room = Math.min(room, o.getBoundingClientRect().left - 40 - r.left);
+            if (o && o.getClientRects().length && getComputedStyle(o).position === 'absolute') room = Math.min(room, o.getBoundingClientRect().left - 40 - r.left);
         }
         return room;
     }
@@ -411,6 +418,14 @@ function glyphGeometry(rows, seed) {
             if (hv < 0.14) { d = 1.15; z = 0.20; } else if (hv < 0.30) { d = 0.60; z = -0.10; }
             const g = cellGeometry(d).clone();
             g.translate(c + 0.5, R - 1 - r + 0.5, z);
+            const n = g.attributes.position.count;
+            const cell = new Float32Array(n * 3);
+            for (let i = 0; i < n; i++) {
+                cell[i * 3] = c + 0.5;
+                cell[i * 3 + 1] = R - 1 - r + 0.5;
+                cell[i * 3 + 2] = z;
+            }
+            g.setAttribute('aCell', new THREE.BufferAttribute(cell, 3));
             parts.push(g);
         }
     }
@@ -420,6 +435,8 @@ function glyphGeometry(rows, seed) {
     const c = new THREE.Vector3();
     geo.boundingBox.getCenter(c);
     geo.translate(-c.x, -c.y, 0);
+    const cells = geo.attributes.aCell;
+    for (let i = 0; i < cells.count; i++) cells.setXY(i, cells.getX(i) - c.x, cells.getY(i) - c.y);
     geo.computeBoundingBox();
     return geo;
 }
@@ -492,7 +509,8 @@ function initHero() {
         canvas.style.display = 'none';
         return null;
     }
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    let heroPR = 2;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, heroPR));
     renderer.setSize(W, H, false);
     renderer.setClearColor(0x000000, 0);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -536,6 +554,50 @@ function initHero() {
     rim.position.set(0.6, 2.2, -1.2);
     scene.add(rim);
 
+    // 方格级的顶点位移：指针附近的方格向前顶出（像针板），点击时一圈波浪扫过，平时轻微起伏
+    const heroU = {
+        uHP: { value: new THREE.Vector3(99, 99, 0) },
+        uHA: { value: 0 },
+        uHR: { value: 0.17 },
+        uT: { value: 0 },
+        uRip: { value: new THREE.Vector4(0, 0, 0, -1) }
+    };
+    const patch = m => {
+        m.onBeforeCompile = sh => {
+            Object.assign(sh.uniforms, heroU);
+            sh.vertexShader = sh.vertexShader
+                .replace('#include <common>', `#include <common>
+attribute vec3 aCell;
+varying float vLift;
+uniform vec3 uHP;
+uniform float uHA;
+uniform float uHR;
+uniform float uT;
+uniform vec4 uRip;`)
+                .replace('#include <begin_vertex>', `#include <begin_vertex>
+{
+  vec4 wc = modelMatrix * vec4(aCell, 1.0);
+  float dd = distance(wc.xy, uHP.xy);
+  float lift = uHA * exp(-dd * dd / (uHR * uHR)) * 1.15;
+  lift += sin(uT * 1.3 + aCell.x * 0.55 + aCell.y * 0.4) * 0.045;
+  if (uRip.w >= 0.0) {
+    float rd = distance(wc.xy, uRip.xy);
+    lift += exp(-pow((rd - uRip.w * 2.6) * 8.0, 2.0)) * (1.0 - uRip.w) * 1.5;
+  }
+  vLift = lift;
+  transformed = aCell + (transformed - aCell) * (1.0 + lift * 0.16);
+  transformed.z += lift;
+}`);
+            sh.fragmentShader = sh.fragmentShader
+                .replace('#include <common>', `#include <common>
+varying float vLift;`)
+                .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
+totalEmissiveRadiance += vec3(0.42, 0.62, 0.95) * clamp(vLift - 0.06, 0.0, 1.5) * 0.32;`);
+        };
+    };
+    patch(matChev);
+    patch(matLetter);
+
     const wordmark = buildWordmark(matChev, matLetter);
     const box = new THREE.Box3().setFromObject(wordmark);
     const span = box.getSize(new THREE.Vector3());
@@ -554,6 +616,25 @@ function initHero() {
     let vY = 0;
     let wpp = 0.004;
     let last = null;
+    let downAt = null;
+    let ripT0 = -1;
+    let touchUntil = 0;
+    const ray = new THREE.Raycaster();
+    const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+    const ndc = new THREE.Vector2();
+    const hit = new THREE.Vector3();
+
+    // 屏幕坐标 → 字标所在平面上的世界坐标
+    function planePoint(clientX, clientY, out) {
+        ndc.set(clientX / W * 2 - 1, -(clientY / H * 2 - 1));
+        ray.setFromCamera(ndc, camera);
+        return ray.ray.intersectPlane(plane, out);
+    }
+    function heroRipple(clientX, clientY) {
+        if (!planePoint(clientX, clientY, hit)) return;
+        heroU.uRip.value.set(hit.x, hit.y, 0, 0);
+        ripT0 = performance.now();
+    }
 
     canvas.addEventListener('pointerenter', () => { overHeroGL = true; });
     canvas.addEventListener('pointerleave', () => { overHeroGL = false; });
@@ -561,6 +642,7 @@ function initHero() {
         if (e.pointerType === 'touch') return;
         heroDragging = true;
         last = { x: e.clientX, y: e.clientY };
+        downAt = { x: e.clientX, y: e.clientY };
         try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* 指针已释放 */ }
     });
     canvas.addEventListener('pointermove', e => {
@@ -573,9 +655,28 @@ function initHero() {
         vY = dx * 0.0007;
     });
     const release = () => { heroDragging = false; last = null; };
-    canvas.addEventListener('pointerup', release);
+    canvas.addEventListener('pointerup', e => {
+        if (downAt && Math.hypot(e.clientX - downAt.x, e.clientY - downAt.y) < 5) heroRipple(e.clientX, e.clientY);
+        downAt = null;
+        release();
+    });
     canvas.addEventListener('pointercancel', release);
     canvas.addEventListener('lostpointercapture', release);
+
+    const heroSec = $('#hero');
+    heroSec.addEventListener('pointerdown', e => {
+        if (e.pointerType !== 'touch') return;
+        touchUntil = performance.now() + 900;
+        downAt = { x: e.clientX, y: e.clientY };
+    }, { passive: true });
+    heroSec.addEventListener('pointermove', e => {
+        if (e.pointerType === 'touch') touchUntil = performance.now() + 900;
+    }, { passive: true });
+    heroSec.addEventListener('pointerup', e => {
+        if (e.pointerType !== 'touch' || !downAt) return;
+        if (Math.hypot(e.clientX - downAt.x, e.clientY - downAt.y) < 10) heroRipple(e.clientX, e.clientY);
+        downAt = null;
+    }, { passive: true });
 
     function heroTextTop() {
         const a = $('#heroTitle').getBoundingClientRect().top;
@@ -584,7 +685,7 @@ function initHero() {
     }
 
     function fit() {
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, heroPR));
         renderer.setSize(W, H, false);
         camera.aspect = W / H;
         const FRAC = 0.56;
@@ -624,16 +725,34 @@ function initHero() {
         bobber.position.y = Math.sin(t * 0.62) * 7 * wpp;
         bobber.rotation.z = Math.sin(t * 0.43) * 0.012;
         bobber.rotation.y = pxs * 0.09;
+
+        const now = performance.now();
+        heroU.uT.value = reduceMotion ? 0 : t;
+        const engaged = overHeroGL || heroDragging || now < touchUntil;
+        heroU.uHA.value += ((engaged && !reduceMotion ? 1 : 0) - heroU.uHA.value) * 0.08;
+        if (heroU.uHA.value > 0.002 && planePoint((pointerX + 0.5) * W, (pointerY + 0.5) * H, hit)) {
+            heroU.uHP.value.lerp(hit, 0.35);
+        }
+        if (ripT0 >= 0) {
+            const r = (now - ripT0) / 1300;
+            if (r >= 1) { ripT0 = -1; heroU.uRip.value.w = -1; } else heroU.uRip.value.w = r;
+        }
         renderer.render(scene, camera);
     }
 
+    function setQuality(level) {
+        heroPR = level >= 2 ? 1 : (level >= 1 ? 1.25 : 2);
+        fit();
+    }
+
     fit();
-    return { fit, frame };
+    return { fit, frame, setQuality };
 }
 
 /* ===================================================================
    粒子：30,000 个白点在球体、键盘、<CK> 三种形态之间变形
    =================================================================== */
+// 顶点着色器：在原有的三形态混合之上，加入按键下沉、指针排开、点击涟漪与 <CK> 炸开
 const VS = `
 attribute vec3 pA;
 attribute vec3 pB;
@@ -641,19 +760,58 @@ attribute vec3 pC;
 attribute float sd;
 attribute float sc;
 attribute float al;
+attribute float kid;
 uniform float wA, wB, wC, squeeze, time, psize;
+uniform vec4 uKeys[24];
+uniform vec3 uKN;
+uniform vec2 uMouse;
+uniform float uAspect;
+uniform float uRepel;
+uniform float uRad;
+uniform float uCamZ;
+uniform vec3 uRip;
+uniform float uBurst;
+uniform vec3 uCC;
 varying float vA;
 varying float vBoost;
 void main(){
-  vec3 p = pA*wA + pB*wB + pC*wC;
+  float press = 0.0;
+  if (kid >= 0.0) {
+    vec4 kv = uKeys[int(kid / 4.0)];
+    press = dot(kv, vec4(equal(vec4(mod(kid, 4.0)), vec4(0.0, 1.0, 2.0, 3.0))));
+  }
+  vec3 b = pB - uKN * press;
+  vec3 c = pC;
+  if (uBurst > 0.001) {
+    vec3 jit = vec3(sin(sd * 41.0), cos(sd * 23.0), sin(sd * 17.0)) * 60.0;
+    vec3 dir = normalize(pC - uCC + jit + vec3(0.0, 0.0, 1e-3));
+    c += dir * uBurst * (90.0 + 300.0 * sd);
+  }
+  vec3 p = pA*wA + b*wB + c*wC;
   float s = sd*6.2831;
   p += vec3(sin(time*.55+s*3.1), cos(time*.47+s*2.3), sin(time*.61+s*4.7))*1.8;
   p.x *= squeeze;
   p.z *= squeeze;
   vec4 mv = modelViewMatrix * vec4(p, 1.0);
+  vec4 clip = projectionMatrix * mv;
+  vec2 ndc = clip.xy / clip.w;
+  float px = -mv.z / uCamZ;
+  vec2 d = (ndc - uMouse) * vec2(uAspect, 1.0);
+  float dist = length(d);
+  float near = uRepel * (1.0 - smoothstep(0.0, uRad, dist));
+  // 像放大镜一样把指针附近的点向外推开，中心不留空洞
+  mv.xy += d * near * 0.26 * (-mv.z);
+  float ring = 0.0;
+  if (uRip.z >= 0.0) {
+    vec2 dr = (ndc - uRip.xy) * vec2(uAspect, 1.0);
+    float rr = length(dr);
+    ring = exp(-pow((rr - uRip.z * 2.2) * 7.0, 2.0)) * (1.0 - uRip.z);
+    mv.xy += (dr / max(rr, 1e-4)) * ring * 26.0 * px;
+  }
   gl_Position = projectionMatrix * mv;
-  gl_PointSize = psize * sc * (760.0 / max(1.0, -mv.z));
-  vA = al * clamp(1.0 - (-mv.z - 520.0) / 2600.0, .22, 1.0);
+  float kp = press * wB;
+  gl_PointSize = psize * sc * (760.0 / max(1.0, -mv.z)) * (1.0 + kp * 0.55 + ring * 0.7);
+  vA = al * clamp(1.0 - (-mv.z - 520.0) / 2600.0, .22, 1.0) * (1.0 + kp * 1.8 + near * 0.8 + ring * 1.4);
   vBoost = clamp(wB + wC, 0.0, 1.0);
 }`;
 
@@ -668,19 +826,83 @@ void main(){
   gl_FragColor = vec4(1.0, 1.0, 1.0, min(a, 1.0));
 }`;
 
-// 程序绘制的键盘俯视图（深色缝隙会被丢弃，键帽越亮粒子越密；C、K 两颗键最亮）
-function keyboardSites() {
+/* ---------- 键盘模型：每颗键的位置、字符和对应的 KeyboardEvent.code ---------- */
+const KEY_ROWS = [
+    { h: 0.62, keys: [
+        ['esc', 'Escape'], ['F1', 'F1'], ['F2', 'F2'], ['F3', 'F3'], ['F4', 'F4'], ['F5', 'F5'], ['F6', 'F6'],
+        ['F7', 'F7'], ['F8', 'F8'], ['F9', 'F9'], ['F10', 'F10'], ['F11', 'F11'], ['F12', 'F12'], ['⏻', '']
+    ].map(k => [15 / 14, ...k]) },
+    { h: 1, keys: [
+        [1, '`', 'Backquote'], [1, '1', 'Digit1'], [1, '2', 'Digit2'], [1, '3', 'Digit3'], [1, '4', 'Digit4'],
+        [1, '5', 'Digit5'], [1, '6', 'Digit6'], [1, '7', 'Digit7'], [1, '8', 'Digit8'], [1, '9', 'Digit9'],
+        [1, '0', 'Digit0'], [1, '-', 'Minus'], [1, '=', 'Equal'], [2, '⌫', 'Backspace']
+    ] },
+    { h: 1, keys: [
+        [1.5, 'tab', 'Tab'], [1, 'q', 'KeyQ'], [1, 'w', 'KeyW'], [1, 'e', 'KeyE'], [1, 'r', 'KeyR'], [1, 't', 'KeyT'],
+        [1, 'y', 'KeyY'], [1, 'u', 'KeyU'], [1, 'i', 'KeyI'], [1, 'o', 'KeyO'], [1, 'p', 'KeyP'],
+        [1, '[', 'BracketLeft'], [1, ']', 'BracketRight'], [1.5, '\\', 'Backslash']
+    ] },
+    { h: 1, keys: [
+        [1.75, 'caps', 'CapsLock'], [1, 'a', 'KeyA'], [1, 's', 'KeyS'], [1, 'd', 'KeyD'], [1, 'f', 'KeyF'],
+        [1, 'g', 'KeyG'], [1, 'h', 'KeyH'], [1, 'j', 'KeyJ'], [1, 'k', 'KeyK', true], [1, 'l', 'KeyL'],
+        [1, ';', 'Semicolon'], [1, "'", 'Quote'], [2.25, '⏎', 'Enter']
+    ] },
+    { h: 1, keys: [
+        [2.25, 'shift', 'ShiftLeft'], [1, 'z', 'KeyZ'], [1, 'x', 'KeyX'], [1, 'c', 'KeyC', true], [1, 'v', 'KeyV'],
+        [1, 'b', 'KeyB'], [1, 'n', 'KeyN'], [1, 'm', 'KeyM'], [1, ',', 'Comma'], [1, '.', 'Period'],
+        [1, '/', 'Slash'], [2.75, 'shift', 'ShiftRight']
+    ] },
+    { h: 1, keys: [
+        [1, 'fn', ''], [1, 'ctrl', 'ControlLeft'], [1, 'opt', 'AltLeft'], [1.25, 'cmd', 'MetaLeft'],
+        [5.5, ' ', 'Space'], [1.25, 'cmd', 'MetaRight'], [1, 'opt', 'AltRight'],
+        [1, '←', 'ArrowLeft'], [1, '↑↓', ''], [1, '→', 'ArrowRight']
+    ] }
+];
+
+function keyboardModel() {
     const KW = 1200;
     const m = 26;
     const u = (KW - m * 2) / 15;
     const KH = Math.round(m * 2 + 5.62 * u);
+    const gap = 0.12 * u;
+    const keys = [];
+    let y = m;
+    for (const row of KEY_ROWS) {
+        let x = m;
+        const rh = row.h * u;
+        for (const [kw, label, code, hot] of row.keys) {
+            const w = kw * u;
+            if (label === '↑↓') {
+                const hh = (rh - gap) / 2;
+                keys.push({ x: x + gap / 2, y: y + gap / 2, w: w - gap, h: hh - gap / 4, label: '↑', code: 'ArrowUp' });
+                keys.push({ x: x + gap / 2, y: y + gap / 2 + hh + gap / 4, w: w - gap, h: hh - gap / 4, label: '↓', code: 'ArrowDown' });
+            } else if (label === '←' || label === '→') {
+                keys.push({ x: x + gap / 2, y: y + gap / 2 + rh / 2, w: w - gap, h: rh / 2 - gap, label, code });
+            } else {
+                keys.push({ x: x + gap / 2, y: y + gap / 2, w: w - gap, h: rh - gap, label, code, hot: !!hot });
+            }
+            x += w;
+        }
+        y += rh;
+    }
+    // 可打出的字符：字母、数字、标点与空格
+    keys.forEach((k, i) => {
+        k.id = i;
+        k.ch = (k.label.length === 1 && /[\x20-\x7e]/.test(k.label)) ? k.label : '';
+    });
+    return { KW, KH, keys };
+}
+
+// 程序绘制的键盘俯视图（深色缝隙会被丢弃，键帽越亮粒子越密；C、K 两颗键最亮）
+// 同时画一张不抗锯齿的“键位编号图”，让每个粒子知道自己属于哪颗键
+function keyboardSites(model) {
+    const { KW, KH, keys } = model;
     const c = document.createElement('canvas');
     c.width = KW;
     c.height = KH;
     const g = c.getContext('2d');
     g.fillStyle = '#000';
     g.fillRect(0, 0, KW, KH);
-
     const rrect = (x, y, w, h, r) => {
         g.beginPath();
         g.moveTo(x + r, y);
@@ -690,78 +912,66 @@ function keyboardSites() {
         g.arcTo(x, y, x + w, y, r);
         g.closePath();
     };
-    // 外壳只画一圈轮廓
     rrect(5, 5, KW - 10, KH - 10, 30);
     g.lineWidth = 7;
     g.strokeStyle = 'rgb(92,92,92)';
     g.stroke();
-
-    const fnW = 15 / 14;
-    const rows = [
-        { h: 0.62, keys: Array(14).fill(fnW) },
-        { h: 1, keys: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2] },
-        { h: 1, keys: [1.5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1.5] },
-        { h: 1, keys: [1.75, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2.25], hot: [8] },
-        { h: 1, keys: [2.25, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2.75], hot: [3] },
-        { h: 1, keys: [1, 1, 1, 1.25, 5.5, 1.25, 1, 1, 1, 1], arrows: true }
-    ];
-    const gap = 0.12 * u;
-    let y = m;
-    for (const row of rows) {
-        let x = m;
-        const rh = row.h * u;
-        row.keys.forEach((kw, i) => {
-            const w = kw * u;
-            const isArrowUD = row.arrows && i === 8;
-            const hot = row.hot && row.hot.includes(i);
-            const draw = (kx, ky, kw2, kh2) => {
-                const top = hot ? 255 : 205;
-                const bot = hot ? 235 : 160;
-                const grad = g.createLinearGradient(0, ky, 0, ky + kh2);
-                grad.addColorStop(0, `rgb(${top},${top},${top})`);
-                grad.addColorStop(0.78, `rgb(${bot},${bot},${bot})`);
-                grad.addColorStop(0.79, 'rgb(96,96,96)');
-                grad.addColorStop(1, 'rgb(78,78,78)');
-                g.fillStyle = grad;
-                rrect(kx, ky, kw2, kh2, Math.min(9, kh2 * 0.18));
-                g.fill();
-            };
-            if (isArrowUD) {
-                const hh = (rh - gap) / 2;
-                draw(x + gap / 2, y + gap / 2, w - gap, hh - gap / 4);
-                draw(x + gap / 2, y + gap / 2 + hh + gap / 4, w - gap, hh - gap / 4);
-            } else if (row.arrows && (i === 7 || i === 9)) {
-                draw(x + gap / 2, y + gap / 2 + rh / 2, w - gap, rh / 2 - gap);
-            } else {
-                draw(x + gap / 2, y + gap / 2, w - gap, rh - gap);
-            }
-            x += w;
-        });
-        y += rh;
+    for (const k of keys) {
+        const top = k.hot ? 255 : 205;
+        const bot = k.hot ? 235 : 160;
+        const grad = g.createLinearGradient(0, k.y, 0, k.y + k.h);
+        grad.addColorStop(0, `rgb(${top},${top},${top})`);
+        grad.addColorStop(0.78, `rgb(${bot},${bot},${bot})`);
+        grad.addColorStop(0.79, 'rgb(96,96,96)');
+        grad.addColorStop(1, 'rgb(78,78,78)');
+        g.fillStyle = grad;
+        rrect(k.x, k.y, k.w, k.h, Math.min(9, k.h * 0.18));
+        g.fill();
     }
 
     const SW = 300;
     const SH = Math.round(SW * KH / KW);
+    const sc = SW / KW;
     const s = document.createElement('canvas');
     s.width = SW;
     s.height = SH;
     const sg = s.getContext('2d', { willReadFrequently: true });
     sg.drawImage(c, 0, 0, SW, SH);
     const data = sg.getImageData(0, 0, SW, SH).data;
+
+    const idc = document.createElement('canvas');
+    idc.width = SW;
+    idc.height = SH;
+    const ig = idc.getContext('2d', { willReadFrequently: true });
+    ig.imageSmoothingEnabled = false;
+    ig.fillStyle = '#000';
+    ig.fillRect(0, 0, SW, SH);
+    for (const k of keys) {
+        ig.fillStyle = `rgb(${k.id + 1},0,0)`;
+        ig.fillRect(Math.floor(k.x * sc), Math.floor(k.y * sc), Math.ceil(k.w * sc) + 1, Math.ceil(k.h * sc) + 1);
+    }
+    const ids = ig.getImageData(0, 0, SW, SH).data;
+
     const xs = [];
     const ys = [];
     const ls = [];
+    const kids = [];
     for (let py = 0; py < SH; py++) {
         for (let px = 0; px < SW; px++) {
             const o = (py * SW + px) * 4;
             const L = (data[o] * 0.299 + data[o + 1] * 0.587 + data[o + 2] * 0.114) / 255;
-            if (L > 0.12) { xs.push(px); ys.push(py); ls.push(L); }
+            if (L > 0.12) {
+                xs.push(px);
+                ys.push(py);
+                ls.push(L);
+                kids.push(L > 0.33 ? ids[o] - 1 : -1);
+            }
         }
     }
     const cum = new Float32Array(ls.length);
     let total = 0;
     for (let i = 0; i < ls.length; i++) { total += 0.25 + ls[i] * ls[i]; cum[i] = total; }
-    return { sw: SW, sh: SH, xs, ys, ls, cum, total };
+    return { sw: SW, sh: SH, xs, ys, ls, kids, cum, total };
 }
 
 function pickIndex(cum, r) {
@@ -805,17 +1015,18 @@ function wordmarkSamples(count) {
     const raw = new Float32Array(count * 3);
     const min = new THREE.Vector3(Infinity, Infinity, Infinity);
     const max = new THREE.Vector3(-Infinity, -Infinity, -Infinity);
+    const v = new THREE.Vector3();
     for (let i = 0; i < count; i++) {
         const t = pickIndex(cumArr, Math.random() * total) * 9;
         let u = Math.random();
         let w = Math.random();
         if (u + w > 1) { u = 1 - u; w = 1 - w; }
         for (let k = 0; k < 3; k++) {
-            const v = tris[t + k] + (tris[t + 3 + k] - tris[t + k]) * u + (tris[t + 6 + k] - tris[t + k]) * w;
-            raw[i * 3 + k] = v;
+            raw[i * 3 + k] = tris[t + k] + (tris[t + 3 + k] - tris[t + k]) * u + (tris[t + 6 + k] - tris[t + k]) * w;
         }
-        min.min(new THREE.Vector3(raw[i * 3], raw[i * 3 + 1], raw[i * 3 + 2]));
-        max.max(new THREE.Vector3(raw[i * 3], raw[i * 3 + 1], raw[i * 3 + 2]));
+        v.set(raw[i * 3], raw[i * 3 + 1], raw[i * 3 + 2]);
+        min.min(v);
+        max.max(v);
     }
     const center = min.clone().add(max).multiplyScalar(0.5);
     for (let i = 0; i < count; i++) {
@@ -834,7 +1045,8 @@ function initStage() {
         stageEl.style.display = 'none';
         return null;
     }
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
+    let maxPR = 1.75;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, maxPR));
     renderer.setSize(W, H, false);
     renderer.setClearColor(0x000000, 0);
 
@@ -862,9 +1074,19 @@ function initStage() {
         pA[i * 3 + 1] = y * R * j;
         pA[i * 3 + 2] = Math.sin(theta) * r * R * j;
     }
+    // 打乱球面点的顺序：降低画质时只画前一部分粒子，球体依然完整
+    for (let i = PN - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        for (let k = 0; k < 3; k++) {
+            const t = pA[i * 3 + k];
+            pA[i * 3 + k] = pA[j * 3 + k];
+            pA[j * 3 + k] = t;
+        }
+    }
     const pA0 = pA.slice();
     const pB = pA.slice();
     const pC = pA.slice();
+    const kidArr = new Float32Array(PN).fill(-1);
 
     const geo = new THREE.BufferGeometry();
     geo.setAttribute('position', new THREE.BufferAttribute(pA.slice(), 3));
@@ -877,11 +1099,24 @@ function initStage() {
     geo.setAttribute('sd', new THREE.BufferAttribute(sd, 1));
     geo.setAttribute('sc', new THREE.BufferAttribute(sc, 1));
     geo.setAttribute('al', new THREE.BufferAttribute(al, 1));
+    const attrK = new THREE.BufferAttribute(kidArr, 1);
+    geo.setAttribute('kid', attrK);
     geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(), 3000);
 
+    const keyVec = Array.from({ length: 24 }, () => new THREE.Vector4());
     const uni = {
         wA: { value: 1 }, wB: { value: 0 }, wC: { value: 0 },
-        squeeze: { value: 1 }, time: { value: 0 }, psize: { value: 2.2 }
+        squeeze: { value: 1 }, time: { value: 0 }, psize: { value: 2.2 },
+        uKeys: { value: keyVec },
+        uKN: { value: new THREE.Vector3() },
+        uMouse: { value: new THREE.Vector2(9, 9) },
+        uAspect: { value: W / H },
+        uRepel: { value: 0 },
+        uRad: { value: 0.24 },
+        uCamZ: { value: camera.position.z },
+        uRip: { value: new THREE.Vector3(0, 0, -1) },
+        uBurst: { value: 0 },
+        uCC: { value: new THREE.Vector3() }
     };
     const mat = new THREE.ShaderMaterial({
         uniforms: uni,
@@ -896,17 +1131,21 @@ function initStage() {
     scene.add(points);
 
     // 键盘：每个粒子绑定一个采样点和三个抖动值，尺寸变化时只重新排布
+    const model = keyboardModel();
+    const NK = model.keys.length;
     let kb = null;
     const kSite = new Int32Array(PN);
     const kJit = new Float32Array(PN * 3);
     try {
-        kb = keyboardSites();
+        kb = keyboardSites(model);
         for (let i = 0; i < PN; i++) {
             kSite[i] = pickIndex(kb.cum, Math.random() * kb.total);
             kJit[i * 3] = Math.random() - 0.5;
             kJit[i * 3 + 1] = Math.random() - 0.5;
             kJit[i * 3 + 2] = Math.random() - 0.5;
+            kidArr[i] = kb.kids[kSite[i]];
         }
+        attrK.needsUpdate = true;
     } catch (err) {
         kb = null;
     }
@@ -922,7 +1161,9 @@ function initStage() {
     function band(secId, upperSel, lowerSel) {
         const sec = document.getElementById(secId);
         const s0 = sec.getBoundingClientRect().top;
+        // 直接在该屏下的元素用 offsetTop（不受显现动画的位移影响），其他用包围盒
         const rel = el => {
+            if (el.offsetParent === sec) return { top: el.offsetTop, bottom: el.offsetTop + el.offsetHeight, h: el.offsetHeight };
             const r = el.getBoundingClientRect();
             return { top: r.top - s0, bottom: r.bottom - s0, h: r.height };
         };
@@ -954,6 +1195,10 @@ function initStage() {
         attrA.needsUpdate = true;
     }
 
+    // 键盘在世界坐标里的摆放参数，命中测试也用它
+    const kbPose = { srcW: 1, srcH: 1, cy: 0, ct: 1, st: 0, zS: 1 };
+    const keyQuads = new Float32Array(NK * 12);
+
     function layoutB() {
         if (!kb) return;
         const tilt = 0.70;
@@ -963,7 +1208,7 @@ function initStage() {
         let srcW;
         let cy;
         if (stacked()) {
-            const b = band('s3', 'h2', '.note, .chips');
+            const b = band('s3', 'h2, .kbd', '.note, .chips');
             srcW = Math.min(W * 0.96, 1300);
             // 透视会让近处一排略放大，按 1.12 倍留余量
             if (srcW * aspect * ct * 1.12 > b.h * 0.9) srcW = b.h * 0.9 / (aspect * ct * 1.12);
@@ -976,6 +1221,7 @@ function initStage() {
         const srcH = srcW * aspect;
         const k = srcW / kb.sw;
         const zS = Math.max(0.45, Math.min(1, srcW / 1300));
+        Object.assign(kbPose, { srcW, srcH, cy, ct, st, zS });
         for (let i = 0; i < PN; i++) {
             const s = kSite[i];
             const L = kb.ls[s];
@@ -987,6 +1233,21 @@ function initStage() {
             pB[i * 3 + 2] = -fy * st + h * ct;
         }
         attrB.needsUpdate = true;
+        // 按下的方向是键盘面的法线，深度随键盘大小缩放
+        uni.uKN.value.set(0, st, ct).multiplyScalar(14 * zS);
+        // 每颗键四个角的世界坐标
+        const h = 13 * zS;
+        model.keys.forEach((key, i) => {
+            const cs = [[key.x, key.y], [key.x + key.w, key.y], [key.x + key.w, key.y + key.h], [key.x, key.y + key.h]];
+            cs.forEach(([x, y], j) => {
+                const fx = (x / model.KW - 0.5) * srcW;
+                const fy = (0.5 - y / model.KH) * srcH;
+                const o = i * 12 + j * 3;
+                keyQuads[o] = fx;
+                keyQuads[o + 1] = fy * ct + h * st + cy;
+                keyQuads[o + 2] = -fy * st + h * ct;
+            });
+        });
     }
 
     function layoutC() {
@@ -1003,15 +1264,19 @@ function initStage() {
             pC[i * 3 + 1] = mark.raw[i * 3 + 1] * KY + OY;
             pC[i * 3 + 2] = mark.raw[i * 3 + 2] * KX;
         }
+        uni.uCC.value.set(0, OY, 0);
         attrC.needsUpdate = true;
     }
 
     function resize() {
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, maxPR));
         renderer.setSize(W, H, false);
         camera.aspect = W / H;
         camera.position.z = (H / 2) / Math.tan(22.5 * Math.PI / 180);
         camera.updateProjectionMatrix();
+        uni.uAspect.value = W / H;
+        uni.uCamZ.value = camera.position.z;
+        uni.uRad.value = W < 700 ? 0.3 : 0.24;
         // 相机距离随视口高度变化，点的像素大小按高度归一，矮屏不会显得更粗更亮
         // 高分屏上点会变细，按像素比的 0.75 次方补偿一部分
         uni.psize.value = 2.2 * clamp(H / 900, 0.55, 1.5) * Math.pow(renderer.getPixelRatio(), 0.75);
@@ -1020,12 +1285,156 @@ function initStage() {
         layoutC();
     }
 
+    // 画质分级：卡顿时先降像素比，再减少粒子数
+    function setQuality(level) {
+        maxPR = level >= 1 ? 1 : 1.75;
+        geo.setDrawRange(0, level >= 2 ? 16000 : PN);
+        resize();
+    }
+
+    /* ---------- 交互状态 ---------- */
+    const base = { A: 1, B: 0, C: 0, sq: 1 };
+    const keyCur = new Float32Array(96);
+    const tapUntil = new Float32Array(96);
+    const held = new Set();
+    let hoverKey = -1;
+    let waveT0 = -1;
+    let eggT0 = -1;
+    let ripT0 = -1;
+    let burstT0 = -1;
+    let repel = 0;
+    let lastMove = -1e9;
+    const mouse = new THREE.Vector2(9, 9);
+    const mouseT = new THREE.Vector2(9, 9);
+    const keyX = model.keys.map(k => (k.x + k.w / 2) / model.KW);
+    const v3 = new THREE.Vector3();
+    const quad = new Float32Array(8);
+
+    function setBase(w, sq) {
+        base.A = w.A;
+        base.B = w.B;
+        base.C = w.C;
+        base.sq = sq;
+    }
+
+    function pointer(clientX, clientY) {
+        mouseT.set(clientX / W * 2 - 1, -(clientY / H * 2 - 1));
+        if (lastMove < 0 || mouse.x > 5) mouse.copy(mouseT);
+        lastMove = performance.now();
+    }
+
+    // 指针下是哪颗键（投影四个角，做凸四边形包含测试）
+    function keyAt(clientX, clientY) {
+        if (!kb || base.B < 0.9) return -1;
+        points.updateMatrixWorld();
+        for (let i = 0; i < NK; i++) {
+            for (let j = 0; j < 4; j++) {
+                const o = i * 12 + j * 3;
+                v3.set(keyQuads[o], keyQuads[o + 1], keyQuads[o + 2]).applyMatrix4(points.matrixWorld).project(camera);
+                quad[j * 2] = (v3.x + 1) / 2 * W;
+                quad[j * 2 + 1] = (1 - v3.y) / 2 * H;
+            }
+            let inside = true;
+            let sign = 0;
+            for (let j = 0; j < 4 && inside; j++) {
+                const ax = quad[j * 2];
+                const ay = quad[j * 2 + 1];
+                const bx = quad[((j + 1) % 4) * 2];
+                const by = quad[((j + 1) % 4) * 2 + 1];
+                const cr = (bx - ax) * (clientY - ay) - (by - ay) * (clientX - ax);
+                if (cr !== 0) {
+                    if (sign === 0) sign = Math.sign(cr);
+                    else if (Math.sign(cr) !== sign) inside = false;
+                }
+            }
+            if (inside) return i;
+        }
+        return -1;
+    }
+
+    const keyByCode = new Map(model.keys.filter(k => k.code).map(k => [k.code, k.id]));
+
+    function tap(i, ms = 150) {
+        if (i < 0) return;
+        tapUntil[i] = performance.now() + ms;
+    }
+    function hold(i, on) {
+        if (i < 0) return;
+        if (on) held.add(i); else held.delete(i);
+    }
+    function setHover(i) { hoverKey = i; }
+    function wave() { waveT0 = performance.now(); }
+    function egg() { eggT0 = performance.now(); }
+    function ripple(clientX, clientY) {
+        ripT0 = performance.now();
+        uni.uRip.value.set(clientX / W * 2 - 1, -(clientY / H * 2 - 1), 0);
+    }
+    function burst() { burstT0 = performance.now(); }
+    function release() {
+        held.clear();
+        hoverKey = -1;
+    }
+
     let spin = 0;
     function frame(now, dt) {
         uni.time.value = now / 1000;
-        spin += dt * (0.085 * uni.wA.value + 0.006 * (uni.wB.value + uni.wC.value));
+
+        // 彩蛋：键盘短暂变成 <CK> 再变回来
+        let wA = base.A;
+        let wB = base.B;
+        let wC = base.C;
+        let sq = base.sq;
+        if (eggT0 >= 0) {
+            const e = (now - eggT0) / 2800;
+            if (e >= 1) {
+                eggT0 = -1;
+            } else {
+                const k = e < 0.28 ? smooth(e / 0.28) : (e < 0.72 ? 1 : 1 - smooth((e - 0.72) / 0.28));
+                const moved = wB * k;
+                wB -= moved;
+                wC += moved;
+                sq = Math.min(sq, 1 - 0.93 * Math.sin(Math.PI * k) * (e < 0.28 || e > 0.72 ? 1 : 0));
+            }
+        }
+        uni.wA.value = wA;
+        uni.wB.value = wB;
+        uni.wC.value = wC;
+        uni.squeeze.value = Math.max(sq, 0.02);
+
+        // 指针排开：球体和 <CK> 上生效，静止 2 秒后慢慢收回
+        const active = now - lastMove < 2200 ? 1 : 0;
+        repel += (active - repel) * 0.06;
+        mouse.lerp(mouseT, 0.25);
+        uni.uMouse.value.copy(mouse);
+        uni.uRepel.value = reduceMotion ? 0 : repel * clamp(wA + wC * 0.8, 0, 1);
+
+        // 涟漪与炸开
+        if (ripT0 >= 0) {
+            const r = (now - ripT0) / 1400;
+            if (r >= 1) { ripT0 = -1; uni.uRip.value.z = -1; } else uni.uRip.value.z = r;
+        }
+        if (burstT0 >= 0) {
+            const b = (now - burstT0) / 1000;
+            if (b >= 1.6) { burstT0 = -1; uni.uBurst.value = 0; } else uni.uBurst.value = b < 0.2 ? smooth(b / 0.2) : Math.exp(-(b - 0.2) * 3.4);
+        }
+
+        // 按键：按住、点按、悬停、回车波浪
+        if (kb && (wB > 0.01 || held.size || hoverKey >= 0)) {
+            const wp = waveT0 >= 0 ? (now - waveT0) / 650 : -9;
+            if (wp > 1.5) waveT0 = -1;
+            for (let i = 0; i < NK; i++) {
+                let t = held.has(i) || now < tapUntil[i] ? 1 : 0;
+                if (i === hoverKey) t = Math.max(t, 0.4);
+                if (wp > -1) t = Math.max(t, 1 - Math.abs(wp - keyX[i]) * 5);
+                const c = keyCur[i];
+                keyCur[i] = c + (t - c) * (t > c ? 0.45 : 0.16);
+            }
+            for (let v = 0; v < 24; v++) keyVec[v].fromArray(keyCur, v * 4);
+        }
+
+        spin += dt * (0.085 * wA + 0.006 * (wB + wC));
         const sp = ((spin + Math.PI) % (Math.PI * 2)) - Math.PI;
-        points.rotation.y = sp * uni.wA.value + pxs * 0.16;
+        points.rotation.y = sp * wA + pxs * 0.16;
         points.rotation.x = pys * 0.09;
         renderer.render(scene, camera);
     }
@@ -1033,7 +1442,10 @@ function initStage() {
     resize();
     renderer.compile(scene, camera);
     renderer.render(scene, camera);
-    return { uni, resize, frame };
+    return {
+        uni, resize, frame, setQuality, setBase, pointer, keyAt, keyByCode, tap, hold, setHover,
+        wave, egg, ripple, burst, release, keys: model.keys, ready: !!kb
+    };
 }
 
 /* ===================================================================
@@ -1074,12 +1486,7 @@ function applyView(y, mix) {
             op: lerp(mix.a.op, mix.b.op, k)
         };
     }
-    if (stage) {
-        stage.uni.wA.value = s.w.A;
-        stage.uni.wB.value = s.w.B;
-        stage.uni.wC.value = s.w.C;
-        stage.uni.squeeze.value = Math.max(s.sq, 0.02);
-    }
+    if (stage) stage.setBase(s.w, s.sq);
     stageEl.style.setProperty('--so', s.op.toFixed(3));
     stageEl.classList.toggle('on', y > H * 0.55);
     rail.classList.toggle('on', y > H * 0.75);
@@ -1087,14 +1494,14 @@ function applyView(y, mix) {
 }
 
 let tw = null;
-function startTween(from, to) {
+function startTween(from, to, n) {
     let mix = null;
     if (Math.abs(to - from) > H * 1.01) {
         const a = stateAt(from);
         const b = stateAt(to);
         mix = { a, b, k: 0, same: dominant(a) === dominant(b) };
     }
-    tw = { from, to, t0: performance.now(), mix };
+    tw = { from, to, n, t0: performance.now(), mix };
 }
 function tweenFrame(now) {
     if (!tw) return;
@@ -1105,6 +1512,7 @@ function tweenFrame(now) {
 }
 
 function go(n) {
+    if (!loadedDone) return;
     n = clamp(Math.round(n), 0, N - 1);
     if (busy) { pendingGo = n; return; }
     if (n === cur) return;
@@ -1114,7 +1522,7 @@ function go(n) {
     const old = sections[cur];
     onLeave(cur);
     old.classList.add(dir > 0 ? 'out-up' : 'out-down');
-    startTween(view, n * H);
+    startTween(view, n * H, n);
     // 旧屏用 0.9 秒的缓出曲线离场，到 0.64 秒时已基本淡出；此时粒子变形也已过半，新屏接着出现，节奏不拖沓
     setTimeout(() => {
         old.classList.remove('show', 'out-up', 'out-down');
@@ -1137,6 +1545,9 @@ function present(n, dir) {
     playSection(s, false);
     onEnter(n);
     updateNav(n);
+    if (!s.contains(document.activeElement)) {
+        try { s.focus({ preventScroll: true }); } catch (err) { /* 旧浏览器 */ }
+    }
     try {
         history.replaceState(null, '', n === 0 ? location.pathname + location.search : '#' + HASHES[n]);
     } catch (err) { /* file:// 下不支持 */ }
@@ -1159,6 +1570,7 @@ function present(n, dir) {
 }
 
 function jumpTo(n) {
+    if (busy) { pendingGo = n; return; }
     busy = true;
     const old = sections[cur];
     old.classList.remove('show');
@@ -1168,7 +1580,7 @@ function jumpTo(n) {
 }
 
 window.addEventListener('hashchange', () => {
-    const i = HASHES.indexOf(decodeURIComponent(location.hash.slice(1)));
+    const i = hashIndex();
     if (i >= 0 && i !== cur) go(i);
 });
 
@@ -1241,7 +1653,7 @@ function claimWheel(now, d) {
 }
 
 window.addEventListener('wheel', e => {
-    if (e.ctrlKey) return;
+    if (e.ctrlKey || cmpOpen()) return;
     const f = e.deltaMode === 1 ? 32 : (e.deltaMode === 2 ? H : 1);
     const dx = e.deltaX * f;
     const dy = e.deltaY * f;
@@ -1252,7 +1664,15 @@ window.addEventListener('wheel', e => {
             if (!vertical && canX(el, dx)) { claimWheel(now, dx); return; }
             if (vertical && el.classList.contains('hscroll') && canX(el, dy)) {
                 e.preventDefault();
-                hsBy(el, dy);
+                if (getComputedStyle(el).scrollSnapType.indexOf('mandatory') >= 0) {
+                    // 有吸附时逐张翻，避免小步滚动被吸附弹回原位
+                    if (now - (el._lastStep || 0) > 260) {
+                        el._lastStep = now;
+                        el.scrollBy({ left: Math.sign(dy) * caseStep(), behavior: reduceMotion ? 'auto' : 'smooth' });
+                    }
+                } else {
+                    hsBy(el, dy);
+                }
                 claimWheel(now, dy);
                 return;
             }
@@ -1270,7 +1690,13 @@ window.addEventListener('wheel', e => {
         else { lastAbs = Math.min(lastAbs, abs) || abs; return; }
     }
     lastAbs = abs;
-    if (gap > 160) wheelAcc = 0;
+    if (gap > 160) {
+        wheelAcc = 0;
+        if (abs >= 25 || e.deltaMode === 1) {
+            go(cur + Math.sign(dy));
+            return;
+        }
+    }
     wheelAcc += dy;
     if (Math.abs(wheelAcc) >= 48) {
         const d = Math.sign(wheelAcc);
@@ -1282,7 +1708,7 @@ window.addEventListener('wheel', e => {
 /* ---------- 触摸：竖向滑动超过 48px 翻页，横滑交给列表 ---------- */
 let ts = null;
 window.addEventListener('touchstart', e => {
-    if (e.touches.length !== 1) { ts = null; return; }
+    if (e.touches.length !== 1 || cmpOpen()) { ts = null; return; }
     const t = e.touches[0];
     const v = findV(e.target);
     ts = {
@@ -1295,8 +1721,13 @@ window.addEventListener('touchstart', e => {
     };
 }, { passive: true });
 window.addEventListener('touchmove', e => {
-    if (!ts) return;
-    if (!ts.v && !ts.h && e.cancelable) e.preventDefault();
+    if (!ts || !e.cancelable) return;
+    const t = e.touches[0];
+    const mdx = t.clientX - ts.x;
+    const mdy = ts.y - t.clientY;
+    const verticalMove = Math.abs(mdy) > Math.abs(mdx);
+    if (!ts.v && !ts.h) { e.preventDefault(); return; }
+    if (verticalMove && (!ts.v || !canY(ts.v, Math.sign(mdy) || 1))) e.preventDefault();
 }, { passive: false });
 window.addEventListener('touchend', e => {
     if (!ts) return;
@@ -1312,11 +1743,198 @@ window.addEventListener('touchend', e => {
 }, { passive: true });
 window.addEventListener('touchcancel', () => { ts = null; }, { passive: true });
 
-/* ---------- 键盘 ---------- */
+/* ===================================================================
+   粒子键盘：真实键盘、鼠标悬停与点击、手指点按都能把键按下去
+   =================================================================== */
+const KBD_SEC = sections.findIndex(s => s.id === 's3');
+const kbdText = $('#kbdText');
+const kbdTip = $('#kbdTip');
+const kbdSoundBtn = $('#kbdSound');
+const TIP_DEFAULT = mouseUI.matches ? '敲几个字母试试，或者直接点这把粒子键盘。' : '点按下面这把粒子键盘试试。';
+let typed = '';
+let tipTimer = 0;
+let soundOn = false;
+let actx = null;
+let noiseBuf = null;
+kbdTip.textContent = TIP_DEFAULT;
+const kbdLive = () => !!(stage && stage.ready && cur === KBD_SEC && !busy);
+
+try { soundOn = localStorage.getItem('ck-kbd-sound') === '1'; } catch (err) { soundOn = false; }
+function syncSoundBtn() {
+    kbdSoundBtn.setAttribute('aria-pressed', String(soundOn));
+    kbdSoundBtn.textContent = soundOn ? '按键音 · 开' : '按键音 · 关';
+}
+syncSoundBtn();
+kbdSoundBtn.addEventListener('click', () => {
+    soundOn = !soundOn;
+    try { localStorage.setItem('ck-kbd-sound', soundOn ? '1' : '0'); } catch (err) { /* 无痕模式 */ }
+    syncSoundBtn();
+    if (soundOn) keySound(true);
+});
+
+// 合成的机械键盘声：一小段带通噪声加一个低频“咚”
+function keySound(strong) {
+    if (!soundOn) return;
+    try {
+        if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+        if (actx.state === 'suspended') actx.resume();
+        const t = actx.currentTime;
+        if (!noiseBuf) {
+            const len = Math.floor(actx.sampleRate * 0.035);
+            noiseBuf = actx.createBuffer(1, len, actx.sampleRate);
+            const d = noiseBuf.getChannelData(0);
+            for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 4);
+        }
+        const src = actx.createBufferSource();
+        src.buffer = noiseBuf;
+        const bp = actx.createBiquadFilter();
+        bp.type = 'bandpass';
+        bp.frequency.value = 2200 + Math.random() * 900;
+        bp.Q.value = 1.1;
+        const g = actx.createGain();
+        g.gain.value = strong ? 0.42 : 0.28;
+        src.connect(bp).connect(g).connect(actx.destination);
+        src.start(t);
+        const o = actx.createOscillator();
+        o.frequency.setValueAtTime(strong ? 150 : 190, t);
+        o.frequency.exponentialRampToValueAtTime(60, t + 0.07);
+        const og = actx.createGain();
+        og.gain.setValueAtTime(strong ? 0.22 : 0.14, t);
+        og.gain.exponentialRampToValueAtTime(0.001, t + 0.09);
+        o.connect(og).connect(actx.destination);
+        o.start(t);
+        o.stop(t + 0.1);
+    } catch (err) { /* 浏览器不支持音频 */ }
+}
+
+function showTip(text, ms) {
+    kbdTip.textContent = text;
+    clearTimeout(tipTimer);
+    tipTimer = setTimeout(() => { kbdTip.textContent = TIP_DEFAULT; }, ms);
+}
+
+function renderTyped() {
+    kbdText.textContent = typed;
+}
+
+// 处理一次按键：字符进入命令行，退格删除，回车提交
+function typeKey(label, ch) {
+    if (label === '⌫' || label === 'Backspace') {
+        typed = typed.slice(0, -1);
+    } else if (label === '⏎' || label === 'Enter') {
+        if (stage) stage.wave();
+        const cmd = typed.trim().toLowerCase();
+        typed = '';
+        if (cmd === 'contact' || cmd === 'hire' || cmd === 'mail') {
+            showTip('带你去联系页。', 2000);
+            setTimeout(() => go(N - 1), 500);
+        } else if (cmd === 'works' || cmd === 'case') {
+            showTip('带你去看案例。', 2000);
+            setTimeout(() => go(sections.findIndex(s => s.id === 's6')), 500);
+        } else if (cmd) {
+            showTip('收到。试试输入 ck、works 或 contact 再回车。', 3600);
+        }
+    } else if (ch) {
+        typed = (typed + ch).slice(-28);
+        if (/ck$/i.test(typed) && stage) {
+            stage.egg();
+            showTip('彩蛋：键盘变成了 <CK>。', 2800);
+        }
+    }
+    renderTyped();
+}
+
+// 真实键盘：在第 3 屏按下的键会同步按下粒子键；空格只当作空格，不翻页
 window.addEventListener('keydown', e => {
-    if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey) return;
+    if (!kbdLive() || e.altKey || e.ctrlKey || e.metaKey) return;
     const tag = (e.target.tagName || '').toLowerCase();
     if (tag === 'input' || tag === 'textarea' || e.target.isContentEditable) return;
+    const id = stage.keyByCode.get(e.code);
+    if (id === undefined) return;
+    stage.hold(id, true);
+    if (e.repeat && e.key !== 'Backspace') return;
+    if (e.code === 'Space') {
+        if (tag === 'button' || tag === 'a') return;
+        e.preventDefault();
+    }
+    keySound(e.key === 'Enter' || e.code === 'Space');
+    if (e.key === 'Backspace' || e.key === 'Enter') typeKey(e.key, '');
+    else if (e.key.length === 1) typeKey('', e.key);
+});
+window.addEventListener('keyup', e => {
+    if (!stage || !stage.ready) return;
+    const id = stage.keyByCode.get(e.code);
+    if (id !== undefined) stage.hold(id, false);
+});
+window.addEventListener('blur', () => { if (stage) stage.release(); });
+
+// 指针：悬停时键微微下沉并在光标旁显示键名；点按（不是滑动）才算输入
+let keyDown = null;
+let overKeyLabel = null;
+window.addEventListener('pointermove', e => {
+    if (stage) stage.pointer(e.clientX, e.clientY);
+    if (e.pointerType !== 'mouse' || !kbdLive()) {
+        if (overKeyLabel !== null && stage) { stage.setHover(-1); overKeyLabel = null; }
+        return;
+    }
+    const id = stage.keyAt(e.clientX, e.clientY);
+    stage.setHover(id);
+    const k = id >= 0 ? stage.keys[id] : null;
+    overKeyLabel = k ? (k.label === ' ' ? 'space' : k.label.toUpperCase()) : null;
+}, { passive: true });
+const INTERACTIVE = 'a, button, input, textarea, select, label, dialog, .step, .case, .cap, .kbd';
+window.addEventListener('pointerdown', e => {
+    if (e.button > 0 || !kbdLive()) return;
+    if (e.target.closest && e.target.closest(INTERACTIVE + ', header')) return;
+    const id = stage.keyAt(e.clientX, e.clientY);
+    if (id < 0) return;
+    stage.hold(id, true);
+    keyDown = { id, x: e.clientX, y: e.clientY };
+}, { passive: true });
+window.addEventListener('pointerup', e => {
+    if (!keyDown || !stage) return;
+    const k = keyDown;
+    keyDown = null;
+    stage.hold(k.id, false);
+    if (Math.hypot(e.clientX - k.x, e.clientY - k.y) > 10) return;
+    stage.tap(k.id);
+    const key = stage.keys[k.id];
+    keySound(key.label === '⏎' || key.label === ' ');
+    typeKey(key.label, key.ch);
+});
+window.addEventListener('pointercancel', () => {
+    if (keyDown && stage) stage.hold(keyDown.id, false);
+    keyDown = null;
+});
+
+/* ---------- 球体点一下起涟漪，<CK> 点一下炸开再聚拢 ---------- */
+mainEl.addEventListener('click', e => {
+    if (!stage || busy || cur === 0 || cur === KBD_SEC) return;
+    if (e.target.closest && e.target.closest(INTERACTIVE)) return;
+    const f = FORMS[cur];
+    if (f === 'A') stage.ripple(e.clientX, e.clientY);
+    else if (f === 'C') stage.burst();
+});
+
+/* ---------- 键盘 ---------- */
+window.addEventListener('keydown', e => {
+    if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || cmpOpen()) return;
+    const tag = (e.target.tagName || '').toLowerCase();
+    if (tag === 'input' || tag === 'textarea' || e.target.isContentEditable) return;
+    // 左右方向键：流程屏切换卡片，案例屏翻案例
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        const dir = e.key === 'ArrowRight' ? 1 : -1;
+        const id = sections[cur].id;
+        if (id === 's4' && !busy) {
+            e.preventDefault();
+            stepPauseUntil = performance.now() + 12000;
+            stepActivate((Math.max(0, stepI) + dir + stepEls.length) % stepEls.length);
+        } else if (id === 's6' && !busy) {
+            e.preventDefault();
+            caseScroll(dir);
+        }
+        return;
+    }
     let d = 0;
     if (e.key === 'ArrowDown' || e.key === 'PageDown' || (e.key === ' ' && !e.shiftKey)) d = 1;
     else if (e.key === 'ArrowUp' || e.key === 'PageUp' || (e.key === ' ' && e.shiftKey)) d = -1;
@@ -1326,7 +1944,7 @@ window.addEventListener('keydown', e => {
         return;
     }
     if (!d) return;
-    if (e.key === ' ' && (tag === 'button' || tag === 'a')) return;
+    if (e.key === ' ' && tag === 'button') return;
     e.preventDefault();
     const fi = sections[cur].querySelector('.flow-in');
     if (fi && scrollsY(fi) && canY(fi, d)) {
@@ -1395,9 +2013,17 @@ function caseUpdate() {
     caseBtns[1].disabled = x >= max - 1;
 }
 casesEl.addEventListener('scroll', caseUpdate, { passive: true });
-caseBtns.forEach(b => b.addEventListener('click', () => hsBy(casesEl, Number(b.dataset.dir) * caseStep())));
+function caseScroll(dir) {
+    if (getComputedStyle(casesEl).scrollSnapType.indexOf('mandatory') >= 0) {
+        casesEl.scrollBy({ left: dir * caseStep(), behavior: reduceMotion ? 'auto' : 'smooth' });
+    } else {
+        hsBy(casesEl, dir * caseStep());
+    }
+}
+caseBtns.forEach(b => b.addEventListener('click', () => caseScroll(Number(b.dataset.dir))));
 
 let drag = null;
+casesEl.addEventListener('dragstart', e => e.preventDefault());
 casesEl.addEventListener('pointerdown', e => {
     if (e.pointerType !== 'mouse' || e.button !== 0) return;
     drag = { x: e.clientX, left: casesEl.scrollLeft, moved: false };
@@ -1408,22 +2034,26 @@ window.addEventListener('pointermove', e => {
     if (!drag.moved && Math.abs(dx) > 5) {
         drag.moved = true;
         casesEl.classList.add('dragging');
+        casesEl.style.scrollSnapType = 'none';
     }
     if (drag.moved) {
         casesEl.scrollLeft = drag.left - dx;
         if (casesEl._hs) { casesEl._hs.t = casesEl.scrollLeft; casesEl._hs.x = casesEl.scrollLeft; }
     }
 });
-window.addEventListener('pointerup', () => {
+function endDrag() {
     if (!drag) return;
     const moved = drag.moved;
     drag = null;
     casesEl.classList.remove('dragging');
+    casesEl.style.scrollSnapType = '';
     if (moved) {
         casesEl._suppress = true;
         setTimeout(() => { casesEl._suppress = false; }, 0);
     }
-});
+}
+window.addEventListener('pointerup', endDrag);
+window.addEventListener('pointercancel', endDrag);
 casesEl.addEventListener('click', e => {
     if (casesEl._suppress) {
         e.preventDefault();
@@ -1437,6 +2067,7 @@ function onEnter(n) {
 }
 function onLeave(n) {
     if (sections[n].id === 's4') stepsStop();
+    if (n === KBD_SEC && stage) stage.release();
 }
 
 /* ===================================================================
@@ -1473,12 +2104,133 @@ $$('[data-copy]').forEach(b => b.addEventListener('click', async () => {
 }));
 
 /* ===================================================================
+   合作需求表单：生成邮件或复制到微信，草稿只存在本机浏览器
+   =================================================================== */
+const composer = $('#composer');
+const cmpStatus = $('#cmpErr');
+const CMP_KEY = 'ck-compose';
+const MAIL = 'chuankangkk1@gmail.com';
+const cmpOpen = () => !!(composer && composer.open);
+
+function cmpData() {
+    const pick = name => { const el = composer.querySelector(`input[name="${name}"]:checked`); return el ? el.value : ''; };
+    return {
+        type: pick('cmpType'),
+        budget: pick('cmpBudget'),
+        name: $('#cmpName').value.trim(),
+        contact: $('#cmpContact').value.trim(),
+        msg: $('#cmpMsg').value.trim()
+    };
+}
+function cmpSave() {
+    try { localStorage.setItem(CMP_KEY, JSON.stringify(cmpData())); } catch (err) { /* 无痕模式 */ }
+}
+function cmpRestore() {
+    let d = null;
+    try { d = JSON.parse(localStorage.getItem(CMP_KEY) || 'null'); } catch (err) { d = null; }
+    if (!d || typeof d !== 'object') return;
+    const setRadio = (name, value) => {
+        const el = Array.from(composer.querySelectorAll(`input[name="${name}"]`)).find(r => r.value === value);
+        if (el) el.checked = true;
+    };
+    setRadio('cmpType', d.type);
+    setRadio('cmpBudget', d.budget);
+    $('#cmpName').value = String(d.name || '').slice(0, 40);
+    $('#cmpContact').value = String(d.contact || '').slice(0, 80);
+    $('#cmpMsg').value = String(d.msg || '').slice(0, 1500);
+}
+function cmpText(d) {
+    return [
+        `合作类型：${d.type}`,
+        `预算 / 规模：${d.budget}`,
+        `称呼：${d.name || '（未填）'}`,
+        `联系方式：${d.contact || '（未填）'}`,
+        '',
+        '需求简述：',
+        d.msg,
+        '',
+        '—— 来自 chuankangkk.top'
+    ].join('\n');
+}
+function cmpSay(msg, ok) {
+    cmpStatus.textContent = msg;
+    cmpStatus.classList.toggle('ok', !!ok);
+}
+function cmpValid(d) {
+    if (d.msg.length < 6) {
+        cmpSay('简单写几句需求吧，至少 6 个字。', false);
+        $('#cmpMsg').focus();
+        return false;
+    }
+    cmpSay('', false);
+    return true;
+}
+function openComposer() {
+    if (!composer || typeof composer.showModal !== 'function') {
+        location.href = `mailto:${MAIL}`;
+        return;
+    }
+    cmpRestore();
+    cmpSay('', false);
+    composer.showModal();
+}
+document.addEventListener('click', e => {
+    const b = e.target.closest ? e.target.closest('[data-compose]') : null;
+    if (!b) return;
+    e.preventDefault();
+    openComposer();
+});
+if (composer) {
+    composer.addEventListener('click', e => {
+        if (e.target === composer || (e.target.closest && e.target.closest('[data-close]'))) composer.close();
+    });
+    composer.addEventListener('input', cmpSave);
+    composer.addEventListener('change', cmpSave);
+    $('#cmpMail').addEventListener('click', () => {
+        const d = cmpData();
+        if (!cmpValid(d)) return;
+        const subject = `【CKSTUDIO】${d.type}${d.name ? ' · ' + d.name : ''}`;
+        location.href = `mailto:${MAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(cmpText(d))}`;
+        cmpSay('已尝试打开邮件应用。如果没有反应，点“复制内容”发到微信或邮箱。', true);
+    });
+    $('#cmpCopy').addEventListener('click', async () => {
+        const d = cmpData();
+        if (!cmpValid(d)) return;
+        const ok = await copyText(cmpText(d));
+        cmpSay(ok ? '已复制，可以直接粘贴到微信（1837620622）或邮件里。' : '复制失败，请手动选择文字复制。', ok);
+    });
+}
+
+/* ---------- 首屏标签里的北京时间 ---------- */
+const bjEl = $('#bjTime');
+let bjFmt = null;
+try {
+    bjFmt = new Intl.DateTimeFormat('zh-CN', { timeZone: 'Asia/Shanghai', hour: '2-digit', minute: '2-digit', hour12: false });
+} catch (err) {
+    bjFmt = null;
+}
+function tickBJ() {
+    if (bjFmt && bjEl) bjEl.textContent = '北京时间 ' + bjFmt.format(new Date());
+}
+tickBJ();
+setInterval(tickBJ, 20000);
+
+/* ---------- 点选流程卡片 ---------- */
+stepEls.forEach((el, i) => el.addEventListener('click', () => {
+    stepPauseUntil = performance.now() + 12000;
+    stepActivate(i);
+}));
+
+/* ===================================================================
    尺寸变化：顶栏高度、标题字号、点阵网格、字标取景、三种粒子形态
    =================================================================== */
 let rzRaf = 0;
 function onResize() {
     cancelAnimationFrame(rzRaf);
     rzRaf = requestAnimationFrame(() => {
+        // 双指放大时视觉视口会变，但布局没变，此时不重新排版
+        if (window.visualViewport && window.visualViewport.scale > 1.01) return;
+        const oldH = H;
         W = window.innerWidth;
         H = window.innerHeight;
         syncHeader();
@@ -1486,12 +2238,18 @@ function onResize() {
         sizeNums();
         if (hero) hero.fit();
         if (stage) stage.resize();
-        if (!busy && !tw) applyView(cur * H);
+        if (tw) {
+            tw.from = tw.from / oldH * H;
+            tw.to = tw.n * H;
+        } else {
+            applyView(cur * H);
+        }
         if (getComputedStyle(navToggle).display === 'none') setMenu(false);
         caseUpdate();
     });
 }
 window.addEventListener('resize', onResize);
+if (document.fonts && document.fonts.addEventListener) document.fonts.addEventListener('loadingdone', onResize);
 if (window.visualViewport) window.visualViewport.addEventListener('resize', onResize);
 
 /* ===================================================================
@@ -1508,7 +2266,28 @@ applyView(0);
 
 let lastT = performance.now();
 document.addEventListener('visibilitychange', () => { lastT = performance.now(); });
+// 卡顿时自动降一档画质（像素比 → 粒子数），地址栏带 ?quality=high 时不降
+const perf = { n: 0, acc: 0, level: 0, skip: 90 };
+const lockQuality = /[?&]quality=high\b/.test(location.search);
+function perfSample(dt) {
+    if (lockQuality || perf.level >= 2 || !loadedDone || document.hidden) return;
+    if (perf.skip > 0) { perf.skip--; return; }
+    perf.acc += dt;
+    perf.n++;
+    if (perf.n < 150) return;
+    const avg = perf.acc / perf.n;
+    perf.acc = 0;
+    perf.n = 0;
+    if (avg > 1 / 36) {
+        perf.level++;
+        perf.skip = 120;
+        if (stage) stage.setQuality(perf.level);
+        if (hero) hero.setQuality(perf.level);
+    }
+}
+
 function frame(now) {
+    requestAnimationFrame(frame);
     const dt = Math.min(0.05, Math.max(0, (now - lastT) / 1000));
     lastT = now;
     if (!loadedDone) loaderTick();
@@ -1516,8 +2295,9 @@ function frame(now) {
     pxs += (pointerX - pxs) * 0.06;
     pys += (pointerY - pys) * 0.06;
     updateCursor();
-    if (hero && view < H - 1) hero.frame(now / 1000);
-    if (stage && view > H * 0.3) stage.frame(now, dt);
-    requestAnimationFrame(frame);
+    let drew = false;
+    if (hero && view < H - 1) { hero.frame(now / 1000); drew = true; }
+    if (stage && view > H * 0.3) { stage.frame(now, dt); drew = true; }
+    if (drew) perfSample(dt);
 }
 requestAnimationFrame(frame);

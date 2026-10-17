@@ -107,6 +107,7 @@ img { display: block; max-width: 100%; }
   position: fixed;
   inset: 0;
   z-index: 200;
+  touch-action: none;
   background: #000;
   transition: opacity .7s var(--ease), visibility .7s var(--ease);
 }
@@ -216,7 +217,7 @@ header.site {
   padding: var(--st) var(--pr) 0 var(--pl);
   display: flex;
   align-items: center;
-  touch-action: manipulation;
+  touch-action: none;
   pointer-events: none;
 }
 header.site > * { pointer-events: auto; }
@@ -362,6 +363,39 @@ header.site > * { pointer-events: auto; }
   background: repeating-linear-gradient(to bottom, rgba(255, 255, 255, .26) 0 32px, transparent 32px 42px);
 }
 #rail.on { opacity: 1; }
+#rail { visibility: hidden; transition: opacity .4s linear, visibility .4s linear; }
+#rail.on { visibility: visible; }
+.rail-hit {
+  position: absolute;
+  left: -14px;
+  top: 0;
+  bottom: 0;
+  width: 30px;
+  display: flex;
+  flex-direction: column;
+}
+.rail-hit li { flex: 1 1 0; }
+.rail-hit a { position: relative; display: block; height: 100%; pointer-events: auto; border-radius: 4px; }
+.rail-hit em {
+  position: absolute;
+  right: calc(100% + 4px);
+  top: 50%;
+  transform: translate(6px, -50%);
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #fff;
+  color: #000;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: 0;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s, transform .35s var(--ease);
+}
+.rail-hit a:hover em, .rail-hit a:focus-visible em { opacity: 1; transform: translate(0, -50%); }
+@media (pointer: coarse), (max-width: 900px) { .rail-hit { display: none; } }
 #railFill {
   position: absolute;
   left: 0;
@@ -403,6 +437,7 @@ main > section {
   touch-action: none;
   background: transparent;
 }
+main > section:focus { outline: none; }
 main > section.show {
   opacity: 1;
   visibility: visible;
@@ -461,7 +496,7 @@ main > section.out-down { transform: translateY(100%); }
   background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, .18) 62%, rgba(0, 0, 0, .45) 74%, rgba(0, 0, 0, .80) 84%, rgba(0, 0, 0, .90) 100%);
 }
 #heroGL { position: absolute; inset: 0; z-index: 4; touch-action: none; }
-@media (any-pointer: coarse) { #heroGL { pointer-events: none; } }
+@media (pointer: coarse) { #heroGL { pointer-events: none; } }
 #heroCopy { position: absolute; inset: 0; z-index: 5; pointer-events: none; }
 #heroTitle {
   position: absolute;
@@ -509,6 +544,8 @@ main > section.out-down { transform: translateY(100%); }
   color: rgba(255, 255, 255, .92);
   pointer-events: none;
 }
+.hero-tag .bj { color: rgba(255, 255, 255, .62); font-variant-numeric: tabular-nums; }
+.hero-tag .bj:not(:empty)::before { content: '·'; margin: 0 7px; color: rgba(255, 255, 255, .45); }
 .hero-tag i {
   width: 7px;
   height: 7px;
@@ -613,6 +650,47 @@ main > section.out-down { transform: translateY(100%); }
 .facts li + li { padding-left: 16px; border-left: 1px solid var(--hair); }
 .facts b { display: block; font-size: clamp(17px, 1.46vw, 24px); font-weight: 700; letter-spacing: -.02em; margin-bottom: 8px; }
 .facts span { display: block; font-size: var(--fs-small); line-height: 1.5; color: rgba(255, 255, 255, .7); font-weight: 500; }
+.kbd {
+  position: absolute;
+  left: var(--pl);
+  top: var(--top);
+  width: min(30vw, 380px);
+  z-index: 6;
+  padding: 14px 16px 12px;
+  border-radius: 14px;
+  background: rgba(10, 10, 10, .55);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .12);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+.kbd-tip { font-size: var(--fs-small); line-height: 1.5; color: rgba(255, 255, 255, .62); font-weight: 500; }
+.kbd-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  margin-top: 8px;
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+  font-size: 16px;
+  letter-spacing: 0;
+  white-space: pre;
+  overflow: hidden;
+}
+.kbd-pr { color: rgba(255, 255, 255, .45); }
+.kbd-caret { width: 9px; height: 18px; background: #fff; animation: caret 1.05s steps(1) infinite; flex: 0 0 auto; }
+@keyframes caret { 50% { opacity: 0; } }
+.kbd-sound {
+  margin-top: 8px;
+  height: 28px;
+  padding: 0 11px;
+  border-radius: 999px;
+  font-size: 12px;
+  letter-spacing: 0;
+  color: rgba(255, 255, 255, .72);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .2);
+  transition: background-color .3s, color .3s;
+}
+.kbd-sound[aria-pressed="true"] { background: #fff; color: #000; }
 .chips {
   position: absolute;
   right: var(--pr);
@@ -731,6 +809,7 @@ main > section.out-down { transform: translateY(100%); }
   overflow-y: auto;
   overscroll-behavior: contain;
   touch-action: pan-y;
+  scroll-padding-top: calc(var(--header-h) + 16px);
   scrollbar-width: none;
   -webkit-mask-image: linear-gradient(to bottom, transparent 0, transparent calc(var(--header-h) - 6px), #000 calc(var(--header-h) + 10px));
   mask-image: linear-gradient(to bottom, transparent 0, transparent calc(var(--header-h) - 6px), #000 calc(var(--header-h) + 10px));
@@ -872,6 +951,14 @@ main > section.out-down { transform: translateY(100%); }
 .clist b { font-weight: 500; overflow-wrap: anywhere; }
 .clist em { font-style: normal; color: rgba(255, 255, 255, .5); font-size: 12px; transition: color .3s; }
 @media (hover: hover) { .clist button:hover em, .clist a:hover em { color: #fff; } }
+.compose-row {
+  margin-top: clamp(16px, 3vh, 26px);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  max-width: 560px;
+}
+.compose-row .hint { margin: 0; }
 .hint {
   margin-top: 18px;
   max-width: 560px;
@@ -930,6 +1017,79 @@ main > section.out-down { transform: translateY(100%); }
 }
 .toast.on { opacity: 1; transform: translate(-50%, 0); }
 
+/* ---------- 合作需求表单 ---------- */
+.cmp {
+  width: min(640px, calc(100vw - 24px));
+  max-height: calc(100dvh - 24px);
+  padding: 0;
+  border: 0;
+  border-radius: 20px;
+  background: #0c0c0d;
+  color: #fff;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .12), 0 30px 80px rgba(0, 0, 0, .6);
+  overflow: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+}
+.cmp::backdrop { background: rgba(0, 0, 0, .62); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.cmp[open] { animation: cmpIn .5s var(--ease); }
+@keyframes cmpIn { from { opacity: 0; transform: translateY(18px) scale(.985); } }
+html.has-cursor .cmp, html.has-cursor .cmp * { cursor: auto; }
+html.has-cursor .cmp button, html.has-cursor .cmp label { cursor: pointer; }
+html.has-cursor .cmp input, html.has-cursor .cmp textarea { cursor: text; }
+.cmp-in { padding: clamp(18px, 3vw, 30px); }
+.cmp-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.cmp-head h2 { font-size: clamp(22px, 2.6vw, 30px); font-weight: 600; letter-spacing: -.02em; }
+.cmp-x { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .2); }
+.cmp-x svg { width: 14px; height: 14px; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; fill: none; }
+.cmp-x:hover { background: #fff; color: #000; }
+.cmp-sub { margin-top: 10px; font-size: 13.5px; line-height: 1.6; color: rgba(255, 255, 255, .6); }
+.cmp-f { margin: 20px 0 0; padding: 0; border: 0; min-width: 0; }
+.cmp-f legend { padding: 0; margin-bottom: 10px; font-size: 13px; color: rgba(255, 255, 255, .55); }
+.cmp-f legend small { font-size: 12px; color: rgba(255, 255, 255, .38); margin-left: 4px; }
+.cmp-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.cmp-chips label { position: relative; }
+.cmp-chips input { position: absolute; opacity: 0; inset: 0; margin: 0; }
+.cmp-chips span {
+  display: inline-flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  font-size: 14px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .2);
+  transition: background-color .25s, color .25s, box-shadow .25s;
+}
+.cmp-chips input:checked + span { background: #fff; color: #000; box-shadow: none; }
+.cmp-chips input:focus-visible + span { outline: 1.5px solid #fff; outline-offset: 3px; }
+.cmp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+.cmp-field { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; font-size: 13px; color: rgba(255, 255, 255, .55); }
+.cmp-grid .cmp-field { margin-top: 0; }
+.cmp-field input, .cmp-field textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 0;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .06);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .14);
+  color: #fff;
+  font: inherit;
+  font-size: 16px;
+  letter-spacing: 0;
+  resize: vertical;
+}
+.cmp-field input::placeholder, .cmp-field textarea::placeholder { color: rgba(255, 255, 255, .32); }
+.cmp-field input:focus, .cmp-field textarea:focus { outline: 0; box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, .7); }
+.cmp-err { min-height: 1.4em; margin-top: 10px; font-size: 13px; color: #ffb4a8; }
+.cmp-err.ok { color: #a7e3b8; }
+.cmp-act { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-top: 6px; }
+.cmp-copy { height: var(--btn-h); padding: 0 18px; border-radius: 999px; font-size: var(--fs-btn); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .28); transition: background-color .3s, color .3s; }
+.cmp-copy:hover { background: #fff; color: #000; }
+@media (max-width: 560px) {
+  .cmp-grid { grid-template-columns: 1fr; }
+  .compose-row { flex-direction: column; align-items: flex-start; gap: 10px; }
+}
+
 /* ==========================================================================
    断点：手机 / iPad / 小屏笔记本 / 横屏手机
    ========================================================================== */
@@ -984,6 +1144,10 @@ main > section.out-down { transform: translateY(100%); }
     max-width: 100%;
   }
   #s3 h2 { text-align: right; align-self: flex-end; }
+  .kbd { position: relative; left: auto; top: auto; width: auto; padding: 10px 12px; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: 10px; }
+  .kbd-tip { grid-column: 1 / -1; font-size: 12.5px; }
+  .kbd-line { margin-top: 4px; min-height: 28px; font-size: 15px; }
+  .kbd-sound { margin-top: 4px; }
   #s2 > .note, #s3 > .note { margin-top: auto; max-height: 36%; overflow: auto; overscroll-behavior: contain; touch-action: pan-y; flex-shrink: 1; }
   #s2 .facts { margin-top: auto; }
   #s2 > .note { margin-top: 0; flex-shrink: 1; }
@@ -1101,7 +1265,7 @@ main > section.out-down { transform: translateY(100%); }
   .st-b { margin-top: 8px; min-height: 0; }
   .hero-tag, .drag-hint { display: none; }
   #s4 > .note { display: none; }
-  .cases { --cw: calc((100dvh - var(--header-h)) * .72); }
+  .cases { --cw: calc((100vh - var(--header-h)) * .72); --cw: calc((100dvh - var(--header-h)) * .72); }
   .cap { min-height: 0; }
 }
 
@@ -1154,11 +1318,6 @@ main > section.out-down { transform: translateY(100%); }
   .arrowbtn svg { width: 12px; height: 12px; }
 }
 
-@media (max-height: 430px) {
-  #heroAside p { max-height: 18vh; }
-  #heroTitle, #heroAside { bottom: calc(1.6vh + var(--sb)); }
-}
-
 @media (max-height: 520px) {
   #heroCopy {
     display: flex;
@@ -1179,8 +1338,14 @@ main > section.out-down { transform: translateY(100%); }
   #heroTitle { text-shadow: 0 2px 16px rgba(0, 0, 0, .55); }
   #heroAside p { max-height: 24vh; overflow: auto; text-align: left; }
   #s2, #s3, #s4 { gap: 8px; }
+  .kbd-tip { display: none; }
+  .kbd { padding: 6px 10px; }
   .facts span { display: none; }
   .chips li { height: 28px; }
+}
+
+@media (max-height: 430px) {
+  #heroAside p { max-height: 18vh; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1212,34 +1377,47 @@ main > section { position: relative; min-height: 100vh; opacity: 1; visibility: 
 
 <header class="site" id="siteHeader">
   <a class="brand" href="#top" data-go="0" aria-label="CKSTUDIO 回到首屏"><span>CK</span>STUDIO</a>
-  <nav class="navpill" id="sitenav" aria-label="主导航">
-    <a href="#about" data-go="1">/理念</a>
-    <a href="#process" data-go="3">/流程</a>
-    <a href="#services" data-go="4">/能力</a>
-    <a href="#works" data-go="5">/案例</a>
-    <a href="works.html">/履历</a>
-  </nav>
   <a class="cta" href="#contact" data-go="6">
     <span class="arrowbtn"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4.2 11.8 11.8 4.2M11.8 4.2H5.6M11.8 4.2v6.2"/></svg></span>
     <span class="pillbtn">联系合作</span>
   </a>
   <button class="navtoggle" id="navToggle" type="button" aria-label="打开菜单" aria-expanded="false" aria-controls="sitenav"><i></i><i></i><i></i></button>
+  <nav class="navpill" id="sitenav" aria-label="主导航">
+    <a href="#about" data-go="1">/理念</a>
+    <a href="#ai" data-go="2">/AI</a>
+    <a href="#process" data-go="3">/流程</a>
+    <a href="#services" data-go="4">/能力</a>
+    <a href="#works" data-go="5">/案例</a>
+    <a href="works.html">/履历</a>
+  </nav>
 </header>
 
 <canvas id="stage" aria-hidden="true"></canvas>
-<div id="rail" aria-hidden="true"><i id="railFill"></i><span id="railNum"><b>01</b> / 07</span></div>
+<nav id="rail" aria-label="分屏导航">
+  <i id="railFill" aria-hidden="true"></i>
+  <span id="railNum" aria-hidden="true"><b>01</b> / 07</span>
+  <ol class="rail-hit">
+    <li><a href="#top" data-go="0"><em>01 首屏</em></a></li>
+    <li><a href="#about" data-go="1"><em>02 理念</em></a></li>
+    <li><a href="#ai" data-go="2"><em>03 AI 提效</em></a></li>
+    <li><a href="#process" data-go="3"><em>04 合作流程</em></a></li>
+    <li><a href="#services" data-go="4"><em>05 能力</em></a></li>
+    <li><a href="#works" data-go="5"><em>06 案例</em></a></li>
+    <li><a href="#contact" data-go="6"><em>07 联系</em></a></li>
+  </ol>
+</nav>
 
 <main id="main">
 
   <!-- 01 首屏 -->
-  <section id="hero" class="show" data-hash="top" aria-label="首屏">
+  <section id="hero" tabindex="-1" class="show" data-hash="top" aria-label="首屏">
     <div id="heroBg"></div>
     <div id="heroSky"></div>
     <canvas id="heroNums" aria-hidden="true"></canvas>
     <div id="heroShade"></div>
     <canvas id="heroGL" aria-hidden="true"></canvas>
     <div id="heroCopy">
-      <p class="hero-tag fade"><i></i>开放合作中 · 项目 / 岗位 / 投资 / 赞助</p>
+      <p class="hero-tag fade"><i></i>开放合作中 · 项目 / 岗位 / 投资 / 赞助<span class="bj" id="bjTime"></span></p>
       <p class="drag-hint fade">拖动 &lt;CK&gt; 旋转</p>
       <h1 class="disp fit" id="heroTitle">
         <span class="rv">传康Kk 个人工作站</span>
@@ -1256,7 +1434,7 @@ main > section { position: relative; min-height: 100vh; opacity: 1; visibility: 
   </section>
 
   <!-- 02 理念：粒子球 -->
-  <section id="s2" class="panel" data-hash="about" aria-label="理念">
+  <section id="s2" tabindex="-1" class="panel" data-hash="about" aria-label="理念">
     <h2 class="disp fit">
       <span class="rv">一个人，</span>
       <span class="rv" data-d="140">就是一个工作室。</span>
@@ -1270,11 +1448,16 @@ main > section { position: relative; min-height: 100vh; opacity: 1; visibility: 
   </section>
 
   <!-- 03 AI 提效：键盘粒子 -->
-  <section id="s3" class="panel" data-hash="ai" aria-label="AI 提效">
+  <section id="s3" tabindex="-1" class="panel" data-hash="ai" aria-label="AI 提效">
     <h2 class="disp fit">
       <span class="rv" data-dot="1">重复的交给 AI，</span>
       <span class="rv" data-dot="1" data-d="140">判断留给我。</span>
     </h2>
+    <div class="kbd fade" id="kbdHud">
+      <p class="kbd-tip" id="kbdTip">敲几个字母试试，这把粒子键盘会跟着按下。</p>
+      <p class="kbd-line" aria-live="polite"><span class="kbd-pr" aria-hidden="true">&gt;</span><span id="kbdText"></span><i class="kbd-caret" aria-hidden="true"></i></p>
+      <button class="kbd-sound" id="kbdSound" type="button" aria-pressed="false">按键音 · 关</button>
+    </div>
     <p class="note fade">资料检索、样板代码、调试排错和文档整理交给 AI 加速；架构设计、数据准确性、用户体验和最终质量，由我逐项把关。交付因此更快，质量不打折扣。</p>
     <ul class="chips fade" aria-label="常用 AI 能力">
       <li>大模型 API</li>
@@ -1286,7 +1469,7 @@ main > section { position: relative; min-height: 100vh; opacity: 1; visibility: 
   </section>
 
   <!-- 04 合作流程：<CK> 粒子 -->
-  <section id="s4" class="panel" data-hash="process" aria-label="合作流程">
+  <section id="s4" tabindex="-1" class="panel" data-hash="process" aria-label="合作流程">
     <h2 class="disp fit" data-avoid="#s4note">
       <span class="rv">从想法到上线，</span>
       <span class="rv" data-d="140">五步走完。</span>
@@ -1322,7 +1505,7 @@ main > section { position: relative; min-height: 100vh; opacity: 1; visibility: 
   </section>
 
   <!-- 05 能力：粒子球（暗） -->
-  <section id="s5" class="panel flow" data-hash="services" aria-label="能力">
+  <section id="s5" tabindex="-1" class="panel flow" data-hash="services" aria-label="能力">
     <div class="flow-in vscroll">
       <div class="flow-head">
         <h2 class="disp fit">
@@ -1345,7 +1528,7 @@ main > section { position: relative; min-height: 100vh; opacity: 1; visibility: 
   </section>
 
   <!-- 06 案例：键盘粒子（暗） -->
-  <section id="s6" class="panel flow" data-hash="works" aria-label="案例">
+  <section id="s6" tabindex="-1" class="panel flow" data-hash="works" aria-label="案例">
     <div class="flow-in vscroll">
       <div class="flow-head">
         <h2 class="disp fit">
@@ -1400,7 +1583,7 @@ main > section { position: relative; min-height: 100vh; opacity: 1; visibility: 
   </section>
 
   <!-- 07 联系与合作：<CK> 粒子（暗） -->
-  <section id="s7" class="panel flow" data-hash="contact" aria-label="联系与合作">
+  <section id="s7" tabindex="-1" class="panel flow" data-hash="contact" aria-label="联系与合作">
     <div class="flow-in vscroll">
       <div class="contact-grid">
         <div class="contact-main">
@@ -1416,7 +1599,13 @@ main > section { position: relative; min-height: 100vh; opacity: 1; visibility: 
             <li><a href="https://github.com/1837620622" target="_blank" rel="noopener noreferrer"><span>GitHub</span><b>@1837620622</b><em>打开</em></a></li>
             <li><div><span>B站 / 闲鱼</span><b>万能程序员</b><em></em></div></li>
           </ul>
-          <p class="hint fade">第一次联系时，附上目标、预算范围和期望时间，我能更快给出判断和方案。</p>
+          <div class="compose-row fade">
+            <button type="button" class="btnpair" data-compose>
+              <span class="arrowbtn"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4.2 11.8 11.8 4.2M11.8 4.2H5.6M11.8 4.2v6.2"/></svg></span>
+              <span class="pillbtn">在线填写合作需求</span>
+            </button>
+            <p class="hint">附上目标、预算范围和期望时间，我能更快给出判断和方案。</p>
+          </div>
         </div>
         <div class="coop fade">
           <h3 class="coop-h">合作方式</h3>
@@ -1441,8 +1630,53 @@ main > section { position: relative; min-height: 100vh; opacity: 1; visibility: 
   </section>
 </main>
 
+<dialog class="cmp" id="composer" aria-labelledby="cmpTitle">
+  <div class="cmp-in">
+    <div class="cmp-head">
+      <h2 id="cmpTitle">合作需求</h2>
+      <button type="button" class="cmp-x" data-close aria-label="关闭"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg></button>
+    </div>
+    <p class="cmp-sub">填好后可以直接生成邮件，或复制内容发到微信 1837620622。草稿只保存在你自己的浏览器里，不会上传。</p>
+    <fieldset class="cmp-f">
+      <legend>合作类型</legend>
+      <div class="cmp-chips">
+        <label><input type="radio" name="cmpType" value="项目接单" checked><span>项目接单</span></label>
+        <label><input type="radio" name="cmpType" value="长期合作"><span>长期合作</span></label>
+        <label><input type="radio" name="cmpType" value="技术顾问"><span>技术顾问</span></label>
+        <label><input type="radio" name="cmpType" value="岗位邀约"><span>岗位邀约</span></label>
+        <label><input type="radio" name="cmpType" value="投资合作"><span>投资合作</span></label>
+        <label><input type="radio" name="cmpType" value="赞助支持"><span>赞助支持</span></label>
+        <label><input type="radio" name="cmpType" value="其他"><span>其他</span></label>
+      </div>
+    </fieldset>
+    <fieldset class="cmp-f">
+      <legend>预算 / 规模 <small>可选</small></legend>
+      <div class="cmp-chips">
+        <label><input type="radio" name="cmpBudget" value="待沟通" checked><span>待沟通</span></label>
+        <label><input type="radio" name="cmpBudget" value="1 万以内"><span>1 万以内</span></label>
+        <label><input type="radio" name="cmpBudget" value="1–5 万"><span>1–5 万</span></label>
+        <label><input type="radio" name="cmpBudget" value="5–20 万"><span>5–20 万</span></label>
+        <label><input type="radio" name="cmpBudget" value="20 万以上"><span>20 万以上</span></label>
+      </div>
+    </fieldset>
+    <div class="cmp-grid">
+      <label class="cmp-field"><span>称呼</span><input id="cmpName" type="text" maxlength="40" autocomplete="name" placeholder="怎么称呼你"></label>
+      <label class="cmp-field"><span>联系方式</span><input id="cmpContact" type="text" maxlength="80" autocomplete="email" placeholder="微信 / 邮箱 / 电话"></label>
+    </div>
+    <label class="cmp-field"><span>需求简述</span><textarea id="cmpMsg" rows="5" maxlength="1500" placeholder="想做什么、现在进展到哪、希望什么时候上线……"></textarea></label>
+    <p class="cmp-err" id="cmpErr" role="alert"></p>
+    <div class="cmp-act">
+      <button type="button" class="btnpair" id="cmpMail">
+        <span class="arrowbtn"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4.2 11.8 11.8 4.2M11.8 4.2H5.6M11.8 4.2v6.2"/></svg></span>
+        <span class="pillbtn">生成邮件</span>
+      </button>
+      <button type="button" class="cmp-copy" id="cmpCopy">复制内容</button>
+    </div>
+  </div>
+</dialog>
+
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script type="module" src="js/landing.js?v=20261017"></script>
+<script type="module" src="js/landing.js?v=20261018"></script>
 </body>
 </html>
