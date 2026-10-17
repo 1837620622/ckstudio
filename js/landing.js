@@ -1242,9 +1242,14 @@ function initStage() {
             if (srcW * aspect * ct * 1.12 > b.h * 0.9) srcW = b.h * 0.9 / (aspect * ct * 1.12);
             cy = H / 2 - b.cy;
         } else {
+            // 桌面：键盘可以压在标题后面，但近处一排不能盖住底部的说明和输入行
+            const b = band('s3', null, '.s3-foot, .kbd');
             srcW = film() ? Math.min(1300, W * 0.9) : Math.min(W * 0.92, 1300);
             if (srcW * aspect * ct > H * 0.46) srcW = H * 0.46 / (aspect * ct);
-            cy = film() ? -H * 0.05 : -H * 0.02;
+            if (srcW * aspect * ct * 1.15 > b.h * 0.92) srcW = b.h * 0.92 / (aspect * ct * 1.15);
+            const half = srcW * aspect * ct / 2;
+            const center = Math.min(b.cy + b.h * 0.06, b.cy + b.h / 2 - 6 - half * 1.15);
+            cy = H / 2 - center;
         }
         const srcH = srcW * aspect;
         const k = srcW / kb.sw;
