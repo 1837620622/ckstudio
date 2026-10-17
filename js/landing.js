@@ -17,7 +17,28 @@ const pad2 = n => String(n).padStart(2, '0');
 
 const root = document.documentElement;
 const body = document.body;
-const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+// 效果设置：指针互动、画质、动效、按键音，只保存在本机浏览器
+const FX_KEY = 'ck-fx';
+const systemReduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+let reduceMotion = systemReduce.matches;
+function loadFx() {
+    let saved = null;
+    try { saved = JSON.parse(localStorage.getItem(FX_KEY) || 'null'); } catch (err) { saved = null; }
+    const s = saved && typeof saved === 'object' ? saved : {};
+    return {
+        pointer: s.pointer !== false,
+        quality: ['auto', 'high', 'low'].includes(s.quality) ? s.quality : 'auto',
+        motion: ['system', 'reduce', 'full'].includes(s.motion) ? s.motion : 'system',
+        sound: s.sound === true
+    };
+}
+const fx = loadFx();
+function saveFx() {
+    try { localStorage.setItem(FX_KEY, JSON.stringify(fx)); } catch (err) { /* 无痕模式 */ }
+}
+// 卡顿时自动降一档画质（像素比 → 粒子数）；选“高”或地址栏带 ?quality=high 时不降
+const perf = { n: 0, acc: 0, level: fx.quality === 'low' ? 2 : 0, skip: 90 };
+let lockQuality = fx.quality === 'high' || /[?&]quality=high\b/.test(location.search);
 const mouseUI = window.matchMedia('(hover: hover) and (pointer: fine)');
 
 const header = $('#siteHeader');
@@ -656,7 +677,7 @@ totalEmissiveRadiance += vec3(0.42, 0.62, 0.95) * clamp(vLift - 0.06, 0.0, 1.5) 
     });
     const release = () => { heroDragging = false; last = null; };
     canvas.addEventListener('pointerup', e => {
-        if (downAt && Math.hypot(e.clientX - downAt.x, e.clientY - downAt.y) < 5) heroRipple(e.clientX, e.clientY);
+        if (fx.pointer && downAt && Math.hypot(e.clientX - downAt.x, e.clientY - downAt.y) < 5) heroRipple(e.clientX, e.clientY);
         downAt = null;
         release();
     });
@@ -674,7 +695,7 @@ totalEmissiveRadiance += vec3(0.42, 0.62, 0.95) * clamp(vLift - 0.06, 0.0, 1.5) 
     }, { passive: true });
     heroSec.addEventListener('pointerup', e => {
         if (e.pointerType !== 'touch' || !downAt) return;
-        if (Math.hypot(e.clientX - downAt.x, e.clientY - downAt.y) < 10) heroRipple(e.clientX, e.clientY);
+        if (fx.pointer && Math.hypot(e.clientX - downAt.x, e.clientY - downAt.y) < 10) heroRipple(e.clientX, e.clientY);
         downAt = null;
     }, { passive: true });
 
@@ -711,7 +732,7 @@ totalEmissiveRadiance += vec3(0.42, 0.62, 0.95) * clamp(vLift - 0.06, 0.0, 1.5) 
     }
 
     function frame(t) {
-        const amp = H < 560 ? 0.30 * 0.35 : 0.30;
+        const amp = reduceMotion ? 0 : (H < 560 ? 0.30 * 0.35 : 0.30);
         if (!heroDragging) {
             bias += vY;
             vY *= 0.955;
@@ -728,7 +749,7 @@ totalEmissiveRadiance += vec3(0.42, 0.62, 0.95) * clamp(vLift - 0.06, 0.0, 1.5) 
 
         const now = performance.now();
         heroU.uT.value = reduceMotion ? 0 : t;
-        const engaged = overHeroGL || heroDragging || now < touchUntil;
+        const engaged = fx.pointer && (overHeroGL || heroDragging || now < touchUntil);
         heroU.uHA.value += ((engaged && !reduceMotion ? 1 : 0) - heroU.uHA.value) * 0.08;
         if (heroU.uHA.value > 0.002 && planePoint((pointerX + 0.5) * W, (pointerY + 0.5) * H, hit)) {
             heroU.uHP.value.lerp(hit, 0.35);
@@ -1402,7 +1423,7 @@ function initStage() {
         uni.squeeze.value = Math.max(sq, 0.02);
 
         // 指针排开：球体和 <CK> 上生效，静止 2 秒后慢慢收回
-        const active = now - lastMove < 2200 ? 1 : 0;
+        const active = fx.pointer && now - lastMove < 2200 ? 1 : 0;
         repel += (active - repel) * 0.06;
         mouse.lerp(mouseT, 0.25);
         uni.uMouse.value.copy(mouse);
@@ -1432,7 +1453,7 @@ function initStage() {
             for (let v = 0; v < 24; v++) keyVec[v].fromArray(keyCur, v * 4);
         }
 
-        spin += dt * (0.085 * wA + 0.006 * (wB + wC));
+        spin += dt * (0.085 * wA + 0.006 * (wB + wC)) * (reduceMotion ? 0.3 : 1);
         const sp = ((spin + Math.PI) % (Math.PI * 2)) - Math.PI;
         points.rotation.y = sp * wA + pxs * 0.16;
         points.rotation.x = pys * 0.09;
@@ -1653,7 +1674,7 @@ function claimWheel(now, d) {
 }
 
 window.addEventListener('wheel', e => {
-    if (e.ctrlKey || cmpOpen()) return;
+    if (e.ctrlKey || modalOpen()) return;
     const f = e.deltaMode === 1 ? 32 : (e.deltaMode === 2 ? H : 1);
     const dx = e.deltaX * f;
     const dy = e.deltaY * f;
@@ -1708,7 +1729,7 @@ window.addEventListener('wheel', e => {
 /* ---------- 触摸：竖向滑动超过 48px 翻页，横滑交给列表 ---------- */
 let ts = null;
 window.addEventListener('touchstart', e => {
-    if (e.touches.length !== 1 || cmpOpen()) { ts = null; return; }
+    if (e.touches.length !== 1 || modalOpen()) { ts = null; return; }
     const t = e.touches[0];
     const v = findV(e.target);
     ts = {
@@ -1753,13 +1774,12 @@ const kbdSoundBtn = $('#kbdSound');
 const TIP_DEFAULT = mouseUI.matches ? '敲几个字母试试，或者直接点这把粒子键盘。' : '点按下面这把粒子键盘试试。';
 let typed = '';
 let tipTimer = 0;
-let soundOn = false;
+let soundOn = fx.sound;
 let actx = null;
 let noiseBuf = null;
 kbdTip.textContent = TIP_DEFAULT;
 const kbdLive = () => !!(stage && stage.ready && cur === KBD_SEC && !busy);
 
-try { soundOn = localStorage.getItem('ck-kbd-sound') === '1'; } catch (err) { soundOn = false; }
 function syncSoundBtn() {
     kbdSoundBtn.setAttribute('aria-pressed', String(soundOn));
     kbdSoundBtn.textContent = soundOn ? '按键音 · 开' : '按键音 · 关';
@@ -1767,7 +1787,8 @@ function syncSoundBtn() {
 syncSoundBtn();
 kbdSoundBtn.addEventListener('click', () => {
     soundOn = !soundOn;
-    try { localStorage.setItem('ck-kbd-sound', soundOn ? '1' : '0'); } catch (err) { /* 无痕模式 */ }
+    fx.sound = soundOn;
+    saveFx();
     syncSoundBtn();
     if (soundOn) keySound(true);
 });
@@ -1909,7 +1930,7 @@ window.addEventListener('pointercancel', () => {
 
 /* ---------- 球体点一下起涟漪，<CK> 点一下炸开再聚拢 ---------- */
 mainEl.addEventListener('click', e => {
-    if (!stage || busy || cur === 0 || cur === KBD_SEC) return;
+    if (!stage || !fx.pointer || busy || cur === 0 || cur === KBD_SEC) return;
     if (e.target.closest && e.target.closest(INTERACTIVE)) return;
     const f = FORMS[cur];
     if (f === 'A') stage.ripple(e.clientX, e.clientY);
@@ -1918,7 +1939,7 @@ mainEl.addEventListener('click', e => {
 
 /* ---------- 键盘 ---------- */
 window.addEventListener('keydown', e => {
-    if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || cmpOpen()) return;
+    if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || modalOpen()) return;
     const tag = (e.target.tagName || '').toLowerCase();
     if (tag === 'input' || tag === 'textarea' || e.target.isContentEditable) return;
     // 左右方向键：流程屏切换卡片，案例屏翻案例
@@ -2110,7 +2131,8 @@ const composer = $('#composer');
 const cmpStatus = $('#cmpErr');
 const CMP_KEY = 'ck-compose';
 const MAIL = 'chuankangkk1@gmail.com';
-const cmpOpen = () => !!(composer && composer.open);
+const fxDlg = $('#fxDlg');
+const modalOpen = () => !!((composer && composer.open) || (fxDlg && fxDlg.open));
 
 function cmpData() {
     const pick = name => { const el = composer.querySelector(`input[name="${name}"]:checked`); return el ? el.value : ''; };
@@ -2222,6 +2244,64 @@ stepEls.forEach((el, i) => el.addEventListener('click', () => {
 }));
 
 /* ===================================================================
+   效果设置：指针互动、画质、动效、按键音；改动立即生效并保存在本机
+   =================================================================== */
+function syncFxForm() {
+    const set = (name, value) => {
+        const el = fxDlg.querySelector(`input[name="${name}"][value="${value}"]`);
+        if (el) el.checked = true;
+    };
+    set('fxPointer', fx.pointer ? 'on' : 'off');
+    set('fxQuality', fx.quality);
+    set('fxMotion', fx.motion);
+    set('fxSound', fx.sound ? 'on' : 'off');
+}
+let appliedLevel = -1;
+function applyFx() {
+    reduceMotion = fx.motion === 'reduce' || (fx.motion === 'system' && systemReduce.matches);
+    root.classList.toggle('fx-off', !fx.pointer);
+    lockQuality = fx.quality === 'high' || /[?&]quality=high\b/.test(location.search);
+    let level = perf.level;
+    if (fx.quality === 'low') level = 2;
+    else if (fx.quality === 'high') level = 0;
+    if (level !== appliedLevel) {
+        appliedLevel = level;
+        perf.level = level;
+        perf.skip = 60;
+        if (stage) stage.setQuality(level);
+        if (hero) hero.setQuality(level);
+    }
+    syncFxForm();
+    syncSoundBtn();
+}
+systemReduce.addEventListener('change', () => { if (fx.motion === 'system') applyFx(); });
+document.addEventListener('click', e => {
+    const b = e.target.closest ? e.target.closest('[data-fx-open]') : null;
+    if (!b) return;
+    e.preventDefault();
+    syncFxForm();
+    if (typeof fxDlg.showModal === 'function') fxDlg.showModal();
+    else fxDlg.setAttribute('open', '');
+});
+fxDlg.addEventListener('click', e => {
+    if (e.target === fxDlg || (e.target.closest && e.target.closest('[data-close]'))) fxDlg.close();
+});
+fxDlg.addEventListener('change', e => {
+    const el = e.target;
+    if (!el.name || !el.checked) return;
+    if (el.name === 'fxPointer') fx.pointer = el.value === 'on';
+    else if (el.name === 'fxQuality') fx.quality = el.value;
+    else if (el.name === 'fxMotion') fx.motion = el.value;
+    else if (el.name === 'fxSound') {
+        fx.sound = el.value === 'on';
+        soundOn = fx.sound;
+        if (soundOn) keySound(true);
+    }
+    saveFx();
+    applyFx();
+});
+
+/* ===================================================================
    尺寸变化：顶栏高度、标题字号、点阵网格、字标取景、三种粒子形态
    =================================================================== */
 let rzRaf = 0;
@@ -2262,13 +2342,11 @@ try { hero = initHero(); } catch (err) { hero = null; $('#heroGL').style.display
 markReady('glb');
 try { stage = initStage(); } catch (err) { stage = null; stageEl.style.display = 'none'; }
 markReady('keys');
+applyFx();
 applyView(0);
 
 let lastT = performance.now();
 document.addEventListener('visibilitychange', () => { lastT = performance.now(); });
-// 卡顿时自动降一档画质（像素比 → 粒子数），地址栏带 ?quality=high 时不降
-const perf = { n: 0, acc: 0, level: 0, skip: 90 };
-const lockQuality = /[?&]quality=high\b/.test(location.search);
 function perfSample(dt) {
     if (lockQuality || perf.level >= 2 || !loadedDone || document.hidden) return;
     if (perf.skip > 0) { perf.skip--; return; }
