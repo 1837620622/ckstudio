@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="传康Kk，独立全栈工程师。CKSTUDIO 是我的个人工作站，承接 AI 应用、量化系统、嵌入式与软件开发，一对一合作；也欢迎岗位邀约、投资合作与赞助。">
+    <meta name="theme-color" content="#070707">
+    <title>作品与履历 · 传康Kk · CKSTUDIO</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23070707'/%3E%3Ctext x='32' y='43' text-anchor='middle' font-family='Didot,Bodoni 72,Georgia,serif' font-size='30' font-weight='700' fill='%23e9e7e3'%3ECK%3C/text%3E%3C/svg%3E">
+    <link rel="preload" href="fonts/inter-latin-var.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="fonts/ck-serif-sc-600.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="style.css?v=20261017b">
+    <link rel="modulepreload" href="js/vendor/three-0.160.0/three.module.min.js">
+</head>
+<body>
+
+    <!-- 加载页 -->
+    <div class="loader" id="loader" aria-hidden="true">
+        <div class="loader-mark">CK</div>
+        <div class="loader-foot">
+            <span>CKSTUDIO</span>
+            <span class="loader-num" id="loaderNum">000</span>
+        </div>
+        <div class="loader-bar"><i id="loaderBar"></i></div>
+    </div>
+
+    <canvas id="scene-canvas" aria-hidden="true"></canvas>
+    <div class="progress" id="progress" aria-hidden="true"></div>
+    <div class="cursor-label" id="cursorLabel" aria-hidden="true"><span>查看</span></div>
+
+    <!-- 导航 -->
+    <nav class="nav" id="nav" aria-label="主导航">
+        <a class="brand" href="./" aria-label="CKSTUDIO 首页">
+            <span class="brand-ck">CK</span>
+            <span class="brand-studio">STUDIO</span>
+        </a>
+        <div class="menu">
+            <a class="menu-link" href="#why">优势</a>
+            <a class="menu-link" href="#services">能力</a>
+            <a class="menu-link" href="#works">案例</a>
+            <a class="menu-link" href="#partner">合作</a>
+            <a class="menu-link" href="#about">关于</a>
+        </div>
+        <div class="nav-right">
+            <a class="btn btn-line btn-sm magnetic" href="#contact"><span class="btn-label"><span data-text="联系我">联系我</span></span></a>
+            <button class="menu-toggle" id="menuToggle" type="button" aria-label="打开菜单" aria-controls="mobileMenu" aria-expanded="false">
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+        <a href="#why"><em>01</em>优势</a>
+        <a href="#services"><em>02</em>能力</a>
+        <a href="#works"><em>03</em>案例</a>
+        <a href="#partner"><em>04</em>合作</a>
+        <a href="#about"><em>05</em>关于</a>
+        <a href="#contact"><em>06</em>联系</a>
+    </div>
+
+    <main>
+        <!-- 首屏 -->
+        <header class="hero" id="home">
+            <div class="hero-inner" id="heroInner">
+                <div class="hero-text">
+                    <p class="eyebrow hero-anim" style="--d: 0ms">CKSTUDIO — 独立全栈工程师</p>
+                    <h1 class="hero-name zh"><span class="line"><span>传康Kk</span></span></h1>
+                    <p class="hero-lede hero-anim" style="--d: 520ms">AI 应用、量化系统、嵌入式与软件开发。<br>一对一合作，从需求到上线，由我亲自完成。</p>
+                    <div class="hero-cta hero-anim" style="--d: 640ms">
+                        <a class="btn btn-solid magnetic" href="#contact"><span class="btn-label"><span data-text="预约沟通">预约沟通</span></span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                        <a class="tlink" href="#works">查看案例</a>
+                    </div>
+                </div>
+
+                <div class="hero-bottom hero-anim" style="--d: 820ms">
+                    <span class="status"><i></i>开放合作 · 接受项目与岗位咨询</span>
+                    <span class="hero-scroll">向下滚动<i></i></span>
+                </div>
+            </div>
+        </header>
+
+        <!-- 01 优势 -->
+        <section class="section" id="why">
+            <div class="wrap grid">
+                <header class="side reveal">
+                    <span class="idx">01</span>
+                    <h2 class="title zh"><span class="line"><span>优势</span></span></h2>
+                    <p class="side-en">Why me</p>
+                </header>
+                <div class="body">
+                    <p class="lead reveal"><b>一个人负责到底。</b>你直接和写代码的人沟通，需求不会在转述中走样；从设计、开发到部署，每个环节都由我亲手完成。</p>
+                    <div class="points">
+                        <article class="point reveal">
+                            <span class="num">01</span>
+                            <h3 class="zh">一对一</h3>
+                            <p>直接对接开发者本人，没有中间转述。问题当天沟通，决定当场确认。</p>
+                        </article>
+                        <article class="point reveal">
+                            <span class="num">02</span>
+                            <h3 class="zh">高质量</h3>
+                            <p>结构清晰、注释完整的代码，附部署文档与使用说明，交付后容易接手和维护。</p>
+                        </article>
+                        <article class="point reveal">
+                            <span class="num">03</span>
+                            <h3 class="zh">高效率</h3>
+                            <p>一人全栈，省去多人协作的等待。按阶段交付，每一步都能看到可运行的成果。</p>
+                        </article>
+                        <article class="point reveal">
+                            <span class="num">04</span>
+                            <h3 class="zh">覆盖面广</h3>
+                            <p>AI、量化、嵌入式、Web 与移动端都能接，跨领域的需求不必分头找人。</p>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 02 能力 -->
+        <section class="section" id="services">
+            <div class="wrap grid">
+                <header class="side reveal">
+                    <span class="idx">02</span>
+                    <h2 class="title zh"><span class="line"><span>能力</span></span></h2>
+                    <p class="side-en">Capabilities</p>
+                </header>
+                <div class="body">
+                    <p class="intro reveal">从一个脚本到一套完整系统，下面这些方向都可以合作。</p>
+                    <ol class="rows">
+                        <li class="row reveal"><span class="num">01</span><h3>AI 应用开发</h3><p>大模型接入、私有知识库（RAG）、智能体与 AI 工作流，把 AI 用进具体业务。</p></li>
+                        <li class="row reveal"><span class="num">02</span><h3>量化与金融数据</h3><p>行情数据采集与清洗、策略回测框架、实时监控与风控看板。</p></li>
+                        <li class="row reveal"><span class="num">03</span><h3>嵌入式与物联网</h3><p>单片机与嵌入式 Linux 程序、设备通信协议、设备数据上云与远程管理。</p></li>
+                        <li class="row reveal"><span class="num">04</span><h3>Web 与小程序</h3><p>官网、管理后台、SaaS 产品与微信小程序，前后端一体开发。</p></li>
+                        <li class="row reveal"><span class="num">05</span><h3>移动与桌面应用</h3><p>Android 与跨平台 App、Electron 桌面工具，覆盖从界面到发布。</p></li>
+                        <li class="row reveal"><span class="num">06</span><h3>自动化与数据处理</h3><p>业务流程自动化、数据采集与清洗、定时任务与报表生成。</p></li>
+                        <li class="row reveal"><span class="num">07</span><h3>数据分析与可视化</h3><p>数据建模与分析、交互式看板，以及系统动力学等专题建模。</p></li>
+                        <li class="row reveal"><span class="num">08</span><h3>云服务与安全</h3><p>Cloudflare、Serverless 与 Docker 部署，性能优化与安全加固。</p></li>
+                    </ol>
+                </div>
+            </div>
+        </section>
+
+        <!-- 03 案例 -->
+        <section class="section" id="works">
+            <div class="wrap grid">
+                <header class="side reveal">
+                    <span class="idx">03</span>
+                    <h2 class="title zh"><span class="line"><span>案例</span></span></h2>
+                    <p class="side-en">Selected work</p>
+                </header>
+                <div class="body">
+                    <p class="intro reveal">部分已上线的自研项目，点击可直接访问。<small>封面为示意插图</small></p>
+                    <div class="works" id="projectGrid"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 04 开源 -->
+        <section class="section" id="opensource">
+            <div class="wrap grid">
+                <header class="side reveal">
+                    <span class="idx">04</span>
+                    <h2 class="title zh"><span class="line"><span>开源</span></span></h2>
+                    <p class="side-en">Open source</p>
+                </header>
+                <div class="body">
+                    <p class="intro reveal">部分技术积累公开在 GitHub，欢迎参考与交流。</p>
+                    <ul class="repos" id="openSourceGrid"></ul>
+                    <a class="tlink reveal" href="https://github.com/1837620622?tab=repositories" target="_blank" rel="noopener noreferrer">GitHub 上的全部仓库</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 05 合作 -->
+        <section class="section" id="partner">
+            <div class="wrap grid">
+                <header class="side reveal">
+                    <span class="idx">05</span>
+                    <h2 class="title zh"><span class="line"><span>合作</span></span></h2>
+                    <p class="side-en">Work with me</p>
+                </header>
+                <div class="body">
+                    <p class="intro reveal">接单、长期合作、岗位邀约、投资与赞助都欢迎。不确定属于哪一类，直接聊就好。</p>
+                    <ol class="rows">
+                        <li class="row reveal"><span class="num">01</span><h3>项目接单</h3><p>网站、App、小程序、AI 工具、量化系统、嵌入式程序，按需求报价，分阶段交付验收。</p></li>
+                        <li class="row reveal"><span class="num">02</span><h3>长期合作</h3><p>作为你的外部技术伙伴，按月或按迭代持续参与产品研发与维护。</p></li>
+                        <li class="row reveal"><span class="num">03</span><h3>技术顾问</h3><p>架构评审、技术选型、代码审查，以及性能、稳定性与安全问题排查。</p></li>
+                        <li class="row reveal"><span class="num">04</span><h3>岗位邀约</h3><p>远程兼职、项目制或长期岗位均可沟通，可承担全栈、AI 工程、量化开发、嵌入式开发等角色。</p></li>
+                        <li class="row reveal"><span class="num">05</span><h3>投资合作</h3><p>对 AI 应用、金融数据与效率工具方向感兴趣的投资人，欢迎交流产品与合作方式。</p></li>
+                        <li class="row reveal"><span class="num">06</span><h3>赞助支持</h3><p>赞助我的开源项目，支持它们持续维护与更新。<a class="inline-link" href="https://github.com/sponsors/1837620622" target="_blank" rel="noopener noreferrer">GitHub Sponsors</a></p></li>
+                        <li class="row reveal"><span class="num">07</span><h3>伙伴招募</h3><p>设计、运营、销售与各技术方向的伙伴，可以按项目一起合作，方式灵活。</p></li>
+                    </ol>
+
+                    <div class="sub reveal">
+                        <h3 class="sub-title">合作流程</h3>
+                        <ol class="steps">
+                            <li><span class="step-num">01</span><b>沟通</b><p>直接和我聊需求，明确目标、范围与预算。</p></li>
+                            <li><span class="step-num">02</span><b>方案</b><p>给出技术方案、排期与报价，确认后开始。</p></li>
+                            <li><span class="step-num">03</span><b>开发</b><p>分阶段交付，每个阶段都有可运行的演示。</p></li>
+                            <li><span class="step-num">04</span><b>交付</b><p>交付源码与文档，提供上线支持与维护期。</p></li>
+                        </ol>
+                    </div>
+
+                    <div class="sub reveal">
+                        <h3 class="sub-title">你会得到</h3>
+                        <p class="deliver">完整源码<i></i>部署文档<i></i>使用说明<i></i>阶段演示<i></i>上线支持<i></i>维护期支持</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 06 关于 -->
+        <section class="section" id="about">
+            <div class="wrap grid">
+                <header class="side reveal">
+                    <span class="idx">06</span>
+                    <h2 class="title zh"><span class="line"><span>关于</span></span></h2>
+                    <p class="side-en">About</p>
+                </header>
+                <div class="body">
+                    <div class="about reveal">
+                        <figure class="portrait">
+                            <img src="https://avatars.githubusercontent.com/u/35034498?v=4" alt="传康Kk" loading="lazy" referrerpolicy="no-referrer" width="460" height="460" data-fallback="avatarFallback">
+                            <span class="portrait-fallback" id="avatarFallback" aria-hidden="true">CK</span>
+                        </figure>
+                        <div class="about-text">
+                            <p class="about-lead">我是传康Kk，独立全栈工程师，CKSTUDIO 是我的个人工作站。</p>
+                            <p>我专注 AI 应用、量化系统与软件开发，也做嵌入式与自动化相关的项目。习惯把事情做完整：从需求梳理、界面设计、开发测试到部署运维，全程亲自负责。</p>
+                            <p>比起功能清单的长度，我更在意产品能否稳定运行、数据是否准确、代码能否长期维护。</p>
+                        </div>
+                    </div>
+
+                    <div class="sub reveal">
+                        <h3 class="sub-title">技术栈</h3>
+                        <dl class="stack">
+                            <div><dt>语言</dt><dd>Python、TypeScript、JavaScript、Java、C / C++、Go、Rust</dd></div>
+                            <div><dt>前端</dt><dd>React、Vue、Next.js、Tailwind、Three.js</dd></div>
+                            <div><dt>后端与数据</dt><dd>Node.js、FastAPI、Django、PostgreSQL、MySQL、Redis、MongoDB</dd></div>
+                            <div><dt>AI</dt><dd>大模型 API、RAG、Agent、Prompt 工程、AI 工作流</dd></div>
+                            <div><dt>嵌入式</dt><dd>C / C++、单片机、嵌入式 Linux、串口与 MQTT</dd></div>
+                            <div><dt>基础设施</dt><dd>Docker、Linux、Cloudflare Workers、Git、Electron</dd></div>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 07 联系 -->
+        <section class="section contact" id="contact">
+            <div class="wrap">
+                <div class="contact-inner">
+                    <p class="eyebrow reveal">07 — 联系</p>
+                    <h2 class="contact-title zh reveal"><span class="line"><span>有想法，</span></span><span class="line"><span>聊聊吧。</span></span></h2>
+                    <p class="contact-desc reveal">项目合作、岗位邀约、投资交流或赞助支持，都欢迎联系。<br>说明需求或来意，我会尽快回复。</p>
+                    <a class="contact-mail reveal" href="mailto:2040168455@qq.com">2040168455@qq.com</a>
+
+                    <ul class="contact-list reveal">
+                        <li><button type="button" data-copy="1837620622"><span>微信</span><b>1837620622</b><em>复制</em></button></li>
+                        <li><button type="button" data-copy="2040168455@qq.com"><span>邮箱</span><b>2040168455@qq.com</b><em>复制</em></button></li>
+                        <li><a href="https://github.com/1837620622" target="_blank" rel="noopener noreferrer"><span>GitHub</span><b>@1837620622</b><em>打开</em></a></li>
+                        <li><div><span>B站 / 闲鱼</span><b>万能程序员</b></div></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="footer-mark" aria-hidden="true">CKSTUDIO</div>
+        <div class="wrap footer-bottom">
+            <span>© 2026 CKSTUDIO · 传康Kk</span>
+            <span>量化相关服务仅限技术开发，不构成任何投资建议。</span>
+            <a class="tlink" href="#home">回到顶部</a>
+        </div>
+    </footer>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script src="js/vendor/lenis-1.3.26/lenis.min.js" defer></script>
+    <script type="module" src="js/three-scene.js?v=20261017b"></script>
+    <script src="script.js?v=20261017b" defer></script>
+</body>
+</html>

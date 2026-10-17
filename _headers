@@ -12,6 +12,9 @@
 /index.html
   Cache-Control: public, max-age=0, must-revalidate
 
+/works.html
+  Cache-Control: public, max-age=0, must-revalidate
+
 /style.css
   Cache-Control: public, max-age=31536000, immutable
 

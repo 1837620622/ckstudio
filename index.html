@@ -1,284 +1,1429 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="传康Kk，独立全栈工程师。CKSTUDIO 是我的个人工作站，承接 AI 应用、量化系统、嵌入式与软件开发，一对一合作；也欢迎岗位邀约、投资合作与赞助。">
-    <meta name="theme-color" content="#070707">
-    <title>传康Kk · CKSTUDIO</title>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23070707'/%3E%3Ctext x='32' y='43' text-anchor='middle' font-family='Didot,Bodoni 72,Georgia,serif' font-size='30' font-weight='700' fill='%23e9e7e3'%3ECK%3C/text%3E%3C/svg%3E">
-    <link rel="preload" href="fonts/inter-latin-var.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="fonts/ck-serif-sc-600.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="style.css?v=20261017b">
-    <link rel="modulepreload" href="js/vendor/three-0.160.0/three.module.min.js">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="传康Kk 的个人技术工作站 CKSTUDIO：AI 应用、量化系统、嵌入式与软件开发，一对一合作；也欢迎岗位邀约、投资合作与赞助。">
+<meta name="theme-color" content="#000000">
+<meta name="color-scheme" content="dark">
+<title>传康Kk · CKSTUDIO — 个人技术工作站</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23000'/%3E%3Cpath fill='%23fff' d='M14 20h4v4h-4zM10 24h4v4h-4zM6 28h4v8H6zM10 36h4v4h-4zM14 40h4v4h-4zM46 20h4v4h-4zM50 24h4v4h-4zM54 28h4v8h-4zM50 36h4v4h-4zM46 40h4v4h-4zM24 22h10v4H24zM22 26h4v12h-4zM24 38h10v4H24zM36 22h4v20h-4zM40 30h3v4h-3zM43 26h3v4h-3zM43 34h3v4h-3z'/%3E%3C/svg%3E">
+<link rel="preload" href="fonts/schibsted-grotesk-latin-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/ck-sans-sc-500.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/hero-plate.webp" as="image" type="image/webp">
+<link rel="modulepreload" href="js/vendor/three-0.160.0/three.module.min.js">
+<style>
+/* ==========================================================================
+   CKSTUDIO · 传康Kk — 整屏翻页的落地页
+   一个固定的粒子画布（球体 → 键盘 → <CK>）贯穿第 2–7 屏，首屏是风景底图与体素字标
+   ========================================================================== */
+@font-face {
+  font-family: 'Schibsted Grotesk';
+  src: url('fonts/schibsted-grotesk-latin-var.woff2') format('woff2');
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* 思源黑体子集：只含大标题用到的字，构建时生成 */
+@font-face {
+  font-family: 'CK Sans SC';
+  src: url('fonts/ck-sans-sc-500.woff2') format('woff2');
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --bg: #000;
+  --pad: 22px;
+  --nav-h: 98px;
+  --fs-hero: clamp(42px, 7.05vw, 112px);
+  --fs-h2: clamp(38px, 6.17vw, 104px);
+  --fs-note: clamp(13px, 1.04vw, 18px);
+  --fs-nav: clamp(12px, 1.05vw, 17px);
+  --fs-logo: clamp(19px, 2.18vw, 36px);
+  --fs-btn: clamp(12px, 1.13vw, 19px);
+  --fs-small: clamp(12.5px, .9vw, 15px);
+  --ls-disp: -.038em;
+  --btn-h: 47px;
+  --header-h: var(--nav-h);
+  --ease: cubic-bezier(.16, 1, .3, 1);
+  --hair: rgba(255, 255, 255, .17);
+  --dots: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 13 13'%3E%3Crect width='10' height='10' fill='%23fff'/%3E%3C/svg%3E");
+  --sl: env(safe-area-inset-left, 0px);
+  --sr: env(safe-area-inset-right, 0px);
+  --st: env(safe-area-inset-top, 0px);
+  --sb: env(safe-area-inset-bottom, 0px);
+  --pl: max(var(--pad), var(--sl));
+  --pr: max(var(--pad), var(--sr));
+  --top: max(12.5vh, calc(var(--header-h) + 12px));
+  --font: 'Schibsted Grotesk', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans CJK SC', 'Segoe UI', Helvetica, Arial, sans-serif;
+  --font-disp: 'Schibsted Grotesk', 'CK Sans SC', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans CJK SC', Helvetica, Arial, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  height: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+html { background: var(--bg); -webkit-text-size-adjust: 100%; }
+body {
+  background: var(--bg);
+  color: #fff;
+  font-family: var(--font);
+  font-weight: 400;
+  letter-spacing: -.02em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+}
+body.loading { overflow: hidden; height: 100vh; }
+canvas { display: block; width: 100%; height: 100%; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; letter-spacing: inherit; background: none; border: 0; padding: 0; margin: 0; cursor: pointer; }
+h1, h2, h3, p, ol, ul, figure { margin: 0; padding: 0; }
+ol, ul { list-style: none; }
+img { display: block; max-width: 100%; }
+:focus-visible { outline: 1.5px solid #fff; outline-offset: 3px; border-radius: 4px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (hover: hover) and (pointer: fine) {
+  html.has-cursor body, html.has-cursor a, html.has-cursor button { cursor: none; }
+}
+
+/* ---------- 加载页 ---------- */
+#loader {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: #000;
+  transition: opacity .7s var(--ease), visibility .7s var(--ease);
+}
+#loader.done { opacity: 0; visibility: hidden; }
+.ld-brand {
+  position: absolute;
+  left: var(--pl);
+  top: calc(var(--st) + 28px);
+  font-size: clamp(13px, 1.05vw, 16px);
+  color: rgba(255, 255, 255, .5);
+  letter-spacing: -.02em;
+}
+.ld-brand b { color: #fff; font-weight: 500; }
+.ld-track {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: rgba(255, 255, 255, .13);
+}
+.ld-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  background: #fff;
+}
+.ld-pct {
+  position: absolute;
+  left: 0;
+  bottom: calc(17px + var(--sb));
+  transform: translateX(-100%);
+  padding-right: 13px;
+  color: #e8e8e8;
+  font-size: clamp(20px, 2.15vw, 34px);
+  letter-spacing: -.035em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ---------- 自定义光标 ---------- */
+#cursor, #cursorLabel { display: none; }
+@media (hover: hover) and (pointer: fine) {
+  #cursor {
+    display: block;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 1.5px solid #fff;
+    border-radius: 50%;
+    mix-blend-mode: difference;
+    z-index: 190;
+    pointer-events: none;
+    opacity: 0;
+    transition: width .35s var(--ease), height .35s var(--ease), margin .35s var(--ease), border-width .35s var(--ease), opacity .3s linear;
+  }
+  #cursor.vis { opacity: 1; }
+  #cursor::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: #fff;
+    transform: translate(-50%, -50%);
+    transition: width .35s var(--ease), height .35s var(--ease);
+  }
+  #cursor.dot { width: 11px; height: 11px; margin: -5.5px 0 0 -5.5px; border-width: 0; }
+  #cursor.dot::after { width: 11px; height: 11px; }
+  #cursor.big { width: 31px; height: 31px; margin: -15.5px 0 0 -15.5px; }
+  #cursor.big::after { width: 16px; height: 16px; }
+  #cursor.link { width: 46px; height: 46px; margin: -23px 0 0 -23px; }
+  #cursor.link::after { width: 0; height: 0; }
+  #cursorLabel {
+    display: block;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 190;
+    pointer-events: none;
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: -.015em;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity .3s linear;
+    mix-blend-mode: difference;
+  }
+  #cursorLabel.on { opacity: 1; }
+}
+
+/* ---------- 顶栏 ---------- */
+header.site {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 120;
+  height: calc(var(--nav-h) + var(--st));
+  padding: var(--st) var(--pr) 0 var(--pl);
+  display: flex;
+  align-items: center;
+  touch-action: manipulation;
+  pointer-events: none;
+}
+header.site > * { pointer-events: auto; }
+.brand {
+  font-size: var(--fs-logo);
+  letter-spacing: -.045em;
+  line-height: 1;
+  white-space: nowrap;
+  font-weight: 400;
+}
+.brand span { color: rgba(255, 255, 255, .6); font-style: normal; }
+.navpill {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--st) + var(--nav-h) / 2);
+  transform: translate(-50%, -50%);
+  height: 42px;
+  display: flex;
+  align-items: stretch;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .10);
+  border: 1px solid rgba(255, 255, 255, .09);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  overflow: hidden;
+}
+.navpill a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  font-size: var(--fs-nav);
+  letter-spacing: -.03em;
+  color: rgba(255, 255, 255, .95);
+  border-left: 1px solid rgba(255, 255, 255, .15);
+  white-space: nowrap;
+  transition: color .3s, background-color .3s;
+}
+.navpill a:first-child { border-left: 0; }
+.navpill a[aria-current="true"] { background: rgba(255, 255, 255, .10); }
+@media (hover: hover) { .navpill a:hover { color: #fff; background: rgba(255, 255, 255, .08); } }
+.btnpair, .cta {
+  display: inline-flex;
+  align-items: center;
+  width: max-content;
+}
+.cta { margin-left: auto; }
+.arrowbtn {
+  position: relative;
+  z-index: 2;
+  width: var(--btn-h);
+  height: var(--btn-h);
+  flex: 0 0 var(--btn-h);
+  border-radius: 50%;
+  background: #fff;
+  color: #131313;
+  display: grid;
+  place-items: center;
+}
+.arrowbtn svg {
+  width: 13px;
+  height: 13px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform .45s var(--ease);
+}
+.pillbtn {
+  height: var(--btn-h);
+  display: inline-flex;
+  align-items: center;
+  padding: 0 18px;
+  margin-left: -7px;
+  border-radius: 999px;
+  background: #fff;
+  color: #141414;
+  font-size: var(--fs-btn);
+  letter-spacing: -.035em;
+  white-space: nowrap;
+  font-weight: 500;
+}
+@media (hover: hover) and (pointer: fine) {
+  .cta:hover .arrowbtn svg, .btnpair:hover .arrowbtn svg { transform: rotate(45deg); }
+}
+.navtoggle {
+  display: none;
+  position: relative;
+  width: var(--btn-h);
+  height: var(--btn-h);
+  flex: 0 0 var(--btn-h);
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, .22);
+  background: rgba(255, 255, 255, .10);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  margin-left: 10px;
+}
+.navtoggle i {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 15px;
+  height: 1.5px;
+  margin: -.75px 0 0 -7.5px;
+  background: #fff;
+  border-radius: 1px;
+  transition: transform .45s var(--ease), background-color .2s;
+}
+.navtoggle i:nth-child(1) { transform: translateY(-5px); }
+.navtoggle i:nth-child(3) { transform: translateY(5px); }
+.navtoggle.open i:nth-child(1) { transform: rotate(45deg); }
+.navtoggle.open i:nth-child(2) { background: transparent; }
+.navtoggle.open i:nth-child(3) { transform: rotate(-45deg); }
+
+/* ---------- 粒子画布（第 2–7 屏可见） ---------- */
+#stage {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+  background: transparent;
+  transition: opacity .5s linear;
+}
+#stage.on { opacity: var(--so, 1); }
+
+/* ---------- 右侧进度轨 ---------- */
+#rail {
+  position: fixed;
+  right: 25px;
+  top: 50%;
+  width: 2px;
+  height: 158px;
+  margin-top: -79px;
+  z-index: 110;
+  opacity: 0;
+  transition: opacity .4s linear;
+  pointer-events: none;
+  background: repeating-linear-gradient(to bottom, rgba(255, 255, 255, .26) 0 32px, transparent 32px 42px);
+}
+#rail.on { opacity: 1; }
+#railFill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 0;
+  background: repeating-linear-gradient(to bottom, #fff 0 32px, transparent 32px 42px);
+  transition: height .22s linear;
+}
+#railNum {
+  position: absolute;
+  top: calc(100% + 14px);
+  right: -4px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: rgba(255, 255, 255, .55);
+  font-variant-numeric: tabular-nums;
+  writing-mode: vertical-rl;
+  white-space: nowrap;
+}
+#railNum b { color: #fff; font-weight: 500; }
+
+/* ---------- 整屏翻页外壳 ---------- */
+main {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  overflow: hidden;
+  background: transparent;
+  touch-action: none;
+}
+main > section {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  touch-action: none;
+  background: transparent;
+}
+main > section.show {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  z-index: 2;
+  transition: opacity .75s var(--ease);
+}
+main > section.out-up,
+main > section.out-down {
+  opacity: 0;
+  z-index: 3;
+  pointer-events: none;
+  transition: opacity .9s var(--ease), transform .9s var(--ease);
+}
+main > section.out-up { transform: translateY(-100%); }
+main > section.out-down { transform: translateY(100%); }
+.panel, #s2, #s3, #s4, #s5, #s6, #s7 { background: transparent; }
+
+/* ---------- 首屏 ---------- */
+#hero {
+  overflow: hidden;
+  background: linear-gradient(to bottom, #466e87 0, #58829b 40%, #6d96b2 100%);
+}
+#heroBg {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 6%;
+  height: 100%;
+  z-index: 0;
+  background: url('assets/hero-plate.webp') center / cover no-repeat;
+  will-change: transform;
+  filter: saturate(.86) brightness(1);
+}
+#heroSky {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgba(20, 80, 130, .42) 0, rgba(20, 80, 130, .42) 34%, rgba(20, 80, 130, 0) 46%);
+}
+#heroNums {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 20%, rgba(0, 0, 0, .55) 36%, rgba(0, 0, 0, .14) 48%, transparent 58%);
+  mask-image: linear-gradient(to bottom, #000 0, #000 20%, rgba(0, 0, 0, .55) 36%, rgba(0, 0, 0, .14) 48%, transparent 58%);
+}
+#heroShade {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, .18) 62%, rgba(0, 0, 0, .45) 74%, rgba(0, 0, 0, .80) 84%, rgba(0, 0, 0, .90) 100%);
+}
+#heroGL { position: absolute; inset: 0; z-index: 4; touch-action: none; }
+@media (any-pointer: coarse) { #heroGL { pointer-events: none; } }
+#heroCopy { position: absolute; inset: 0; z-index: 5; pointer-events: none; }
+#heroTitle {
+  position: absolute;
+  left: var(--pl);
+  bottom: calc(4.4vh + var(--sb));
+  max-width: calc(100vw - 2 * var(--pad));
+  font-size: var(--fs-hero);
+}
+#heroAside {
+  position: absolute;
+  right: var(--pr);
+  bottom: calc(4.43vh + var(--sb));
+  width: 20.1vw;
+  min-width: 220px;
+}
+#heroAside p {
+  font-size: var(--fs-note);
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: -.01em;
+  text-align: justify;
+  margin-bottom: clamp(13px, 2.0vh, 22px);
+  pointer-events: auto;
+  overflow-wrap: anywhere;
+}
+#heroAside .btnpair { pointer-events: auto; }
+.hero-tag, .drag-hint {
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(16, 40, 58, .38);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .12);
+}
+.hero-tag {
+  position: absolute;
+  left: var(--pl);
+  top: calc(var(--header-h) + 4px);
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-size: var(--fs-small);
+  font-weight: 500;
+  color: rgba(255, 255, 255, .92);
+  pointer-events: none;
+}
+.hero-tag i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #9fe3b0;
+  box-shadow: 0 0 0 3px rgba(159, 227, 176, .22);
+  animation: pulse 2.4s ease-in-out infinite;
+}
+@keyframes pulse { 50% { box-shadow: 0 0 0 6px rgba(159, 227, 176, 0); } }
+.drag-hint {
+  position: absolute;
+  right: var(--pr);
+  top: calc(var(--header-h) + 4px);
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--fs-small);
+  color: rgba(255, 255, 255, .82);
+  pointer-events: none;
+}
+@media (any-pointer: coarse) { .drag-hint { display: none; } }
+
+/* ---------- 大标题与逐字显现 ---------- */
+.disp {
+  font-family: var(--font-disp);
+  font-weight: 400;
+  letter-spacing: var(--ls-disp);
+  line-height: 1.08;
+  z-index: 6;
+}
+.rv { display: block; white-space: nowrap; }
+.rv > span {
+  display: inline-block;
+  opacity: 0;
+  filter: blur(13px);
+  transform: translateY(.12em);
+  transition: opacity .85s var(--ease), filter .85s var(--ease), transform .85s var(--ease);
+}
+.rv.in > span { opacity: 1; filter: blur(0); transform: none; }
+.rv > .zh { letter-spacing: -.01em; }
+.dotfill {
+  background-image: var(--dots);
+  background-size: 6.5px 6.5px;
+  background-size: max(3px, .058em) max(3px, .058em);
+  background-repeat: repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  -webkit-text-stroke: .4px rgba(255, 255, 255, .11);
+}
+.dotfill.zh { background-size: max(2.6px, .045em) max(2.6px, .045em); -webkit-text-stroke: .5px rgba(255, 255, 255, .22); }
+.fade {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity .9s var(--ease), transform .9s var(--ease);
+}
+.fade.in { opacity: 1; transform: none; }
+
+/* ---------- 第 2–4 屏（粒子在后面） ---------- */
+.panel:not(.flow) h2 {
+  position: absolute;
+  font-size: var(--fs-h2);
+  top: var(--top);
+}
+#s2 h2 { left: 13.6vw; }
+#s3 h2 { right: 15.1vw; text-align: right; }
+#s4 h2 { left: var(--pl); }
+.note {
+  font-size: var(--fs-note);
+  font-weight: 500;
+  line-height: 1.55;
+  letter-spacing: -.01em;
+  color: rgba(255, 255, 255, .95);
+  overflow-wrap: anywhere;
+}
+.note a { border-bottom: 1px solid rgba(255, 255, 255, .5); }
+.panel > .note { position: absolute; bottom: calc(3.71vh + var(--sb)); z-index: 6; }
+#s2 > .note { right: var(--pr); width: 22.3vw; min-width: 230px; }
+#s3 > .note { left: var(--pl); width: 21.2vw; min-width: 220px; }
+#s4 > .note { right: var(--pr); top: var(--top); bottom: auto; width: 22.3vw; min-width: 230px; color: rgba(255, 255, 255, .78); }
+.kicker {
+  display: block;
+  font-size: var(--fs-small);
+  font-weight: 500;
+  color: rgba(255, 255, 255, .5);
+  margin-bottom: 10px;
+  letter-spacing: 0;
+}
+.facts {
+  position: absolute;
+  left: 13.6vw;
+  bottom: calc(3.71vh + var(--sb));
+  width: min(46vw, 700px);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  z-index: 6;
+}
+.facts li {
+  padding: 14px 18px 0 0;
+  border-top: 1px solid var(--hair);
+}
+.facts li + li { padding-left: 16px; border-left: 1px solid var(--hair); }
+.facts b { display: block; font-size: clamp(17px, 1.46vw, 24px); font-weight: 700; letter-spacing: -.02em; margin-bottom: 8px; }
+.facts span { display: block; font-size: var(--fs-small); line-height: 1.5; color: rgba(255, 255, 255, .7); font-weight: 500; }
+.chips {
+  position: absolute;
+  right: var(--pr);
+  bottom: calc(3.71vh + var(--sb));
+  max-width: 40vw;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  z-index: 6;
+}
+.chips li {
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, .22);
+  background: rgba(0, 0, 0, .35);
+  font-size: var(--fs-small);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* 合作流程卡片 */
+#steps {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(2.8vh + var(--sb));
+  z-index: 7;
+  padding: 0 var(--pr) 0 var(--pl);
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  touch-action: pan-x;
+}
+.step, .cap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: none;
+  isolation: isolate;
+  overscroll-behavior: contain;
+}
+.step { padding: 17px 15px 33px; height: clamp(168px, 23.9vh, 250px); border-top: 1px solid var(--hair); }
+.step::-webkit-scrollbar, .cap::-webkit-scrollbar { display: none; }
+.step + .step, .cap { box-shadow: inset 1px 0 0 var(--hair); }
+.step::before, .cap::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: #fff;
+  transform: translateY(101%);
+  transition: transform .55s var(--ease);
+}
+.step::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: #fff;
+  transform: scaleX(0);
+  transform-origin: left;
+}
+.step.act::after { animation: stepfill var(--dwell, 4200ms) linear forwards; }
+@keyframes stepfill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.st-n, .cap-n {
+  align-self: flex-end;
+  font-size: var(--fs-small);
+  font-weight: 500;
+  color: rgba(255, 255, 255, .36);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+  transition: color .3s;
+}
+.st-n b, .cap-n b { color: #fff; font-weight: 500; transition: color .3s; }
+.st-t {
+  margin-top: auto;
+  font-size: clamp(16px, 1.46vw, 24px);
+  font-weight: 700;
+  letter-spacing: -.02em;
+  transition: color .3s;
+}
+.st-b {
+  margin-top: 14px;
+  font-size: var(--fs-small);
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: -.01em;
+  color: rgba(255, 255, 255, .82);
+  min-height: 4.5em;
+  transition: color .3s;
+}
+@media (hover: hover) and (pointer: fine) {
+  .step:hover::before, .cap:hover::before { transform: none; }
+  .step:hover .st-t, .step:hover .st-b, .cap:hover h3, .cap:hover p, .cap:hover .cap-tags { color: #000; }
+  .step:hover .st-n, .cap:hover .cap-n { color: rgba(0, 0, 0, .40); }
+  .step:hover .st-n b, .cap:hover .cap-n b { color: #000; }
+}
+
+/* ---------- 第 5–7 屏：内容较多，允许在屏内滚动 ---------- */
+.flow-in {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  padding: var(--top) var(--pr) calc(2.8vh + var(--sb)) var(--pl);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, transparent calc(var(--header-h) - 6px), #000 calc(var(--header-h) + 10px));
+  mask-image: linear-gradient(to bottom, transparent 0, transparent calc(var(--header-h) - 6px), #000 calc(var(--header-h) + 10px));
+}
+.flow-in::-webkit-scrollbar { display: none; }
+.flow-in > * { flex-shrink: 0; }
+.flow .disp { position: relative; left: auto; top: auto; font-size: var(--fs-h2); }
+.flow-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 40px;
+}
+.flow-head .note { width: 24vw; min-width: 240px; color: rgba(255, 255, 255, .8); padding-bottom: .4em; }
+
+/* 能力 */
+.caps {
+  margin-top: auto;
+  padding-top: 28px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.cap {
+  padding: 16px 16px 20px;
+  min-height: clamp(150px, 18.5vh, 200px);
+  border-top: 1px solid var(--hair);
+  background: rgba(0, 0, 0, .28);
+}
+.cap:nth-child(4n + 1) { box-shadow: none; }
+.cap h3 { margin-top: auto; font-size: clamp(16px, 1.3vw, 22px); font-weight: 700; letter-spacing: -.02em; transition: color .3s; }
+.cap p { margin-top: 10px; font-size: var(--fs-small); font-weight: 500; line-height: 1.5; color: rgba(255, 255, 255, .78); transition: color .3s; }
+.cap-tags { margin-top: 12px; font-size: 12px; font-weight: 500; letter-spacing: 0; color: rgba(255, 255, 255, .45); transition: color .3s; }
+
+/* 案例 */
+.cases-wrap { margin-top: auto; padding-top: 26px; }
+.cases {
+  --cw: calc(clamp(150px, 29vh, 330px) * 1.5);
+  display: flex;
+  gap: 14px;
+  margin: 0 calc(-1 * var(--pr)) 0 calc(-1 * var(--pl));
+  padding: 0 var(--pr) 4px var(--pl);
+  scroll-padding: 0 var(--pr) 0 var(--pl);
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  touch-action: pan-x pan-y;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.cases::-webkit-scrollbar { display: none; }
+.cases.dragging { cursor: grabbing; }
+.case { flex: 0 0 var(--cw); width: var(--cw); display: flex; flex-direction: column; }
+.case-media {
+  position: relative;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #0b0b0c;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .1);
+}
+.case-media img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.1s var(--ease), filter .6s; -webkit-user-drag: none; }
+.case-meta { display: flex; align-items: baseline; gap: 10px; margin-top: 13px; }
+.case-n { font-size: 12px; color: rgba(255, 255, 255, .45); font-variant-numeric: tabular-nums; letter-spacing: 0; }
+.case h3 { font-size: clamp(15px, 1.15vw, 19px); font-weight: 700; letter-spacing: -.02em; }
+.case-cat { margin-left: auto; font-size: 12px; color: rgba(255, 255, 255, .55); white-space: nowrap; }
+.case p { margin-top: 7px; font-size: var(--fs-small); line-height: 1.5; color: rgba(255, 255, 255, .72); font-weight: 500; }
+@media (hover: hover) and (pointer: fine) {
+  .case:hover .case-media img { transform: scale(1.045); }
+}
+.cases-ctl {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--hair);
+}
+.cases-count { font-size: 13px; color: rgba(255, 255, 255, .5); font-variant-numeric: tabular-nums; letter-spacing: 0; }
+.cases-count b { color: #fff; font-weight: 500; }
+.tlink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--fs-small);
+  font-weight: 500;
+  border-bottom: 1px solid rgba(255, 255, 255, .45);
+  padding-bottom: 2px;
+  transition: border-color .3s;
+}
+.tlink:hover { border-color: #fff; }
+.cases-btns { margin-left: auto; display: flex; gap: 8px; }
+.circ {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, .28);
+  display: grid;
+  place-items: center;
+  transition: background-color .3s, color .3s, border-color .3s, opacity .3s;
+}
+.circ svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.circ:disabled { opacity: .3; cursor: default; }
+@media (hover: hover) { .circ:not(:disabled):hover { background: #fff; color: #000; border-color: #fff; } }
+
+/* 联系与合作 */
+.contact-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  gap: 5vw;
+  align-items: start;
+}
+.contact-main .note { margin-top: 22px; max-width: 30em; color: rgba(255, 255, 255, .8); }
+.mail {
+  display: inline-block;
+  margin-top: clamp(16px, 3vh, 30px);
+  font-size: clamp(24px, 2.9vw, 46px);
+  letter-spacing: -.04em;
+  line-height: 1.1;
+  border-bottom: 1px solid rgba(255, 255, 255, .35);
+  padding-bottom: 4px;
+  transition: border-color .3s;
+  overflow-wrap: anywhere;
+}
+.mail:hover { border-color: #fff; }
+.clist { margin-top: clamp(16px, 3vh, 30px); border-top: 1px solid var(--hair); max-width: 560px; }
+.clist li { border-bottom: 1px solid var(--hair); }
+.clist button, .clist a, .clist div {
+  width: 100%;
+  min-height: 48px;
+  display: grid;
+  grid-template-columns: 6.5em minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  font-size: var(--fs-small);
+}
+.clist span { color: rgba(255, 255, 255, .5); }
+.clist b { font-weight: 500; overflow-wrap: anywhere; }
+.clist em { font-style: normal; color: rgba(255, 255, 255, .5); font-size: 12px; transition: color .3s; }
+@media (hover: hover) { .clist button:hover em, .clist a:hover em { color: #fff; } }
+.coop { padding-top: .5em; padding-right: 18px; }
+.coop-h { font-size: var(--fs-small); font-weight: 500; color: rgba(255, 255, 255, .5); margin-bottom: 12px; }
+.coop ol { border-top: 1px solid var(--hair); }
+.coop li {
+  display: grid;
+  grid-template-columns: 2.6em 6.2em minmax(0, 1fr);
+  gap: 10px;
+  align-items: baseline;
+  padding: clamp(10px, 1.55vh, 15px) 0;
+  border-bottom: 1px solid var(--hair);
+  font-size: var(--fs-small);
+}
+.coop li > span { font-size: 12px; color: rgba(255, 255, 255, .4); font-variant-numeric: tabular-nums; letter-spacing: 0; }
+.coop li b { font-weight: 700; font-size: clamp(14px, 1.05vw, 17px); }
+.coop li p { color: rgba(255, 255, 255, .72); line-height: 1.5; font-weight: 500; }
+.coop li a { border-bottom: 1px solid rgba(255, 255, 255, .45); color: #fff; }
+.foot {
+  margin-top: auto;
+  padding-top: 22px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 26px;
+  align-items: center;
+  font-size: 12px;
+  color: rgba(255, 255, 255, .45);
+  letter-spacing: 0;
+}
+.foot-inner { display: contents; }
+.foot a { color: rgba(255, 255, 255, .8); transition: color .3s; }
+.foot a:hover { color: #fff; }
+.foot .push { margin-left: auto; }
+.contact-grid + .foot { border-top: 0; }
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(28px + var(--sb));
+  z-index: 180;
+  transform: translate(-50%, 12px);
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: #fff;
+  color: #000;
+  font-size: 13px;
+  font-weight: 500;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s, transform .45s var(--ease);
+}
+.toast.on { opacity: 1; transform: translate(-50%, 0); }
+
+/* ==========================================================================
+   断点：手机 / iPad / 小屏笔记本 / 横屏手机
+   ========================================================================== */
+@media (max-width: 1040px) {
+  :root { --nav-h: 108px; --pad: 16px; --btn-h: 40px; --fs-nav: 13px; }
+  header.site {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: 40px 38px;
+    row-gap: 8px;
+    column-gap: 10px;
+    align-content: center;
+  }
+  .brand { grid-column: 1; grid-row: 1; align-self: center; overflow: hidden; text-overflow: ellipsis; }
+  .cta { grid-column: 2; grid-row: 1; margin-left: 0; }
+  .navpill {
+    position: static;
+    transform: none;
+    grid-column: 1 / -1;
+    grid-row: 2;
+    height: 38px;
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    touch-action: pan-x;
+  }
+  .navpill::-webkit-scrollbar { display: none; }
+  .navpill a { padding: 0 14px; flex: 1 0 auto; }
+  .caps { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  #rail { right: max(6px, var(--sr)); }
+  #railNum { display: none; }
+  .contact-grid { gap: 32px; }
+}
+
+@media (max-width: 900px) {
+  #s2, #s3, #s4 {
+    display: flex;
+    flex-direction: column;
+    padding: calc(var(--header-h) + 14px) var(--pr) max(14px, var(--sb)) var(--pl);
+    gap: 14px;
+  }
+  #s2 h2, #s3 h2, #s4 h2, #s2 > .note, #s3 > .note, #s4 > .note, .facts, .chips {
+    position: relative;
+    left: auto;
+    right: auto;
+    top: auto;
+    bottom: auto;
+    width: auto;
+    min-width: 0;
+    max-width: 100%;
+  }
+  #s3 h2 { text-align: right; align-self: flex-end; }
+  #s2 > .note, #s3 > .note { margin-top: auto; max-height: 36%; overflow: auto; overscroll-behavior: contain; touch-action: pan-y; flex-shrink: 1; }
+  #s2 .facts { margin-top: auto; }
+  #s2 > .note { margin-top: 0; flex-shrink: 1; }
+  #s3 .chips { justify-content: flex-start; max-width: 100%; }
+  #s4 > .note { margin-top: 0; max-height: none; flex-shrink: 0; }
+  .facts li { padding: 10px 10px 0 0; }
+  .facts li + li { padding-left: 10px; }
+  .facts b { font-size: 16px; margin-bottom: 4px; }
+  .facts span { font-size: 12.5px; }
+  #rail { right: max(8px, var(--sr)); height: 120px; margin-top: -60px; }
+  #railNum { display: none; }
+  #steps {
+    position: relative;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    margin: auto calc(-1 * var(--pr)) 0 calc(-1 * var(--pl));
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scroll-padding: 0 var(--pr) 0 var(--pl);
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+    flex-shrink: 0;
+  }
+  #steps::-webkit-scrollbar { display: none; }
+  .step {
+    flex: 0 0 min(86vw, 340px);
+    height: auto;
+    min-height: 150px;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+  .st-n { font-size: 12px; }
+  .st-t { font-size: 18px; }
+  .st-b { font-size: 14px; line-height: 1.5; margin-top: 10px; }
+  .flow-in { padding-top: calc(var(--header-h) + 14px); padding-bottom: max(16px, var(--sb)); }
+  .flow-head { display: block; }
+  .flow-head .note { width: auto; min-width: 0; margin-top: 12px; padding: 0; }
+  .caps { grid-template-columns: repeat(2, minmax(0, 1fr)); padding-top: 20px; }
+  .cap { min-height: 0; padding: 14px 14px 16px; background: transparent; }
+  .cap:nth-child(4n + 1) { box-shadow: inset 1px 0 0 var(--hair); }
+  .cap:nth-child(2n + 1) { box-shadow: none; }
+  .cap h3 { margin-top: 18px; }
+  .cases { --cw: min(76vw, 380px); scroll-snap-type: x mandatory; }
+  .case { scroll-snap-align: start; }
+  .contact-grid { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .clist { max-width: none; }
+  .coop li { grid-template-columns: 2.2em 5.6em minmax(0, 1fr); }
+  .foot .push { margin-left: 0; }
+}
+
+@media (max-width: 800px) {
+  #heroCopy {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 0 var(--pr) max(18px, var(--sb)) var(--pl);
+  }
+  #heroTitle, #heroAside {
+    position: relative;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    width: auto;
+    min-width: 0;
+    max-width: 100%;
+  }
+  #heroAside p { text-align: left; max-height: 28dvh; overflow: auto; overscroll-behavior: contain; touch-action: pan-y; }
+}
+
+@media (max-width: 720px) {
+  :root {
+    --fs-hero: clamp(28px, 9.2vw, 56px);
+    --fs-h2: clamp(26px, 8.4vw, 48px);
+    --fs-note: 14px;
+    --fs-logo: clamp(18px, 5.4vw, 28px);
+    --fs-btn: 13px;
+    --fs-small: 13px;
+  }
+  #heroAside p { text-align: left; }
+  .coop li { grid-template-columns: 2em minmax(0, 1fr); row-gap: 4px; }
+  .coop li p { grid-column: 2; }
+  .clist button, .clist a, .clist div { grid-template-columns: 5.2em minmax(0, 1fr) auto; }
+  .cases-btns { display: none; }
+  .hero-tag, .drag-hint { display: none; }
+}
+
+@media (max-width: 420px) {
+  .cap { padding: 12px 10px 14px 12px; }
+  .cap:nth-child(2n + 1) { padding-left: 0; }
+  .cap h3 { margin-top: 10px; font-size: 15px; }
+  .cap p { font-size: 12.5px; margin-top: 6px; }
+  .cap-tags { margin-top: 8px; font-size: 11px; }
+}
+@media (max-width: 339px) {
+  .caps { grid-template-columns: minmax(0, 1fr); }
+  .cap { box-shadow: none !important; padding-left: 0; }
+}
+
+@media (max-height: 640px) {
+  #steps { max-height: 48dvh; }
+}
+
+@media (max-height: 560px) {
+  :root {
+    --fs-hero: clamp(22px, min(7.05vw, 7.2vh), 64px);
+    --fs-h2: clamp(22px, min(6.17vw, 6.4vh), 56px);
+    --fs-note: 12.5px;
+  }
+  #heroAside p { margin-bottom: 8px; }
+  .step { padding: 8px 10px 14px; }
+  .st-b { margin-top: 8px; }
+  .hero-tag, .drag-hint { display: none; }
+  #s4 > .note { display: none; }
+  .cases { --cw: calc((100dvh - var(--header-h)) * .72); }
+  .cap { min-height: 0; }
+}
+
+@media (max-height: 560px) and (min-width: 901px) {
+  .step { height: clamp(110px, 32vh, 180px); padding: 8px 10px 16px; }
+  .st-b { margin-top: 10px; }
+}
+
+@media (max-height: 560px) and (min-width: 1041px) {
+  :root { --nav-h: 64px; --btn-h: 36px; }
+  .navpill { height: 34px; }
+}
+
+@media (max-width: 1040px) and (max-height: 560px) {
+  :root { --nav-h: 62px; --btn-h: 36px; }
+  header.site { display: flex; }
+  .navtoggle { display: block; }
+  .cta { margin-left: auto; }
+  .navpill {
+    display: none;
+    position: fixed;
+    left: calc(10px + var(--sl));
+    right: calc(10px + var(--sr));
+    top: calc(var(--header-h) + 8px);
+    width: auto;
+    height: auto;
+    max-height: calc(100dvh - var(--header-h) - 24px);
+    flex-direction: column;
+    border-radius: 16px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background: rgba(24, 24, 24, .9);
+    touch-action: pan-y;
+  }
+  header.site.open .navpill { display: flex; }
+  .navpill a {
+    min-height: 44px;
+    flex: 0 0 auto;
+    justify-content: flex-start;
+    padding: 0 18px;
+    border-left: 0;
+    border-top: 1px solid rgba(255, 255, 255, .15);
+  }
+  .navpill a:first-child { border-top: 0; }
+}
+
+@media (max-width: 380px) {
+  :root { --pad: 12px; --fs-btn: 12px; --btn-h: 36px; }
+  .navpill a { padding: 0 11px; }
+  .arrowbtn svg { width: 12px; height: 12px; }
+}
+
+@media (max-height: 430px) {
+  #heroAside p { max-height: 18vh; }
+  #heroTitle, #heroAside { bottom: calc(1.6vh + var(--sb)); }
+}
+
+@media (max-height: 520px) {
+  #heroCopy {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 0 var(--pr) max(10px, var(--sb)) var(--pl);
+  }
+  #heroTitle, #heroAside {
+    position: relative;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    width: auto;
+    min-width: 0;
+    max-width: min(100%, 36rem);
+  }
+  #heroTitle { text-shadow: 0 2px 16px rgba(0, 0, 0, .55); }
+  #heroAside p { max-height: 24vh; overflow: auto; text-align: left; }
+  #s2, #s3, #s4 { gap: 8px; }
+  .facts span { display: none; }
+  .chips li { height: 28px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rv > span { filter: none; transition-duration: .3s; }
+  .fade { transform: none; transition-duration: .3s; }
+  main > section.out-up, main > section.out-down { transform: none; }
+}
+</style>
+<noscript>
+<style>
+html, body { height: auto; overflow: auto; }
+#loader, #stage, #rail, #heroGL { display: none; }
+main { position: static; }
+main > section { position: relative; min-height: 100vh; opacity: 1; visibility: visible; pointer-events: auto; }
+.rv > span, .fade { opacity: 1; filter: none; transform: none; }
+.flow-in { position: relative; min-height: 100vh; }
+</style>
+</noscript>
 </head>
-<body>
+<body class="loading">
 
-    <!-- 加载页 -->
-    <div class="loader" id="loader" aria-hidden="true">
-        <div class="loader-mark">CK</div>
-        <div class="loader-foot">
-            <span>CKSTUDIO</span>
-            <span class="loader-num" id="loaderNum">000</span>
-        </div>
-        <div class="loader-bar"><i id="loaderBar"></i></div>
-    </div>
+<div id="loader" aria-hidden="true">
+  <div class="ld-brand"><b>CKSTUDIO</b> — 传康Kk 个人工作站</div>
+  <div class="ld-track"><div class="ld-fill" id="ldFill"></div></div>
+  <div class="ld-pct" id="ldPct">0%</div>
+</div>
+<div id="cursor" aria-hidden="true"></div>
+<div id="cursorLabel" aria-hidden="true">向下滚动</div>
 
-    <canvas id="scene-canvas" aria-hidden="true"></canvas>
-    <div class="progress" id="progress" aria-hidden="true"></div>
-    <div class="cursor-label" id="cursorLabel" aria-hidden="true"><span>查看</span></div>
+<header class="site" id="siteHeader">
+  <a class="brand" href="#top" data-go="0" aria-label="CKSTUDIO 回到首屏"><span>CK</span>STUDIO</a>
+  <nav class="navpill" id="sitenav" aria-label="主导航">
+    <a href="#about" data-go="1">/理念</a>
+    <a href="#process" data-go="3">/流程</a>
+    <a href="#services" data-go="4">/能力</a>
+    <a href="#works" data-go="5">/案例</a>
+    <a href="works.html">/履历</a>
+  </nav>
+  <a class="cta" href="#contact" data-go="6">
+    <span class="arrowbtn"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4.2 11.8 11.8 4.2M11.8 4.2H5.6M11.8 4.2v6.2"/></svg></span>
+    <span class="pillbtn">联系合作</span>
+  </a>
+  <button class="navtoggle" id="navToggle" type="button" aria-label="打开菜单" aria-expanded="false" aria-controls="sitenav"><i></i><i></i><i></i></button>
+</header>
 
-    <!-- 导航 -->
-    <nav class="nav" id="nav" aria-label="主导航">
-        <a class="brand" href="#home" aria-label="回到顶部">
-            <span class="brand-ck">CK</span>
-            <span class="brand-studio">STUDIO</span>
+<canvas id="stage" aria-hidden="true"></canvas>
+<div id="rail" aria-hidden="true"><i id="railFill"></i><span id="railNum"><b>01</b> / 07</span></div>
+
+<main id="main">
+
+  <!-- 01 首屏 -->
+  <section id="hero" class="show" data-hash="top" aria-label="首屏">
+    <div id="heroBg"></div>
+    <div id="heroSky"></div>
+    <canvas id="heroNums" aria-hidden="true"></canvas>
+    <div id="heroShade"></div>
+    <canvas id="heroGL" aria-hidden="true"></canvas>
+    <div id="heroCopy">
+      <p class="hero-tag fade"><i></i>开放合作中 · 项目 / 岗位 / 投资 / 赞助</p>
+      <p class="drag-hint fade">拖动 &lt;CK&gt; 旋转</p>
+      <h1 class="disp fit" id="heroTitle">
+        <span class="rv">传康Kk 个人工作站</span>
+        <span class="rv" data-dot="1" data-d="240">CKSTUDIO</span>
+      </h1>
+      <div id="heroAside">
+        <p class="fade">AI 应用、量化系统、嵌入式与软件开发。一对一合作，从需求、设计到部署上线，由我本人负责到底；也欢迎岗位邀约、投资与赞助。</p>
+        <a class="btnpair fade" href="#contact" data-go="6">
+          <span class="arrowbtn"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4.2 11.8 11.8 4.2M11.8 4.2H5.6M11.8 4.2v6.2"/></svg></span>
+          <span class="pillbtn">预约沟通</span>
         </a>
-        <div class="menu">
-            <a class="menu-link" href="#why">优势</a>
-            <a class="menu-link" href="#services">能力</a>
-            <a class="menu-link" href="#works">案例</a>
-            <a class="menu-link" href="#partner">合作</a>
-            <a class="menu-link" href="#about">关于</a>
-        </div>
-        <div class="nav-right">
-            <a class="btn btn-line btn-sm magnetic" href="#contact"><span class="btn-label"><span data-text="联系我">联系我</span></span></a>
-            <button class="menu-toggle" id="menuToggle" type="button" aria-label="打开菜单" aria-controls="mobileMenu" aria-expanded="false">
-                <span></span>
-                <span></span>
-            </button>
-        </div>
-    </nav>
-
-    <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
-        <a href="#why"><em>01</em>优势</a>
-        <a href="#services"><em>02</em>能力</a>
-        <a href="#works"><em>03</em>案例</a>
-        <a href="#partner"><em>04</em>合作</a>
-        <a href="#about"><em>05</em>关于</a>
-        <a href="#contact"><em>06</em>联系</a>
+      </div>
     </div>
+  </section>
 
-    <main>
-        <!-- 首屏 -->
-        <header class="hero" id="home">
-            <div class="hero-inner" id="heroInner">
-                <div class="hero-text">
-                    <p class="eyebrow hero-anim" style="--d: 0ms">CKSTUDIO — 独立全栈工程师</p>
-                    <h1 class="hero-name zh"><span class="line"><span>传康Kk</span></span></h1>
-                    <p class="hero-lede hero-anim" style="--d: 520ms">AI 应用、量化系统、嵌入式与软件开发。<br>一对一合作，从需求到上线，由我亲自完成。</p>
-                    <div class="hero-cta hero-anim" style="--d: 640ms">
-                        <a class="btn btn-solid magnetic" href="#contact"><span class="btn-label"><span data-text="预约沟通">预约沟通</span></span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-                        <a class="tlink" href="#works">查看案例</a>
-                    </div>
-                </div>
+  <!-- 02 理念：粒子球 -->
+  <section id="s2" class="panel" data-hash="about" aria-label="理念">
+    <h2 class="disp fit">
+      <span class="rv">一个人，</span>
+      <span class="rv" data-d="140">就是一个工作室。</span>
+    </h2>
+    <ul class="facts fade">
+      <li><b>一对一</b><span>直接对接写代码的人，没有中间转述</span></li>
+      <li><b>全链路</b><span>设计、开发、部署、运维，一人完成</span></li>
+      <li><b>可交接</b><span>源码、文档与使用说明，接手不费力</span></li>
+    </ul>
+    <p class="note fade">你直接和写代码的人沟通，需求不会在转述中走样，问题当天回复，决定当场确认。从界面设计、开发测试到部署运维，每个环节都由我亲手完成；交付的代码结构清晰、文档齐全，后续维护和交接都不费力。</p>
+  </section>
 
-                <div class="hero-bottom hero-anim" style="--d: 820ms">
-                    <span class="status"><i></i>开放合作 · 接受项目与岗位咨询</span>
-                    <span class="hero-scroll">向下滚动<i></i></span>
-                </div>
-            </div>
-        </header>
+  <!-- 03 AI 提效：键盘粒子 -->
+  <section id="s3" class="panel" data-hash="ai" aria-label="AI 提效">
+    <h2 class="disp fit">
+      <span class="rv" data-dot="1">重复的交给 AI，</span>
+      <span class="rv" data-dot="1" data-d="140">判断留给我。</span>
+    </h2>
+    <p class="note fade">资料检索、样板代码、调试排错和文档整理交给 AI 加速；架构设计、数据准确性、用户体验和最终质量，由我逐项把关。交付因此更快，质量不打折扣。</p>
+    <ul class="chips fade" aria-label="常用 AI 能力">
+      <li>大模型 API</li>
+      <li>RAG 知识库</li>
+      <li>Agent 智能体</li>
+      <li>AI 工作流</li>
+      <li>自动化测试</li>
+    </ul>
+  </section>
 
-        <!-- 01 优势 -->
-        <section class="section" id="why">
-            <div class="wrap grid">
-                <header class="side reveal">
-                    <span class="idx">01</span>
-                    <h2 class="title zh"><span class="line"><span>优势</span></span></h2>
-                    <p class="side-en">Why me</p>
-                </header>
-                <div class="body">
-                    <p class="lead reveal"><b>一个人负责到底。</b>你直接和写代码的人沟通，需求不会在转述中走样；从设计、开发到部署，每个环节都由我亲手完成。</p>
-                    <div class="points">
-                        <article class="point reveal">
-                            <span class="num">01</span>
-                            <h3 class="zh">一对一</h3>
-                            <p>直接对接开发者本人，没有中间转述。问题当天沟通，决定当场确认。</p>
-                        </article>
-                        <article class="point reveal">
-                            <span class="num">02</span>
-                            <h3 class="zh">高质量</h3>
-                            <p>结构清晰、注释完整的代码，附部署文档与使用说明，交付后容易接手和维护。</p>
-                        </article>
-                        <article class="point reveal">
-                            <span class="num">03</span>
-                            <h3 class="zh">高效率</h3>
-                            <p>一人全栈，省去多人协作的等待。按阶段交付，每一步都能看到可运行的成果。</p>
-                        </article>
-                        <article class="point reveal">
-                            <span class="num">04</span>
-                            <h3 class="zh">覆盖面广</h3>
-                            <p>AI、量化、嵌入式、Web 与移动端都能接，跨领域的需求不必分头找人。</p>
-                        </article>
-                    </div>
-                </div>
-            </div>
-        </section>
+  <!-- 04 合作流程：<CK> 粒子 -->
+  <section id="s4" class="panel" data-hash="process" aria-label="合作流程">
+    <h2 class="disp fit" data-avoid="#s4note">
+      <span class="rv">从想法到上线，</span>
+      <span class="rv" data-d="140">五步走完。</span>
+    </h2>
+    <p class="note fade" id="s4note">每一步都有可运行的成果可看。交付时附完整源码、部署文档与使用说明，上线后提供维护期支持。</p>
+    <div id="steps" role="list" aria-label="合作的五个步骤">
+      <article class="step" role="listitem">
+        <span class="st-n"><b>01</b> / 05</span>
+        <h3 class="st-t">沟通</h3>
+        <p class="st-b">直接和我聊需求：目标、范围、预算和时间。不确定的地方，我先帮你把问题理清楚。</p>
+      </article>
+      <article class="step" role="listitem">
+        <span class="st-n"><b>02</b> / 05</span>
+        <h3 class="st-t">方案</h3>
+        <p class="st-b">给出技术方案、模块拆分、排期与报价。方案确认后再动工，范围和价格都写清楚。</p>
+      </article>
+      <article class="step" role="listitem">
+        <span class="st-n"><b>03</b> / 05</span>
+        <h3 class="st-t">原型</h3>
+        <p class="st-b">先做出可运行的原型，尽早验证关键假设，再投入正式开发，少走弯路。</p>
+      </article>
+      <article class="step" role="listitem">
+        <span class="st-n"><b>04</b> / 05</span>
+        <h3 class="st-t">开发</h3>
+        <p class="st-b">分阶段开发与评审，AI 辅助调试和测试，每个阶段都有可演示的版本。</p>
+      </article>
+      <article class="step" role="listitem">
+        <span class="st-n"><b>05</b> / 05</span>
+        <h3 class="st-t">交付</h3>
+        <p class="st-b">交付源码与文档，协助部署上线，提供维护期支持，后续迭代随时可接。</p>
+      </article>
+    </div>
+  </section>
 
-        <!-- 02 能力 -->
-        <section class="section" id="services">
-            <div class="wrap grid">
-                <header class="side reveal">
-                    <span class="idx">02</span>
-                    <h2 class="title zh"><span class="line"><span>能力</span></span></h2>
-                    <p class="side-en">Capabilities</p>
-                </header>
-                <div class="body">
-                    <p class="intro reveal">从一个脚本到一套完整系统，下面这些方向都可以合作。</p>
-                    <ol class="rows">
-                        <li class="row reveal"><span class="num">01</span><h3>AI 应用开发</h3><p>大模型接入、私有知识库（RAG）、智能体与 AI 工作流，把 AI 用进具体业务。</p></li>
-                        <li class="row reveal"><span class="num">02</span><h3>量化与金融数据</h3><p>行情数据采集与清洗、策略回测框架、实时监控与风控看板。</p></li>
-                        <li class="row reveal"><span class="num">03</span><h3>嵌入式与物联网</h3><p>单片机与嵌入式 Linux 程序、设备通信协议、设备数据上云与远程管理。</p></li>
-                        <li class="row reveal"><span class="num">04</span><h3>Web 与小程序</h3><p>官网、管理后台、SaaS 产品与微信小程序，前后端一体开发。</p></li>
-                        <li class="row reveal"><span class="num">05</span><h3>移动与桌面应用</h3><p>Android 与跨平台 App、Electron 桌面工具，覆盖从界面到发布。</p></li>
-                        <li class="row reveal"><span class="num">06</span><h3>自动化与数据处理</h3><p>业务流程自动化、数据采集与清洗、定时任务与报表生成。</p></li>
-                        <li class="row reveal"><span class="num">07</span><h3>数据分析与可视化</h3><p>数据建模与分析、交互式看板，以及系统动力学等专题建模。</p></li>
-                        <li class="row reveal"><span class="num">08</span><h3>云服务与安全</h3><p>Cloudflare、Serverless 与 Docker 部署，性能优化与安全加固。</p></li>
-                    </ol>
-                </div>
-            </div>
-        </section>
+  <!-- 05 能力：粒子球（暗） -->
+  <section id="s5" class="panel flow" data-hash="services" aria-label="能力">
+    <div class="flow-in vscroll">
+      <div class="flow-head">
+        <h2 class="disp fit">
+          <span class="rv">能做的，</span>
+          <span class="rv" data-d="140">不止一个方向。</span>
+        </h2>
+        <p class="note fade">从一个脚本到一整套系统，这些方向都可以直接找我。跨领域的需求不必分头找人，一个人对接到底。</p>
+      </div>
+      <ol class="caps">
+        <li class="cap fade"><span class="cap-n"><b>01</b></span><h3>AI 应用开发</h3><p>大模型接入、私有知识库（RAG）、智能体与 AI 工作流，把 AI 用进具体业务。</p><span class="cap-tags">LLM · RAG · Agent</span></li>
+        <li class="cap fade"><span class="cap-n"><b>02</b></span><h3>量化与金融数据</h3><p>行情采集与清洗、策略回测框架、实时监控与风控看板。</p><span class="cap-tags">回测 · 监控 · 数据管道</span></li>
+        <li class="cap fade"><span class="cap-n"><b>03</b></span><h3>嵌入式与物联网</h3><p>单片机与嵌入式 Linux 程序、设备通信协议、数据上云与远程管理。</p><span class="cap-tags">MCU · Linux · MQTT</span></li>
+        <li class="cap fade"><span class="cap-n"><b>04</b></span><h3>Web 与小程序</h3><p>官网、管理后台、SaaS 产品与微信小程序，前后端一体开发。</p><span class="cap-tags">React · Vue · Node.js</span></li>
+        <li class="cap fade"><span class="cap-n"><b>05</b></span><h3>移动与桌面应用</h3><p>Android 与跨平台 App、Electron 桌面工具，从界面到发布。</p><span class="cap-tags">Android · Electron</span></li>
+        <li class="cap fade"><span class="cap-n"><b>06</b></span><h3>自动化与数据处理</h3><p>业务流程自动化、数据采集与清洗、定时任务与报表生成。</p><span class="cap-tags">Python · 定时任务 · 报表</span></li>
+        <li class="cap fade"><span class="cap-n"><b>07</b></span><h3>数据分析与可视化</h3><p>数据建模与分析、交互式看板，以及系统动力学等专题建模。</p><span class="cap-tags">建模 · 看板 · Vensim</span></li>
+        <li class="cap fade"><span class="cap-n"><b>08</b></span><h3>云服务与安全</h3><p>Cloudflare、Serverless 与 Docker 部署，性能优化与安全加固。</p><span class="cap-tags">Workers · Docker · Linux</span></li>
+      </ol>
+    </div>
+  </section>
 
-        <!-- 03 案例 -->
-        <section class="section" id="works">
-            <div class="wrap grid">
-                <header class="side reveal">
-                    <span class="idx">03</span>
-                    <h2 class="title zh"><span class="line"><span>案例</span></span></h2>
-                    <p class="side-en">Selected work</p>
-                </header>
-                <div class="body">
-                    <p class="intro reveal">部分已上线的自研项目，点击可直接访问。<small>封面为示意插图</small></p>
-                    <div class="works" id="projectGrid"></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 04 开源 -->
-        <section class="section" id="opensource">
-            <div class="wrap grid">
-                <header class="side reveal">
-                    <span class="idx">04</span>
-                    <h2 class="title zh"><span class="line"><span>开源</span></span></h2>
-                    <p class="side-en">Open source</p>
-                </header>
-                <div class="body">
-                    <p class="intro reveal">部分技术积累公开在 GitHub，欢迎参考与交流。</p>
-                    <ul class="repos" id="openSourceGrid"></ul>
-                    <a class="tlink reveal" href="https://github.com/1837620622?tab=repositories" target="_blank" rel="noopener noreferrer">GitHub 上的全部仓库</a>
-                </div>
-            </div>
-        </section>
-
-        <!-- 05 合作 -->
-        <section class="section" id="partner">
-            <div class="wrap grid">
-                <header class="side reveal">
-                    <span class="idx">05</span>
-                    <h2 class="title zh"><span class="line"><span>合作</span></span></h2>
-                    <p class="side-en">Work with me</p>
-                </header>
-                <div class="body">
-                    <p class="intro reveal">接单、长期合作、岗位邀约、投资与赞助都欢迎。不确定属于哪一类，直接聊就好。</p>
-                    <ol class="rows">
-                        <li class="row reveal"><span class="num">01</span><h3>项目接单</h3><p>网站、App、小程序、AI 工具、量化系统、嵌入式程序，按需求报价，分阶段交付验收。</p></li>
-                        <li class="row reveal"><span class="num">02</span><h3>长期合作</h3><p>作为你的外部技术伙伴，按月或按迭代持续参与产品研发与维护。</p></li>
-                        <li class="row reveal"><span class="num">03</span><h3>技术顾问</h3><p>架构评审、技术选型、代码审查，以及性能、稳定性与安全问题排查。</p></li>
-                        <li class="row reveal"><span class="num">04</span><h3>岗位邀约</h3><p>远程兼职、项目制或长期岗位均可沟通，可承担全栈、AI 工程、量化开发、嵌入式开发等角色。</p></li>
-                        <li class="row reveal"><span class="num">05</span><h3>投资合作</h3><p>对 AI 应用、金融数据与效率工具方向感兴趣的投资人，欢迎交流产品与合作方式。</p></li>
-                        <li class="row reveal"><span class="num">06</span><h3>赞助支持</h3><p>赞助我的开源项目，支持它们持续维护与更新。<a class="inline-link" href="https://github.com/sponsors/1837620622" target="_blank" rel="noopener noreferrer">GitHub Sponsors</a></p></li>
-                        <li class="row reveal"><span class="num">07</span><h3>伙伴招募</h3><p>设计、运营、销售与各技术方向的伙伴，可以按项目一起合作，方式灵活。</p></li>
-                    </ol>
-
-                    <div class="sub reveal">
-                        <h3 class="sub-title">合作流程</h3>
-                        <ol class="steps">
-                            <li><span class="step-num">01</span><b>沟通</b><p>直接和我聊需求，明确目标、范围与预算。</p></li>
-                            <li><span class="step-num">02</span><b>方案</b><p>给出技术方案、排期与报价，确认后开始。</p></li>
-                            <li><span class="step-num">03</span><b>开发</b><p>分阶段交付，每个阶段都有可运行的演示。</p></li>
-                            <li><span class="step-num">04</span><b>交付</b><p>交付源码与文档，提供上线支持与维护期。</p></li>
-                        </ol>
-                    </div>
-
-                    <div class="sub reveal">
-                        <h3 class="sub-title">你会得到</h3>
-                        <p class="deliver">完整源码<i></i>部署文档<i></i>使用说明<i></i>阶段演示<i></i>上线支持<i></i>维护期支持</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 06 关于 -->
-        <section class="section" id="about">
-            <div class="wrap grid">
-                <header class="side reveal">
-                    <span class="idx">06</span>
-                    <h2 class="title zh"><span class="line"><span>关于</span></span></h2>
-                    <p class="side-en">About</p>
-                </header>
-                <div class="body">
-                    <div class="about reveal">
-                        <figure class="portrait">
-                            <img src="https://avatars.githubusercontent.com/u/35034498?v=4" alt="传康Kk" loading="lazy" referrerpolicy="no-referrer" width="460" height="460" data-fallback="avatarFallback">
-                            <span class="portrait-fallback" id="avatarFallback" aria-hidden="true">CK</span>
-                        </figure>
-                        <div class="about-text">
-                            <p class="about-lead">我是传康Kk，独立全栈工程师，CKSTUDIO 是我的个人工作站。</p>
-                            <p>我专注 AI 应用、量化系统与软件开发，也做嵌入式与自动化相关的项目。习惯把事情做完整：从需求梳理、界面设计、开发测试到部署运维，全程亲自负责。</p>
-                            <p>比起功能清单的长度，我更在意产品能否稳定运行、数据是否准确、代码能否长期维护。</p>
-                        </div>
-                    </div>
-
-                    <div class="sub reveal">
-                        <h3 class="sub-title">技术栈</h3>
-                        <dl class="stack">
-                            <div><dt>语言</dt><dd>Python、TypeScript、JavaScript、Java、C / C++、Go、Rust</dd></div>
-                            <div><dt>前端</dt><dd>React、Vue、Next.js、Tailwind、Three.js</dd></div>
-                            <div><dt>后端与数据</dt><dd>Node.js、FastAPI、Django、PostgreSQL、MySQL、Redis、MongoDB</dd></div>
-                            <div><dt>AI</dt><dd>大模型 API、RAG、Agent、Prompt 工程、AI 工作流</dd></div>
-                            <div><dt>嵌入式</dt><dd>C / C++、单片机、嵌入式 Linux、串口与 MQTT</dd></div>
-                            <div><dt>基础设施</dt><dd>Docker、Linux、Cloudflare Workers、Git、Electron</dd></div>
-                        </dl>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 07 联系 -->
-        <section class="section contact" id="contact">
-            <div class="wrap">
-                <div class="contact-inner">
-                    <p class="eyebrow reveal">07 — 联系</p>
-                    <h2 class="contact-title zh reveal"><span class="line"><span>有想法，</span></span><span class="line"><span>聊聊吧。</span></span></h2>
-                    <p class="contact-desc reveal">项目合作、岗位邀约、投资交流或赞助支持，都欢迎联系。<br>说明需求或来意，我会尽快回复。</p>
-                    <a class="contact-mail reveal" href="mailto:2040168455@qq.com">2040168455@qq.com</a>
-
-                    <ul class="contact-list reveal">
-                        <li><button type="button" data-copy="1837620622"><span>微信</span><b>1837620622</b><em>复制</em></button></li>
-                        <li><button type="button" data-copy="2040168455@qq.com"><span>邮箱</span><b>2040168455@qq.com</b><em>复制</em></button></li>
-                        <li><a href="https://github.com/1837620622" target="_blank" rel="noopener noreferrer"><span>GitHub</span><b>@1837620622</b><em>打开</em></a></li>
-                        <li><div><span>B站 / 闲鱼</span><b>万能程序员</b></div></li>
-                    </ul>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- 页脚 -->
-    <footer class="footer">
-        <div class="footer-mark" aria-hidden="true">CKSTUDIO</div>
-        <div class="wrap footer-bottom">
-            <span>© 2026 CKSTUDIO · 传康Kk</span>
-            <span>量化相关服务仅限技术开发，不构成任何投资建议。</span>
-            <a class="tlink" href="#home">回到顶部</a>
+  <!-- 06 案例：键盘粒子（暗） -->
+  <section id="s6" class="panel flow" data-hash="works" aria-label="案例">
+    <div class="flow-in vscroll">
+      <div class="flow-head">
+        <h2 class="disp fit">
+          <span class="rv">做过的项目，</span>
+          <span class="rv" data-d="140">都在线上运行。</span>
+        </h2>
+        <p class="note fade">部分自研并已上线的项目，点击卡片直接访问，封面为示意插图。开源仓库与完整履历见<a href="works.html">作品与履历</a>。</p>
+      </div>
+      <div class="cases-wrap fade">
+        <div class="cases hscroll" id="cases">
+          <a class="case" href="https://fund-cn.chuankangkk.top/" target="_blank" rel="noopener noreferrer" data-cursor="访问">
+            <div class="case-media"><img src="assets/works/fund-cn.webp" alt="中国基金实时行情 封面示意图" width="1200" height="800" decoding="async" draggable="false"></div>
+            <div class="case-meta"><span class="case-n">01</span><h3>中国基金实时行情</h3><span class="case-cat">行情与数据</span></div>
+            <p>国内基金实时估值、涨跌排行和自选列表，部署在 Cloudflare Workers 上。</p>
+          </a>
+          <a class="case" href="https://gold.chuankangkk.top/" target="_blank" rel="noopener noreferrer" data-cursor="访问">
+            <div class="case-media"><img src="assets/works/gold.webp" alt="黄金量化监控 封面示意图" width="1200" height="800" decoding="async" draggable="false"></div>
+            <div class="case-meta"><span class="case-n">02</span><h3>黄金量化监控</h3><span class="case-cat">量化</span></div>
+            <p>黄金行情看板，均线与指标监控，接入 AI 生成简要的行情分析。</p>
+          </a>
+          <a class="case" href="https://fund.chuankangkk.top/" target="_blank" rel="noopener noreferrer" data-cursor="访问">
+            <div class="case-media"><img src="assets/works/fund-global.webp" alt="全球基金估值 封面示意图" width="1200" height="800" decoding="async" draggable="false"></div>
+            <div class="case-meta"><span class="case-n">03</span><h3>全球基金估值</h3><span class="case-cat">行情与数据</span></div>
+            <p>海外基金估值，双数据源交叉校验，支持中英文切换。</p>
+          </a>
+          <a class="case" href="https://3d.chuankangkk.top/" target="_blank" rel="noopener noreferrer" data-cursor="访问">
+            <div class="case-media"><img src="assets/works/ck-3d.webp" alt="CK 3D 封面示意图" width="1200" height="800" decoding="async" draggable="false"></div>
+            <div class="case-meta"><span class="case-n">04</span><h3>CK 3D</h3><span class="case-cat">前端交互</span></div>
+            <p>可拖拽、可旋转的三维交互页面，WebGL 实时渲染。</p>
+          </a>
+          <a class="case" href="https://yanhua.chuankangkk.top/" target="_blank" rel="noopener noreferrer" data-cursor="访问">
+            <div class="case-media"><img src="assets/works/fireworks.webp" alt="传康烟花秀 封面示意图" width="1200" height="800" decoding="async" draggable="false"></div>
+            <div class="case-meta"><span class="case-n">05</span><h3>传康烟花秀</h3><span class="case-cat">前端交互</span></div>
+            <p>Canvas 粒子烟花动效，点击画面即可触发。</p>
+          </a>
+          <a class="case" href="https://sleep-3s3.pages.dev/" target="_blank" rel="noopener noreferrer" data-cursor="访问">
+            <div class="case-media"><img src="assets/works/sleep.webp" alt="睡眠助手 封面示意图" width="1200" height="800" decoding="async" draggable="false"></div>
+            <div class="case-meta"><span class="case-n">06</span><h3>睡眠助手</h3><span class="case-cat">工具</span></div>
+            <p>白噪音页面，多种环境声，睡前或专注时播放。</p>
+          </a>
         </div>
-    </footer>
+        <div class="cases-ctl">
+          <span class="cases-count"><b id="caseNow">01</b> / 06</span>
+          <a class="tlink" href="works.html">作品与履历</a>
+          <div class="cases-btns">
+            <button class="circ" type="button" data-dir="-1" aria-label="上一个案例"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13 8H3M7.5 3.5 3 8l4.5 4.5"/></svg></button>
+            <button class="circ" type="button" data-dir="1" aria-label="下一个案例"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M8.5 3.5 13 8l-4.5 4.5"/></svg></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <!-- 07 联系与合作：<CK> 粒子（暗） -->
+  <section id="s7" class="panel flow" data-hash="contact" aria-label="联系与合作">
+    <div class="flow-in vscroll">
+      <div class="contact-grid">
+        <div class="contact-main">
+          <h2 class="disp fit">
+            <span class="rv">有想法，</span>
+            <span class="rv" data-d="140">聊聊吧。</span>
+          </h2>
+          <p class="note fade">项目合作、岗位邀约、投资交流或赞助支持，都欢迎联系。说明需求或来意，我会尽快回复。</p>
+          <a class="mail fade" href="mailto:2040168455@qq.com">2040168455@qq.com</a>
+          <ul class="clist fade">
+            <li><button type="button" data-copy="1837620622"><span>微信</span><b>1837620622</b><em>复制</em></button></li>
+            <li><button type="button" data-copy="2040168455@qq.com"><span>邮箱</span><b>2040168455@qq.com</b><em>复制</em></button></li>
+            <li><a href="https://github.com/1837620622" target="_blank" rel="noopener noreferrer"><span>GitHub</span><b>@1837620622</b><em>打开</em></a></li>
+            <li><div><span>B站 / 闲鱼</span><b>万能程序员</b><em></em></div></li>
+          </ul>
+        </div>
+        <div class="coop fade">
+          <h3 class="coop-h">合作方式</h3>
+          <ol>
+            <li><span>01</span><b>项目接单</b><p>网站、App、小程序、AI 工具、量化系统与嵌入式程序，按需求报价，分阶段验收。</p></li>
+            <li><span>02</span><b>长期合作</b><p>作为外部技术伙伴，按月或按迭代参与产品研发与维护。</p></li>
+            <li><span>03</span><b>技术顾问</b><p>架构评审、技术选型、代码审查，性能、稳定性与安全排查。</p></li>
+            <li><span>04</span><b>岗位邀约</b><p>远程兼职、项目制或长期岗位：全栈、AI 工程、量化开发、嵌入式开发。</p></li>
+            <li><span>05</span><b>投资合作</b><p>关注 AI 应用、金融数据与效率工具方向的投资人，欢迎交流产品与合作方式。</p></li>
+            <li><span>06</span><b>赞助支持</b><p>赞助我的开源项目，支持持续维护与更新：<a href="https://github.com/sponsors/1837620622" target="_blank" rel="noopener noreferrer">GitHub Sponsors</a></p></li>
+            <li><span>07</span><b>伙伴招募</b><p>设计、运营、销售与各技术方向的伙伴，可以按项目一起合作。</p></li>
+          </ol>
+        </div>
+      </div>
+      <footer class="foot fade">
+        <span>© 2026 CKSTUDIO · 传康Kk</span>
+        <span>量化相关服务仅限技术开发，不构成任何投资建议。</span>
+        <a class="push" href="works.html">作品与履历</a>
+        <a href="#top" data-go="0">回到首屏</a>
+      </footer>
+    </div>
+  </section>
+</main>
 
-    <script src="js/vendor/lenis-1.3.26/lenis.min.js" defer></script>
-    <script type="module" src="js/three-scene.js?v=20261017b"></script>
-    <script src="script.js?v=20261017b" defer></script>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script type="module" src="js/landing.js?v=20261017"></script>
 </body>
 </html>
